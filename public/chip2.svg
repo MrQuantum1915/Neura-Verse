@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32" height="32" id="chip">
+  <defs>
+    <linearGradient id="a">
+      <!-- <stop offset="0" stop-color="#0077ff"></stop> -->
+      <stop offset="0" stop-color="#00f7ff"></stop>
+    </linearGradient>
+    <linearGradient xlink:href="#a" id="b" x1="2" x2="27" y1="16.5" y2="16.5" gradientUnits="userSpaceOnUse"></linearGradient>
+  </defs>
+  <path fill="url(#b)" d="M9 3v5h-.5C7.678 8 7 8.678 7 9.5v.5H2v1h5v3H2v1h5v3H2v1h5v3H2v1h5v.5c0 .822.678 1.5 1.5 1.5H9v5h1v-5h3v5h1v-5h3v5h1v-5h3v5h1v-5h.5c.822 0 1.5-.678 1.5-1.5V23h5v-1h-5v-3h5v-1h-5v-3h5v-1h-5v-3h5v-1h-5v-.5c0-.822-.678-1.5-1.5-1.5H22V3h-1v5h-3V3h-1v5h-3V3h-1v5h-3V3H9zm-.5 6h14c.286 0 .5.214.5.5v14c0 .286-.214.5-.5.5h-14a.488.488 0 0 1-.5-.5v-14c0-.286.214-.5.5-.5zm4.375 4a.884.884 0 0 0-.875.875v5.25c0 .476.399.875.875.875h5.25a.884.884 0 0 0 .875-.875v-5.25a.884.884 0 0 0-.875-.875h-5.25zM13 14h5v5h-5v-5z" color="#000" font-family="sans-serif" font-weight="400" overflow="visible" style="line-height:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000;text-transform:none;block-progression:tb;isolation:auto;mix-blend-mode:normal"></path>
+</svg>

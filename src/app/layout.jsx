@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
@@ -65,6 +66,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${roboto.variable} ${courierPrime.variable} ${oswald.variable} ${playfairDisplay.variable} ${robotoSlab.variable} ${shareTechMono.variable}`}>
+      <SpeedInsights />
       <body className="min-h-screen flex flex-col">
         <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col  bg-black">

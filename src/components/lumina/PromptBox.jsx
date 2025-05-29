@@ -3,9 +3,9 @@ import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 
 
-const model = "gemini-2.0-flash";
+function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model }) {
 
-function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete }) {
+    const model = Model.id;
 
     const [awaitingResponse, setawaitingResponse] = useState(false);
     // auto-resizing textarea with max height
@@ -63,7 +63,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
         else {
             alert("Please enter a prompt.");
             setawaitingResponse(false);
-            { console.log("awaitingResponse", awaitingResponse) }
+            // { console.log("awaitingResponse", awaitingResponse) }
         }
     }
 
@@ -120,7 +120,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                     className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105  hover:rotate-45 active:opacity-100 ${awaitingResponse ? "animate-pulse p-4 bg-black/10 hover:rotate-90" : " bg-[linear-gradient(45deg,_#922bff,_#00d9ff)]"}`}
                     aria-label="Submit Prompt"
                     onClick={(e) => {
-                        awaitingResponse ? (console.log("stop"), handleInput()) : (sendToGemini(), textareaRef.current.value = "", handleInput());
+                        awaitingResponse ? (handleInput()) : (sendToGemini(), textareaRef.current.value = "", handleInput());
                         e.preventDefault();
                     }}
                 />

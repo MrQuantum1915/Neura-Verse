@@ -14,6 +14,11 @@ export async function POST(request) {
         const model = body.model;
 
         console.log("User Prompt:", userPrompt);
+        console.log("Model:", model);
+
+        // const available = await ai.models.list();
+        // console.log("Available Models:", available);
+
 
         const response = await ai.models.generateContentStream({
             model: model,

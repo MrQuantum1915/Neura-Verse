@@ -7,8 +7,10 @@ import remarkGfm from 'remark-gfm';
 import { useRef, useEffect } from "react";
 import Image from "next/image";
 import TopBar from "@/components/lumina/TopBar";
-
-
+import MoreIcon from "@/components/icons/MoreIcon";
+import LikeIcon from "@/components/icons/LikeIcon";
+import DislikeIcon from "@/components/icons/DislikeIcon";
+import CopyIcon from "@/components/icons/CopyIcon";
 
 function CustomLink({ href, children }) {
     return (
@@ -59,8 +61,15 @@ const CustomLi = ({ children }) => (
     <li className="py-1">{children}</li>
 );
 
-const defaultModel = "Gemini-2.5-Flash-Preview"
-
+const defaultModel = {
+    itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash"
+}
+const toolbar = [
+    { itemName: "Like", icon: <LikeIcon fill="white" size={20} /> },
+    { itemName: "Dislike", icon: <DislikeIcon fill="white" size={20} /> },
+    { itemName: "Copy", icon: <CopyIcon fill="white" size={20} /> },
+    { itemName: "More", icon: <MoreIcon stroke="white" size={20} /> },
+];
 
 function Lumina() {
 
@@ -92,7 +101,7 @@ function Lumina() {
                 updated[updated.length - 1] = { ...updated[updated.length - 1], text: streamResponse };
                 return updated;
             } else {
-                return [...prev, { role: "ai", text: streamResponse, responseComplete: false }];
+                return [...prev, { role: "ai", text: streamResponse, responseComplete: false, model: Model }];
             }
         });
     };
@@ -132,43 +141,53 @@ function Lumina() {
 
                     <div>
                         {messages.length === 0 ? (
-                            <div className="text-5xl mt-74 flex flex-col items-center justify-center">
+                            <div className="text-5xl mt-74 flex flex-col items-center justify-center ">
                                 <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey Buddy</h1>
                                 <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
                             </div>
                         ) : (
-                            <div className="w-250 py-4">
+                            <div className="w-240 py-4">
 
                                 {messages.map((msg, index) => (
                                     <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                         {
                                             msg.role === "ai" && (
-
-                                                <div className={`${msg.responseComplete ? ("self-start mt-6") : ("fixed left-[50%] top-[2%]")} flex-shrink-0 h-full`}>
-                                                    {(msg.responseComplete) ? (
-                                                        <Image
-                                                            src={"/lumina.jpg"}
-                                                            alt="Lumina"
-                                                            width={48}
-                                                            height={48}
-                                                            className="rounded-full"
-                                                        />
-                                                    ) : (
-                                                        <div className="flex items-center">
-                                                            <div className="loader">
-                                                                <div className="inner one"></div>
-                                                                <div className="inner two"></div>
-                                                                <div className="inner three"></div>
+                                                <div className={`${msg.responseComplete ? ("self-start mt-2") : ("fixed left-[50%] top-[2%]")} flex-shrink-0 h-full`}>
+                                                    {
+                                                        (msg.responseComplete) ? (
+                                                            <Image
+                                                                src={"/lumina.jpg"}
+                                                                alt="Lumina"
+                                                                width={48}
+                                                                height={48}
+                                                                className="rounded-full"
+                                                            />
+                                                        ) : (
+                                                            <div className="flex items-center">
+                                                                <div className="loader">
+                                                                    <div className="inner one"></div>
+                                                                    <div className="inner two"></div>
+                                                                    <div className="inner three"></div>
+                                                                </div>
+                                                                <div className="px-4">
+                                                                    THINKING...
+                                                                </div>
                                                             </div>
-                                                            <div className="px-4">
-                                                                THINKING...
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                        )}
                                                 </div>
                                             )
                                         }
+
                                         <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs" : "text-white/85 rounded-tl-xs"}`}>
+
+                                            {
+                                                msg.role === "ai" && (
+                                                    <div className="flex flex-row w-fit h-fit rounded-2xl p-2 border border-white/50 text-cyan-400/85">
+                                                        {msg.model.itemName}
+                                                    </div>
+                                                )
+                                            }
+
                                             <ReactMarkdown components={
                                                 {
                                                     h1: CustomH1,
@@ -186,6 +205,23 @@ function Lumina() {
                                             } remarkPlugins={[remarkGfm]}>
                                                 {msg.text}
                                             </ReactMarkdown>
+
+
+                                            {/* toolbar */}
+                                            {
+
+                                                msg.role === "ai" && (
+                                                    <div className="flex flex-row w-fit h-fit p-2 mx-0 m-2 rounded-2xl bg-white/10">
+                                                        {toolbar.map((item) => (
+                                                            <div key={item.itemName} className="mx-2 cursor-pointer">
+                                                                {item.icon}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )
+
+
+                                            }
                                         </div>
                                     </div>
                                 ))}
@@ -197,7 +233,7 @@ function Lumina() {
                     </div>
                 </div>
 
-                <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} />
+                <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} />
 
             </main >
         </div >

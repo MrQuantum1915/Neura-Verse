@@ -59,6 +59,8 @@ const CustomLi = ({ children }) => (
     <li className="py-1">{children}</li>
 );
 
+const defaultModel = "Gemini-2.5-Flash-Preview"
+
 
 function Lumina() {
 
@@ -66,6 +68,11 @@ function Lumina() {
 
     const [messages, setMessages] = useState([]);
     const [gotResponse, setgotResponse] = useState(false);
+
+    const [Model, setModel] = useState(defaultModel)
+
+
+
 
     // handlers to add user and AI messages
     const handleNewPrompt = (userPrompt) => {
@@ -119,7 +126,8 @@ function Lumina() {
         <div className="flex flex-row h-screen w-full overflow-hidden">
             <Sidebar page="Lumina" setsidebarClose={setsidebarClose} />
             <main className="w-full h-screen flex flex-col justify-between items-center ">
-                <TopBar sidebarClose={sidebarClose} />
+                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} />
+
                 <div className=" w-full h-screen pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
 
                     <div>
@@ -129,14 +137,14 @@ function Lumina() {
                                 <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
                             </div>
                         ) : (
-                            <div className="w-[50vw] py-4">
+                            <div className="w-250 py-4">
 
                                 {messages.map((msg, index) => (
-                                    <div key={index} className={`mb-4 flex flex-row ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                    <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                         {
                                             msg.role === "ai" && (
 
-                                                <div className="mr-4 mt-6 flex-shrink-0 self-start">
+                                                <div className={`${msg.responseComplete ? ("self-start mt-6") : ("fixed left-[50%] top-[2%]")} flex-shrink-0 h-full`}>
                                                     {(msg.responseComplete) ? (
                                                         <Image
                                                             src={"/lumina.jpg"}
@@ -146,17 +154,21 @@ function Lumina() {
                                                             className="rounded-full"
                                                         />
                                                     ) : (
-                                                        <div className="loader">
-                                                            <div className="inner one"></div>
-                                                            <div className="inner two"></div>
-                                                            <div className="inner three"></div>
+                                                        <div className="flex items-center">
+                                                            <div className="loader">
+                                                                <div className="inner one"></div>
+                                                                <div className="inner two"></div>
+                                                                <div className="inner three"></div>
+                                                            </div>
+                                                            <div className="px-4">
+                                                                THINKING...
+                                                            </div>
                                                         </div>
-
                                                     )}
                                                 </div>
                                             )
                                         }
-                                        <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white rounded-tr-xs" : "text-white rounded-tl-xs"}`}>
+                                        <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs" : "text-white/85 rounded-tl-xs"}`}>
                                             <ReactMarkdown components={
                                                 {
                                                     h1: CustomH1,

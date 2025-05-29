@@ -28,6 +28,15 @@ const navigationItems = [
 
 ];
 
+let sidebarSvg = (
+  <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white"
+    strokeWidth="2" className="feather feather-align-justify">
+    <line x1="21" y1="10" x2="3" y2="10"></line>
+    <line x1="21" y1="6" x2="3" y2="6"></line>
+    <line x1="21" y1="14" x2="3" y2="14"></line>
+    <line x1="21" y1="18" x2="3" y2="18"></line>
+  </svg>
+);
 
 function Sidebar({ page, setsidebarClose }) {
   const [sidebar, setSidebar] = useState(true);
@@ -43,7 +52,7 @@ function Sidebar({ page, setsidebarClose }) {
       >
         <div className="w-full">
           <Link href="/playgrounds/lumina">
-            <h1 className={`text-5xl m-6 cursor-pointer ${playfairDisplay.className}`}>{page}</h1>
+            <h1 className={`text-5xl m-6  cursor-pointer ${playfairDisplay.className}`}>{page}</h1>
           </Link>
 
           <div className="h- w-full">
@@ -62,9 +71,9 @@ function Sidebar({ page, setsidebarClose }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col justify-between items-end">
+      <div className="flex flex-col justify-between items-center">
         <button
-          className="mt-10 cursor-pointer w-12 md:w-16 px-2"
+          className="mt-5 cursor-pointer w-12 w-16 px-2"
           onClick={() => {
             setSidebar(!sidebar);
             if (!sidebar) {
@@ -72,16 +81,34 @@ function Sidebar({ page, setsidebarClose }) {
             } else {
               setsidebarClose(true);
             }
-          }}
+            }}
           aria-label={sidebar ? "Close sidebar" : "Open sidebar"}
         >
-          <Image
-            src={`${sidebar ? "/sidebar_close.png" : "/sidebar_open.png"}`}
+
+          <svg width="50px" height="50px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ffffff" strokeWidth="1">
+            {sidebar ? (
+              <>
+                <line x1="21" y1="10" x2="7" y2="10" className="transition-all duration-300" />
+                <line x1="21" y1="15" x2="10" y2="15" className="transition-all duration-300" />
+                <line x1="21" y1="20" x2="4" y2="20" className="transition-all duration-300" />
+              </>
+            ) : (
+              <>
+                <line x1="19" y1="10" x2="3" y2="10" className="transition-all duration-300" />
+                <line x1="14" y1="15" x2="3" y2="15" className="transition-all duration-300" />
+                <line x1="20" y1="20" x2="3" y2="20" className="transition-all duration-300" />
+              </>
+            )
+            }
+
+          </svg>
+          {/* <Image
+            src={`${sidebar ? "/sidebar.svg" : "/sidebar.svg"}`}
             width={40}
             height={40}
             alt="Sidebar Toggle"
-            className={`invert transition-all duration-1000 ease-in-out`}
-          />
+            className={`${!sidebar ? "rotate-[-180deg]" : ""} transition-all duration-1000 ease-in-out`}
+          /> */}
         </button>
 
         {
@@ -105,5 +132,3 @@ function Sidebar({ page, setsidebarClose }) {
 }
 
 export default Sidebar;
-
-

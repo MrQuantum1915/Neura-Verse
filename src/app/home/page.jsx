@@ -3,7 +3,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-white">
       <h1 className="text-4xl font-bold m-10">Home</h1>
       <button className="btn m-20 border-1 border-white/30 rounded-3xl">
-        <svg width="180px" height="60px" viewBox="0 0 180 60">
+        <svg id="buttonSvg" width="180px" height="60px" viewBox="0 0 180 60">
           <defs>
             <linearGradient id="stroke-gradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#ff0000" />

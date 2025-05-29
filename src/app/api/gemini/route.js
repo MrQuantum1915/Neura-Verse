@@ -1,18 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
-import { NextResponse } from "next/server";
+// import { NextResponse } from "next/server";
 
 const myApiKey = process.env.Gemini_API_Key;
 
 const ai = new GoogleGenAI({ apiKey: myApiKey });
 
+
+
 export async function POST(request) {
     try {
         const body = await request.json();
         const userPrompt = body.prompt;
+        const model = body.model;
+
         console.log("User Prompt:", userPrompt);
 
         const response = await ai.models.generateContentStream({
-            model: "gemini-2.0-flash",
+            model: model,
             contents: {
                 parts: [
                     { text: userPrompt }

@@ -28,7 +28,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({ prompt, model }),
             })
                 .then(async (Response) => {
                     if (!Response.ok) {

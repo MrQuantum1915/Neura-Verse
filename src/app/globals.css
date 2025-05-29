@@ -221,14 +221,14 @@ html {
 
 
 
-svg {
+#buttonSvg {
   stroke-width: 2;
   stroke-dasharray: 150 480;
   stroke-dashoffset: 150;
   transition: 1s ease-in-out;
 }
 
-.btn:hover svg {
+.btn:hover #buttonSvg {
   stroke-dashoffset: -480;
 }
 
@@ -242,8 +242,8 @@ svg {
   /* position: absolute;
   top: calc(50% - 32px);
   left: calc(50% - 32px); */
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   perspective: 800px;
 }
@@ -262,7 +262,6 @@ svg {
   animation: rotate-one 1s linear infinite;
   border-bottom: 3px solid #EFEFFA;
 }
-
 .inner.two {
   right: 0%;
   top: 0%;

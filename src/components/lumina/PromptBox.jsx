@@ -2,6 +2,9 @@
 import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 
+
+const model = "gemini-2.0-flash";
+
 function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete }) {
 
     const [awaitingResponse, setawaitingResponse] = useState(false);

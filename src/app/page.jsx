@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white font-sans">
@@ -16,26 +18,21 @@ export default function Home() {
           A universe of AI playgrounds for creators, thinkers, and the curious.<br />
           Dive in to experiment, build, and play—<span className="text-cyan-300 font-semibold">new features arriving soon.</span>
         </p>
-        <a
-          href="#playgrounds"
-          className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg text-2xl font-bold hover:scale-105 active:scale-95 transition-transform"
-        >
-          Explore Playgrounds
-        </a>
+       
       </section>
 
       {/* Features / Playgrounds */}
-      <section id="playgrounds" className="py-20 px-4 bg-black/80">
+      <section id="playgrounds" className="py-20 px-4">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 tracking-tight">AI Playgrounds</h2>
         <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
             <div className="text-4xl mb-4 group-hover:scale-110 transition"></div>
-            <h3 className="text-2xl font-semibold mb-2">Text Lab</h3>
+            <h3 className="text-2xl font-semibold mb-2">Lumina</h3>
             <p className="text-gray-400">Generate stories, brainstorm, or automate writing with advanced AI models.</p>
           </div>
           <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
             <div className="text-4xl mb-4 group-hover:scale-110 transition"></div>
-            <h3 className="text-2xl font-semibold mb-2">Image Studio</h3>
+            <h3 className="text-2xl font-semibold mb-2">Stellara Vision</h3>
             <p className="text-gray-400">Create stunning visuals and experiment with generative art tools.</p>
           </div>
           <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
@@ -59,14 +56,14 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="flex flex-col items-center py-12 bg-gradient-to-r from-black to-gray-900">
+      <section className="flex flex-col items-center py-12">
         <h4 className="text-2xl font-bold mb-4">Ready to explore?</h4>
-        <a
-          href="#playgrounds"
+        <Link
+          href="/playgrounds"
           className="px-6 py-3 bg-purple-700 rounded-lg text-xl font-semibold hover:bg-purple-800 transition"
         >
-          Start Playing Now
-        </a>
+          Launch
+        </Link>
       </section>
 
 

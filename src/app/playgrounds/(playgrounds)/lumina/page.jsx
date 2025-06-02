@@ -168,13 +168,13 @@ function Lumina() {
     return (
         <div className={`flex flex-row h-screen w-full overflow-hidden`}>
             <Sidebar page="Lumina" setsidebarClose={setsidebarClose} />
-            <main className="w-full h-screen flex flex-col justify-between items-center ">
+            <main className="w-full h-full flex flex-col justify-between items-center ">
 
                 <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" />
 
-                <div className="flex flex-row w-full h-full">
-                    <div className="flex flex-col w-full h-full items-center">
-                        <div className=" w-full h-screen pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
+                <div className="flex w-full h-full flex-row">
+                    <div className="flex flex-col  w-full h-full items-center">
+                        <div className=" w-full h-full pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
 
                             <div>
                                 {messages.length === 0 ? (

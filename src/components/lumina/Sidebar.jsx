@@ -28,15 +28,15 @@ const navigationItems = [
 
 ];
 
-let sidebarSvg = (
-  <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white"
-    strokeWidth="2" className="feather feather-align-justify">
-    <line x1="21" y1="10" x2="3" y2="10"></line>
-    <line x1="21" y1="6" x2="3" y2="6"></line>
-    <line x1="21" y1="14" x2="3" y2="14"></line>
-    <line x1="21" y1="18" x2="3" y2="18"></line>
-  </svg>
-);
+// let sidebarSvg = (
+//   <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white"
+//     strokeWidth="2" className="feather feather-align-justify">
+//     <line x1="21" y1="10" x2="3" y2="10"></line>
+//     <line x1="21" y1="6" x2="3" y2="6"></line>
+//     <line x1="21" y1="14" x2="3" y2="14"></line>
+//     <line x1="21" y1="18" x2="3" y2="18"></line>
+//   </svg>
+// );
 
 function Sidebar({ page, setsidebarClose }) {
   const [sidebar, setSidebar] = useState(true);
@@ -45,35 +45,40 @@ function Sidebar({ page, setsidebarClose }) {
     <div className={`z-2 flex flex-row items-start justify-between min-h-screen  bg-black border-r-2 border-amber-50/10 text-white`}>
       <div
         className={
-          sidebar
-            ? "flex flex-col h-screen items-start w-64 bg-black transition-all duration-1000 ease-in-out"
-            : "flex flex-col h-screen items-start opacity-0 w-0 overflow-hidden text-wrap-none transition-all duration-1000 ease-in-out"
+          // sidebar
+          `flex flex-col h-screen items-start ${sidebar ? ("w-64") : ("opacity-0 w-0 translate-x-[-100%] pointer-events-none overflow-hidden text-wrap-none overflow-x-hidden")} bg-black transition-all duration-1000 ease-in-out`
+          // "flex flex-col h-screen items-start  transition-all duration-1000 ease-in-out"
         }
       >
-        <div className="w-full">
+        <div className="w-fit">
           <Link href="/playgrounds/lumina">
-            <h1 className={`text-5xl m-6  cursor-pointer ${playfairDisplay.className}`}>{page}</h1>
+            <h1 className={`text-5xl m-6  cursor-pointer hover:text-cyan-400 transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
           </Link>
 
-          <div className="h- w-full">
+          <div className="w-fit">
             <HistoryTab />
           </div>
+
+
           {/* navigation */}
-          <div className="flex flex-col items-center m-2 relative bottom-3">
+          <div className="flex flex-col items-start mx-5 m-4 absolute bottom-3">
             {navigationItems.map((items => (
               <Link href={items.href} key={items.label}>
-                <div className="flex items-center justify-center cursor-pointer border border-amber-50/10 rounded-2xl p-2 m-2 hover:bg-white/10 w-fit">
-                  <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
+                <div className="flex items-center justify-center cursor-pointer border border-amber-50/10 rounded-2xl p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
+                  <Image src={items.icon} width={20} height={20} alt={items.label} className="cursor-pointer m-1 invert " />
                   <div className="px-4">{items.label}</div>
                 </div>
               </Link>
             )))}
           </div>
+
+
         </div>
       </div>
-      <div className="flex flex-col justify-between items-center">
+
+      <div className="flex flex-col justify-between items-center w-fit relative">
         <button
-          className="mt-5 cursor-pointer w-12 w-16 px-2"
+          className="mt-5 cursor-pointer w-12 w-16 px-2 rounded-full opacity-50   hover:opacity-100 transition-all duration-300 ease-in-out"
           onClick={() => {
             setSidebar(!sidebar);
             if (!sidebar) {
@@ -81,7 +86,7 @@ function Sidebar({ page, setsidebarClose }) {
             } else {
               setsidebarClose(true);
             }
-            }}
+          }}
           aria-label={sidebar ? "Close sidebar" : "Open sidebar"}
         >
 
@@ -117,7 +122,7 @@ function Sidebar({ page, setsidebarClose }) {
             <div className="flex flex-col items-center m-auto fixed bottom-0">
               {navigationItems.map((items => (
                 <Link href={items.href} key={items.label}>
-                  <div className="flex items-center justify-center cursor-pointer border border-amber-50/10 rounded-xl p-2 m-2 hover:bg-white/10 w-fit">
+                  <div className="flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 border border-amber-50/10 rounded-xl p-2 m-2 hover:bg-white/10 w-fit transition-all duration-400 ease-in-out">
                     <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
                   </div>
                 </Link>

@@ -3,11 +3,13 @@ import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 
 
-function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model }) {
+function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model, context }) {
 
     const model = Model.id;
 
     const [awaitingResponse, setawaitingResponse] = useState(false);
+
+
     // auto-resizing textarea with max height
     const textareaRef = useRef(null);
     const handleInput = (e) => {
@@ -20,18 +22,45 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
     };
 
 
-    function sendToGemini() {
+    // handling media uploads
+    const [uploadedFiles, setuploadedFiles] = useState([]);
+
+    const handleMediaUpload = (e) => {
+        setuploadedFiles(e.target.files);
+        // console.log(e.target.files);
+    };
+
+    // const handleUploadChange = () => {
+    //     mediaUploadRef.current.click();
+    // };
+
+
+
+    function sendToLLM() {
         const prompt = textareaRef.current.value;
         if (prompt.trim() !== "") {
             onPrompt(prompt);
             setawaitingResponse(true);
+
+            const updatedContext = [...context, { role: "user", text: prompt }]; // this is to be done to avoid abnormal behaviour of app, because react instructs to treat state objects or array as immutable, you should not directly change the original object itself. 
+
+
+            const formData = new FormData();
+            formData.append('file', uploadedFiles);
+            formData.append('model', model);
+
+            //array is object in js
+            formData.append('updatedContext', JSON.stringify(updatedContext)); // because formData api is designed to send data as strings blobs and files. So we need to serialize it and so we convert into string.
+
             let responseText = "";
+
             fetch("/api/gemini", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ prompt, model }),
+                // headers: {
+                //     "Content-Type": "application/json",
+                // },
+                // body: JSON.stringify({ model, updatedContext }),
+                body: formData,
             })
                 .then(async (Response) => {
                     if (!Response.ok) {
@@ -56,6 +85,8 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                 })
                 .catch(error => {
                     setawaitingResponse(false);
+                    gotResponse(true);
+                    handleResponseComplete();
                     console.error('Error:', error);
                 });
         }
@@ -73,13 +104,20 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
 
     return (
 
-        <div className=" fixed bottom-5 w-[40vw] bg-black rounded-3xl flex flex-row items-center justify-between px-2 border-1 border-white/30">
+        <div className=" fixed bottom-5 w-[40vw] bg-black rounded-xl flex flex-row items-center justify-between px-2 border-1 border-white/30">
 
-            {/* upload your damn media here , whatever*/}
-            <button className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
-                <Image src={"/file-upload-icon.svg"} width={30} height={30} alt="Upload Media"></Image>
-            </button>
-
+            {/* user uploads their damn media here , just whatever*/}
+            <label className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
+                <input onChange={handleMediaUpload} type="file" className="hidden" multiple accept="image/*" />
+                <Image src={"/file-upload-icon.svg"} width={30} height={30} alt="Upload Media" />
+            </label>
+            {
+                (uploadedFiles.length!=0) &&
+                (
+                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{uploadedFiles.length}
+                    </div>
+                )
+            }
             {/* <button className="btn m-20 border-1 border-white/30 rounded-3xl"> */}
 
             {/* </button> */}
@@ -87,14 +125,14 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
             <textarea
                 ref={textareaRef}
                 role="take-user-prompt"
-                className="promptBoxTextarea  text-[1.25em] overflow-hidden p-3 m-3 w-[90%] bg-white/7 outline-none border-2 rounded-2xl border-transparent focus:border-cyan-400 resize-none max-h-40 transition-all duration-700 ease-in-out"
+                className="promptBoxTextarea  text-[1.25em] overflow-hidden p-3 m-3 w-[90%] bg-white/7 outline-none border-2 rounded-xl border-transparent focus:border-cyan-400 resize-none max-h-40 transition-all duration-700 ease-in-out"
                 onInput={handleInput}
                 placeholder="What's On Your Mind...?"
                 aria-label="Prompt Input"
                 onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        sendToGemini();
+                        sendToLLM();
                         textareaRef.current.value = "";
                         handleInput();
                     }
@@ -111,20 +149,21 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                 />
             </button> */}
 
-                <button>
+            <button>
                 <Image
                     src={`${awaitingResponse ? "/stop.svg" : "/submit.png"}`}
                     width={40}
                     height={40}
                     alt="Submit"
-                    className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105  hover:rotate-45 active:opacity-100 ${awaitingResponse ? "animate-pulse p-4 bg-black/10 hover:rotate-90" : " bg-[linear-gradient(45deg,_#922bff,_#00d9ff)]"}`}
+                    className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105  hover:rotate-45 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-[linear-gradient(45deg,_#922bff,_#00d9ff)]"}`}
                     aria-label="Submit Prompt"
                     onClick={(e) => {
-                        awaitingResponse ? (handleInput()) : (sendToGemini(), textareaRef.current.value = "", handleInput());
+                        awaitingResponse ? (handleInput()) : (sendToLLM(), handleUploadChange(), textareaRef.current.value = "", handleInput());
                         e.preventDefault();
                     }}
                 />
             </button>
+
         </div >
 
     );

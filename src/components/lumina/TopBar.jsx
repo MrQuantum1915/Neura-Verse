@@ -17,9 +17,11 @@ const playfairDisplay = Playfair_Display({
 const models = [
     { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash" },
     { itemName: "Gemini 2.0 Flash-Lite", id: "gemini-2.0-flash-lite" },
+    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20" },
+    // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
 ];
 
-function TopBar({ sidebarClose, Model, setModel }) {
+function TopBar({ sidebarClose, Model, setModel, page }) {
 
     const [Open, setOpen] = useState(false);
     const triggerRef = useRef(null);
@@ -59,8 +61,8 @@ function TopBar({ sidebarClose, Model, setModel }) {
             {
                 sidebarClose && (
                     <Link href="/playgrounds/lumina">
-                        <div className={`text-4xl md:text-5xl ${playfairDisplay.className} font-bold m-4 md:m-6 cursor-pointer`}>
-                            Lumina
+                        <div className={`text-4xl md:text-5xl hover:text-cyan-400 transition-all duration-500 ease-in-out ${playfairDisplay.className} m-4 md:m-6 cursor-pointer`}>
+                            {page}
                         </div>
                     </Link>
                 )
@@ -69,15 +71,14 @@ function TopBar({ sidebarClose, Model, setModel }) {
 
                 <div
                     onClick={() => { setOpen(prevOpen => !prevOpen) }}
-                    className='relative flex flex-grow-0 items-center cursor-pointer rounded-2xl border-2 border-white/10 w-fit px-2 my-2 font-bold hover:bg-white/5 transition-all duration-300 ease-in-out'
+                    className='relative flex flex-grow-0 items-center cursor-pointer rounded border-2 border-white/10 w-fit px-2 py-1 my-2  hover:bg-white/5 transition-all duration-300 ease-in-out'
                     ref={triggerRef}
                 >
 
-                    <div className="mx-2">
+                    <div className="mx-2 font-extrabold">
                         Models
                     </div>
-                    <Image src={"/dropdown.svg"} width={40} height={40} alt="Dropdown"></Image>
-
+                    <Image src={"/dropdown.svg"} width={20} height={20} alt="Dropdown" className="mt-1"></Image>
                     {
                         Open &&
                         <DropDown itemsArray={models} selectItem={handleSelectItem} ref={dropdownMenuRef} />
@@ -85,7 +86,7 @@ function TopBar({ sidebarClose, Model, setModel }) {
                 </div>
 
 
-                <div className="border border-white/10 rounded-2xl px-4 mb-1 text-cyan-400">
+                <div className="border border-white/10 rounded-xl px-4 mb-1 text-cyan-400">
                     {Model.itemName}
                 </div>
             </div>

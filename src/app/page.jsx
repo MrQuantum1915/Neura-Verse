@@ -1,8 +1,74 @@
-
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center bg-black text-white p-4">
-      <h1 className="text-7xl">Welcome to NEURA VERSE</h1>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white font-sans">
+
+
+      {/* Hero Section */}
+      <section className="flex-1 flex flex-col items-center justify-center text-center relative overflow-hidden">
+        {/* Layered/3D Background Accent */}
+        <div className="absolute inset-0 -z-10 pointer-events-none">
+          <div className="absolute left-1/2 top-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-purple-700/20 via-blue-500/10 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+        </div>
+        <h1 className="text-[clamp(2.5rem,8vw,5rem)] font-extrabold tracking-tight leading-tight mb-4 animate-fade-in">
+          Welcome to <span className="text-cyan-400">NEURA VERSE</span>
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto mb-8 animate-fade-in delay-100">
+          A universe of AI playgrounds for creators, thinkers, and the curious.<br />
+          Dive in to experiment, build, and play—<span className="text-cyan-300 font-semibold">new features arriving soon.</span>
+        </p>
+        <a
+          href="#playgrounds"
+          className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg text-2xl font-bold hover:scale-105 active:scale-95 transition-transform"
+        >
+          Explore Playgrounds
+        </a>
+      </section>
+
+      {/* Features / Playgrounds */}
+      <section id="playgrounds" className="py-20 px-4 bg-black/80">
+        <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 tracking-tight">AI Playgrounds</h2>
+        <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+          <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
+            <div className="text-4xl mb-4 group-hover:scale-110 transition"></div>
+            <h3 className="text-2xl font-semibold mb-2">Text Lab</h3>
+            <p className="text-gray-400">Generate stories, brainstorm, or automate writing with advanced AI models.</p>
+          </div>
+          <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
+            <div className="text-4xl mb-4 group-hover:scale-110 transition"></div>
+            <h3 className="text-2xl font-semibold mb-2">Image Studio</h3>
+            <p className="text-gray-400">Create stunning visuals and experiment with generative art tools.</p>
+          </div>
+          <div className="rounded-2xl bg-gray-900/80 p-8 shadow-xl hover:shadow-purple-900/40 transition group">
+            <div className="text-4xl mb-4 group-hover:scale-110 transition"></div>
+            <h3 className="text-2xl font-semibold mb-2">Code Forge</h3>
+            <p className="text-gray-400">Get code suggestions, debug, and build with AI-powered coding assistants.</p>
+          </div>
+        </div>
+        <p className="text-center text-lg text-gray-500 mt-10">More playgrounds and features coming soon!</p>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-16 max-w-3xl mx-auto px-6 text-center">
+        <h3 className="text-3xl font-bold mb-4">About Neura Verse</h3>
+        <p className="text-lg text-gray-300 mb-2">
+          Neura Verse is your gateway to exploring, learning, and creating with AI. Whether you’re a developer, artist, or just curious, our playgrounds are designed to inspire experimentation and regular use.
+        </p>
+        <p className="text-lg text-gray-400">
+          Stay tuned—our universe is expanding with new tools and features!
+        </p>
+      </section>
+
+      {/* Call to Action */}
+      <section className="flex flex-col items-center py-12 bg-gradient-to-r from-black to-gray-900">
+        <h4 className="text-2xl font-bold mb-4">Ready to explore?</h4>
+        <a
+          href="#playgrounds"
+          className="px-6 py-3 bg-purple-700 rounded-lg text-xl font-semibold hover:bg-purple-800 transition"
+        >
+          Start Playing Now
+        </a>
+      </section>
+
 
     </div>
   );

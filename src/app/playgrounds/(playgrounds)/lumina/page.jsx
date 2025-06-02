@@ -2,15 +2,27 @@
 import Sidebar from "@/components/lumina/Sidebar"
 import PromptBox from "@/components/lumina/PromptBox";
 import ReactMarkdown from 'react-markdown';
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import remarkGfm from 'remark-gfm';
-import { useRef, useEffect } from "react";
 import Image from "next/image";
 import TopBar from "@/components/lumina/TopBar";
+import WorkSpace from "@/components/lumina/WorkSpace";
+
 import MoreIcon from "@/components/icons/MoreIcon";
 import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
+
+
+
+import { Playfair_Display } from 'next/font/google';
+const playfairDisplay = Playfair_Display({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700', '800', '900'],
+    style: ['normal', 'italic'],
+    display: 'swap',
+    variable: '--font-playfair-display',
+});
 
 function CustomLink({ href, children }) {
     return (
@@ -96,12 +108,12 @@ function Lumina() {
     const handleStreamResponse = (streamResponse) => {
         setMessages(prev => {
             // if last message is ai, update it; else, add new ai message
-            if (prev.length > 0 && prev[prev.length - 1].role === "ai") {
+            if (prev.length > 0 && prev[prev.length - 1].role === "model") {
                 const updated = [...prev];
                 updated[updated.length - 1] = { ...updated[updated.length - 1], text: streamResponse };
                 return updated;
             } else {
-                return [...prev, { role: "ai", text: streamResponse, responseComplete: false, model: Model }];
+                return [...prev, { role: "model", text: streamResponse, responseComplete: false, model: Model }];
             }
         });
     };
@@ -131,109 +143,143 @@ function Lumina() {
         }
     }, [messages]);
 
+
+    const loadingMessages = [
+        "Analysing...",
+        "Thinking...",
+        "Generating...",
+        "Cooking...",
+        "Crafting...",
+    ];
+    const [currentLoadingMessage, setCurrentLoadingMessage] = useState(loadingMessages[0]);
+    useEffect(() => {
+        let index = 0;
+        const interval = setInterval(() => {
+            index = (index + 1) % loadingMessages.length;
+            setCurrentLoadingMessage(loadingMessages[index]);
+        }, 2000);
+
+        return () => {
+            clearInterval(interval);
+        }
+    }, [])
+
+
     return (
-        <div className="flex flex-row h-screen w-full overflow-hidden">
+        <div className={`flex flex-row h-screen w-full overflow-hidden`}>
             <Sidebar page="Lumina" setsidebarClose={setsidebarClose} />
             <main className="w-full h-screen flex flex-col justify-between items-center ">
-                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} />
 
-                <div className=" w-full h-screen pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
+                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" />
 
-                    <div>
-                        {messages.length === 0 ? (
-                            <div className="text-5xl mt-74 flex flex-col items-center justify-center ">
-                                <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey Buddy</h1>
-                                <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
-                            </div>
-                        ) : (
-                            <div className="w-240 py-4">
+                <div className="flex flex-row w-full h-full">
+                    <div className="flex flex-col w-full h-full items-center">
+                        <div className=" w-full h-screen pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
 
-                                {messages.map((msg, index) => (
-                                    <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                                        {
-                                            msg.role === "ai" && (
-                                                <div className={`${msg.responseComplete ? ("self-start mt-2") : ("fixed left-[50%] top-[2%]")} flex-shrink-0 h-full`}>
-                                                    {
-                                                        (msg.responseComplete) ? (
-                                                            <Image
-                                                                src={"/lumina.jpg"}
-                                                                alt="Lumina"
-                                                                width={48}
-                                                                height={48}
-                                                                className="rounded-full"
-                                                            />
-                                                        ) : (
-                                                            <div className="flex items-center">
-                                                                <div className="loader">
-                                                                    <div className="inner one"></div>
-                                                                    <div className="inner two"></div>
-                                                                    <div className="inner three"></div>
-                                                                </div>
-                                                                <div className="px-4">
-                                                                    THINKING...
-                                                                </div>
-                                                            </div>
-                                                        )}
-                                                </div>
-                                            )
-                                        }
-
-                                        <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs" : "text-white/85 rounded-tl-xs"}`}>
-
-                                            {
-                                                msg.role === "ai" && (
-                                                    <div className="flex flex-row w-fit h-fit rounded-2xl p-2 border border-white/50 text-cyan-400/85">
-                                                        {msg.model.itemName}
-                                                    </div>
-                                                )
-                                            }
-
-                                            <ReactMarkdown components={
-                                                {
-                                                    h1: CustomH1,
-                                                    h2: CustomH2,
-                                                    h3: CustomH3,
-                                                    h4: CustomH4,
-                                                    h5: CustomH5,
-                                                    h6: CustomH6,
-                                                    p: CustomParagraph,
-                                                    ul: CustomUl,
-                                                    ol: CustomOl,
-                                                    li: CustomLi,
-                                                    a: CustomLink,
-                                                }
-                                            } remarkPlugins={[remarkGfm]}>
-                                                {msg.text}
-                                            </ReactMarkdown>
-
-
-                                            {/* toolbar */}
-                                            {
-
-                                                msg.role === "ai" && (
-                                                    <div className="flex flex-row w-fit h-fit p-2 mx-0 m-2 rounded-2xl bg-white/10">
-                                                        {toolbar.map((item) => (
-                                                            <div key={item.itemName} className="mx-2 cursor-pointer">
-                                                                {item.icon}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )
-
-
-                                            }
-                                        </div>
+                            <div>
+                                {messages.length === 0 ? (
+                                    <div className={`text-5xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
+                                        <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey Buddy</h1>
+                                        <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="w-240 py-4">
 
-                                <div ref={messagesEndRef} />
-                            </div>
-                        )}
-                        <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
+                                        {messages.map((msg, index) => (
+                                            <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                                {
+                                                    ((msg.role === "model")) && (
+                                                        <div className="self-start flex-shrink-0 h-full rounded-full">
+                                                            <Image
+                                                                src={"/L_final.jpg"}
+                                                                alt="Lumina"
+                                                                width={58}
+                                                                height={58}
+                                                                className={`rounded-full ${((index === messages.length - 1) && (!gotResponse)) ? ("animate-pulse") : ("animate-none")}`}
+                                                            />
+                                                        </div>)
+                                                }
+
+                                                {
+                                                    msg.role === "model" && (
+                                                        <div className="fixed left-[50%] top-[2%] flex-shrink-0 h-full">
+
+                                                            {
+                                                                (!msg.responseComplete && !gotResponse) && (
+                                                                    <div className="flex items-center">
+                                                                        <div className="loader">
+                                                                            <div className="inner one"></div>
+                                                                            <div className="inner two"></div>
+                                                                            <div className="inner three"></div>
+                                                                        </div>
+                                                                        <div className="px-4">
+                                                                            {currentLoadingMessage}
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        </div>
+                                                    )
+                                                }
+
+                                                <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs max-w-150" : "text-white/85 rounded-tl-xs"}`}>
+
+                                                    {
+                                                        msg.role === "model" && (
+                                                            <div className="flex flex-row w-fit h-fit rounded-2xl p-2 border border-white/50 text-cyan-400/85">
+                                                                {msg.model.itemName}
+                                                            </div>
+                                                        )
+                                                    }
+
+                                                    <ReactMarkdown components={
+                                                        {
+                                                            h1: CustomH1,
+                                                            h2: CustomH2,
+                                                            h3: CustomH3,
+                                                            h4: CustomH4,
+                                                            h5: CustomH5,
+                                                            h6: CustomH6,
+                                                            p: CustomParagraph,
+                                                            ul: CustomUl,
+                                                            ol: CustomOl,
+                                                            li: CustomLi,
+                                                            a: CustomLink,
+                                                        }
+                                                    } remarkPlugins={[remarkGfm]}>
+                                                        {msg.text}
+                                                    </ReactMarkdown>
+
+
+                                                    {/* toolbar */}
+                                                    {
+
+                                                        msg.role === "model" && (
+                                                            <div className="flex flex-row w-fit h-fit p-2 mx-0 m-2 rounded-2xl bg-white/10">
+                                                                {toolbar.map((item) => (
+                                                                    <div key={item.itemName} className="mx-2 cursor-pointer opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out">
+                                                                        {item.icon}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )
+                                                    }
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <div ref={messagesEndRef} />
+                                    </div>
+                                )
+                                }
+                                <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
+                            </div >
+                        </div >
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} />
                     </div>
-                </div>
 
-                <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} />
+                    <WorkSpace />
+                </div>
 
             </main >
         </div >

@@ -1,5 +1,5 @@
 # Visit this website > [Neura Verse](https://neuraverse-omega.vercel.app)
-
+## BTW this is not mobile friendly so open on desktop
 ## Will make this readme more descriptive soon :)
 
 # Tech Stack

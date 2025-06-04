@@ -88,6 +88,7 @@ function Lumina() {
     const [sidebarClose, setsidebarClose] = useState(false);
 
     const [messages, setMessages] = useState([]);
+    const [UploadedFiles, setUploadedFiles] = useState([{ fileName: "quanta.jpg", fileURI: "xQ", selected: true }]);
     const [gotResponse, setgotResponse] = useState(false);
 
     const [Model, setModel] = useState(defaultModel)
@@ -168,11 +169,13 @@ function Lumina() {
     return (
         <div className={`flex flex-row h-screen w-full overflow-hidden`}>
             <Sidebar page="Lumina" setsidebarClose={setsidebarClose} />
+
             <main className="w-full h-full flex flex-col justify-between items-center ">
 
                 <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" />
 
-                <div className="flex w-full h-full flex-row">
+                {/* Set height below TopBar to fill remaining space */}
+                <div className="flex w-full flex-row" style={{ height: "calc(100vh - 90px)" }}>
                     <div className="flex flex-col  w-full h-full items-center">
                         <div className=" w-full h-full pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
 
@@ -275,10 +278,11 @@ function Lumina() {
                                 <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} UploadedFiles={UploadedFiles} setUploadedFiles={setUploadedFiles} />
                     </div>
 
-                    <WorkSpace />
+                    <WorkSpace files={UploadedFiles} />
+
                 </div>
 
             </main >

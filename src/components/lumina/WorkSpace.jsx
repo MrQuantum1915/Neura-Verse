@@ -5,11 +5,11 @@ import Image from 'next/image';
 
 
 
-function WorkSpace() {
+function WorkSpace({ files }) {
 
     const [WorkspaceOpen, setWorkspaceOpen] = useState(false)
     const [selectedFiles, setselectedFiles] = useState([]);
-    
+
 
     return (
         <div className="flex flex-row">
@@ -39,6 +39,28 @@ function WorkSpace() {
                 <h1 className={`px-4 py-2 text-xl  transition-transform duration-1000 ease-in-out border border-white/30`}>
                     Workspace
                 </h1>
+
+                <div className="flex flex-col p-2  w-full h-full max-h-screen overflow-y-scroll">
+                    {files.map((item) => (
+                        <div className="flex flex-row" key={item.fileURI}>
+                            <button
+                                className="cursor-pointer px-2"
+                                onClick={() => {
+                                    setselectedFiles(prev => {
+                                        if (prev.includes(item.fileName)) {
+                                            return prev.filter(f => f !== item.fileName);
+                                        } else {
+                                            return [...prev, item.fileName];
+                                        }
+                                    });
+                                }}
+                            >
+                                <div className={`${selectedFiles.includes(item.fileName) ? ("bg-cyan-400/20 text-cyan-400") : ("text-white/75")} rounded-xl px-3 p-1 mx-4 my-2`}>{item.fileName}</div>
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
             </div>
         </div>
     )

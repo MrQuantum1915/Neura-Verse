@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 
 
-function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model, context }) {
+function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model, context, UploadedFiles, setUploadedFiles }) {
 
     const model = Model.id;
 
@@ -22,11 +22,14 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
     };
 
 
-    // handling media uploads
-    const [uploadedFiles, setuploadedFiles] = useState([]);
-
     const handleMediaUpload = (e) => {
-        setuploadedFiles(e.target.files);
+        setUploadedFiles(()=>{
+            const updatedUploadedFiles = [...UploadedFiles];
+            Array.from(e.target.files).forEach(file => {
+                updatedUploadedFiles.push({ fileName: file.name, fileURI: URL.createObjectURL(file), selected: true });
+            });
+            return updatedUploadedFiles;
+        });
         // console.log(e.target.files);
     };
 
@@ -46,7 +49,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
 
 
             const formData = new FormData();
-            formData.append('file', uploadedFiles);
+            formData.append('file', UploadedFiles);
             formData.append('model', model);
 
             //array is object in js
@@ -112,9 +115,9 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                 <Image src={"/file-upload-icon.svg"} width={30} height={30} alt="Upload Media" />
             </label>
             {
-                (uploadedFiles.length!=0) &&
+                (UploadedFiles.length!=0) &&
                 (
-                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{uploadedFiles.length}
+                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{UploadedFiles.length}
                     </div>
                 )
             }

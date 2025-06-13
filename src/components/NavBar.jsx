@@ -25,6 +25,9 @@ function NavBar() {
               </NavItem>
             </li>
           ))}
+          <li key={"SignIn"} className="ml-6 px-4 py-2 rounded-xl bg-white text-black">
+            Sign In
+          </li>
         </ul>
       </div>
     </nav>

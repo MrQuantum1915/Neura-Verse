@@ -1,8 +1,16 @@
 import Link from "next/link";
+import { Share_Tech_Mono } from 'next/font/google';
+const shareTechMono = Share_Tech_Mono({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal'],
+  display: 'swap',
+  variable: '--font-share-tech-mono',
+});
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white font-sans">
+    <div className={`min-h-screen flex flex-col bg-gradient-to-br from-black via-gray-900 to-gray-950 text-white font-sans ${shareTechMono.className}`}>
 
 
       {/* Hero Section */}
@@ -18,7 +26,7 @@ export default function Home() {
           A universe of AI playgrounds for creators, thinkers, and the curious.<br />
           Dive in to experiment, build, and play—<span className="text-cyan-300 font-semibold">new features arriving soon.</span>
         </p>
-       
+
       </section>
 
       {/* Features / Playgrounds */}

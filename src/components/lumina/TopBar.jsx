@@ -57,7 +57,7 @@ function TopBar({ sidebarClose, Model, setModel, page }) {
 
 
     return (
-        <div className={`flex flex-row flex-wrap ${sidebarClose ? ("justify-between") : ("justify-end")}  w-full h-auto border-b border-white/10 `}>
+        <div className={`flex flex-row flex-wrap ${sidebarClose ? ("justify-between") : ("justify-end")}  w-full h-23 border-b border-white/10 `}>
             {
                 sidebarClose && (
                     <Link href="/playgrounds/lumina">

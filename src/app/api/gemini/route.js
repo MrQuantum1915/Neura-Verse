@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { createPartFromUri } from "@google/genai";
 // import { NextResponse } from "next/server";
 
 const myApiKey = process.env.Gemini_API_Key;
@@ -10,11 +11,22 @@ const ai = new GoogleGenAI({ apiKey: myApiKey });
 export async function POST(request) {
     try {
 
-        const formData = await request.formData();
-        const file = formData.get('file'); // untill the app has low user base and traffic, passing the whole context along with media in every prompt to gemini is feasible. When traffic increase, here I will have to pass a summary of previous chat. To increase Cost effieciency
-        const model = formData.get('model');
-        const updatedContextRaw = formData.get('updatedContext');
-        const context = JSON.parse(updatedContextRaw);
+        const body = await request.json();
+
+        const model = body.model;
+        const context = body.context;
+        // untill the app has low user base and traffic, passing the whole context along with media in every prompt to gemini is feasible. When traffic increase, here I will have to pass a summary of previous chat. To increase Cost effieciency
+
+
+        const media = body.mediaList;
+
+
+
+        // const formData = await request.formData();
+        // const file = formData.get('file');
+        // const model = formData.get('model');
+        // const updatedContextRaw = formData.get('updatedContext');
+        // const context = JSON.parse(updatedContextRaw);
 
         // console.log(typeof context)
 
@@ -36,10 +48,13 @@ export async function POST(request) {
         const response = await ai.models.generateContentStream({
             model: model,
             //remember bro here "key" is not needed bcz we are not rendering anything in react here
-            contents: context.map((item) => ({
+            contents: context.map((item, idx) => ({
                 role: item.role,
                 parts: [
                     { text: item.text },
+                    ...((media.length>0 && idx === context.length - 1 && item.role === "user")
+                        ? (media.map((file) => createPartFromUri(file.fileURI, file.mimeType)))
+                        : [])
                 ],
             })),
         });

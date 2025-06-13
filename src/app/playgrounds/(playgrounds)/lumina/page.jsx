@@ -88,10 +88,14 @@ function Lumina() {
     const [sidebarClose, setsidebarClose] = useState(false);
 
     const [messages, setMessages] = useState([]);
-    const [UploadedFiles, setUploadedFiles] = useState([{ fileName: "quanta.jpg", fileURI: "xQ", selected: true }]);
+    const [Frontend_UploadedFiles, setFrontend_UploadedFiles] = useState([]);
+    const [UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet] = useState(new Set());
+    const [selectedFiles, setselectedFiles] = useState([]);
+    const [UploadingFile, setUploadingFile] = useState(false);
+
     const [gotResponse, setgotResponse] = useState(false);
 
-    const [Model, setModel] = useState(defaultModel)
+    const [Model, setModel] = useState(defaultModel);
 
 
 
@@ -278,10 +282,10 @@ function Lumina() {
                                 <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} UploadedFiles={UploadedFiles} setUploadedFiles={setUploadedFiles} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile = {UploadingFile} />
                     </div>
 
-                    <WorkSpace files={UploadedFiles} />
+                    <WorkSpace files={Frontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />
 
                 </div>
 

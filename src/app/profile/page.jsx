@@ -415,20 +415,20 @@ function Profile() {
                                 async () => {
                                     const supabase = createClient_client();
                                     const { error } = await supabase.auth.signOut()
-                                    
-                                    // Also delete all cookies
-                                    const cookies = document.cookie.split(';');
-                                    for (const cookie of cookies) {
-                                        const eqPos = cookie.indexOf('=');
-                                        const name = eqPos > -1 ? cookie.trim().substring(0, eqPos) : cookie.trim();
-                                        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-                                    }
 
                                     if (error) {
                                         console.error('Error signing out:', error);
                                         alert("Error signing out. Please try again.");
                                     } else {
-                                        redirect('/home');
+                                        // Also delete all cookies
+                                        const cookies = document.cookie.split(';');
+                                        for (const cookie of cookies) {
+                                            const eqPos = cookie.indexOf('=');
+                                            const name = eqPos > -1 ? cookie.trim().substring(0, eqPos) : cookie.trim();
+                                            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`; // its starting time of Linux epoch which used to define timestamps. This is past so essentially it deletes the cookie as it is expired
+
+                                        }
+                                        window.location.href = '/'; // using this instead of userouter Hook because it does not forec full page reload. Hence component does not rerender , hence some data does not change on the page. Hence i force full page reload to reset everything.
                                     }
 
                                 }

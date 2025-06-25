@@ -15,7 +15,8 @@ import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { Playfair_Display } from 'next/font/google';
 const playfairDisplay = Playfair_Display({
@@ -92,14 +93,21 @@ function Lumina() {
     const [profile_pic, setprofile_pic] = useState(null)
 
     // this runs on every full render and checks if session is active or user logged in
+    const router = useRouter();
+
     useEffect(() => {
         const fetchUserLoggedIn = async () => {
             try {
                 const supabase = createClient_client();
                 const { data: { session } } = await supabase.auth.getSession();
-                if (!session) {
-                    redirect("/auth/login");
+                console.log(session);
+                console.log(session===null);
+                if(session === null){
+                    router.push("/auth/login");
                 }
+                // if (!session || !session.user) {
+                    // redirect("/auth/login");
+                // }
                 else {
 
                     function getCookie(name) {

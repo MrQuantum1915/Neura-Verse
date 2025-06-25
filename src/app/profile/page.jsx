@@ -8,7 +8,8 @@ import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react';
 
 import { createClient_client } from '@/utils/supabase/supabaseClient';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // client compoent should use useRouter hook instead of redirect
+// import { redirect } from 'next/navigation';
 import { updateUsername } from './_actions/updateUsername';
 import { updateEmail } from './_actions/updateEmail';
 import { updateFullName } from './_actions/updateFullName';
@@ -29,6 +30,9 @@ function Profile() {
     const [changeFullName, setChangeFullName] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
 
+    const router = useRouter();
+
+
     useEffect(() => {
         const supabase = createClient_client();
         const fetchData = async () => {
@@ -46,7 +50,7 @@ function Profile() {
                 setProfile(data);
             }
             else {
-                redirect('/auth/login');
+                router.push("/auth/login");
             }
         };
         fetchData();

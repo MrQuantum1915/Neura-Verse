@@ -415,6 +415,15 @@ function Profile() {
                                 async () => {
                                     const supabase = createClient_client();
                                     const { error } = await supabase.auth.signOut()
+                                    
+                                    // Also delete all cookies
+                                    const cookies = document.cookie.split(';');
+                                    for (const cookie of cookies) {
+                                        const eqPos = cookie.indexOf('=');
+                                        const name = eqPos > -1 ? cookie.trim().substring(0, eqPos) : cookie.trim();
+                                        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+                                    }
+
                                     if (error) {
                                         console.error('Error signing out:', error);
                                         alert("Error signing out. Please try again.");

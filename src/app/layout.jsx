@@ -9,6 +9,10 @@ import {
   Roboto_Slab,
   Roboto,
   Share_Tech_Mono,
+  Montserrat,
+  Poppins,
+  Inter,
+  DM_Sans,
 } from 'next/font/google';
 
 const roboto = Roboto({
@@ -57,6 +61,37 @@ const shareTechMono = Share_Tech_Mono({
   variable: '--font-share-tech-mono',
 });
 
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-montserrat',
+});
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-poppins',
+});
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-dm-sans',
+});
+
 export const metadata = {
   title: "Neura-Verse",
   description: "This is website to explore the amazing digital world of AI using our Playgrounds",
@@ -65,11 +100,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${roboto.variable} ${courierPrime.variable} ${oswald.variable} ${playfairDisplay.variable} ${robotoSlab.variable} ${shareTechMono.variable}`}>
+    <html lang="en" className={`${roboto.variable} ${courierPrime.variable} ${oswald.variable} ${playfairDisplay.variable} ${robotoSlab.variable} ${shareTechMono.variable} ${montserrat.variable} ${poppins.variable} ${inter.variable} ${dmSans.variable}`}>
       <SpeedInsights />
       <body className="min-h-screen flex flex-col">
         <ConditionallyIncludeNavbar />
-        <main className="flex-1 flex flex-col  bg-black">
+        <main className={`flex-1 flex flex-col bg-black ${roboto.className}`}>
           {children}
         </main>
         <ConditionallyIncludeFooter />

@@ -8,12 +8,14 @@ import Image from "next/image";
 import TopBar from "@/components/lumina/TopBar";
 import WorkSpace from "@/components/lumina/WorkSpace";
 
+import { createClient_client } from "@/utils/supabase/supabaseClient"; // using browser client as this is a client side component
+
 import MoreIcon from "@/components/icons/MoreIcon";
 import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 
-
+import { redirect } from "next/navigation";
 
 import { Playfair_Display } from 'next/font/google';
 const playfairDisplay = Playfair_Display({
@@ -85,6 +87,51 @@ const toolbar = [
 
 function Lumina() {
 
+    // for user session and login
+    const [name, setname] = useState("Visitor")
+    const [profile_pic, setprofile_pic] = useState(null)
+
+    // this runs on every full render and checks if session is active or user logged in
+    useEffect(() => {
+        const fetchUserLoggedIn = async () => {
+            try {
+                const supabase = createClient_client();
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!session) {
+                    redirect("/auth/login");
+                }
+                else {
+
+                    function getCookie(name) {
+                        const value = `; ${document.cookie}`; // prepend a semicolon and space to all cookies to make splitting easier
+
+                        const parts = value.split(`; ${name}=`);   // split the cookie string into parts at the desired cookie name (with the pattern "; name=")
+                        // if the cookie was found, there will be 2 parts in the array
+                        if (parts.length === 2) {
+                            // pop the last part (after the cookie name), split at the next semicolon, and get the first value (the cookie value itself)
+                            return decodeURIComponent(parts.pop().split(';').shift()); // because cookie stores the url in encoded version due to certain characters, so we need to decode it first.
+                        }
+                        else {
+                            return null;
+                        }
+                    }
+
+                    setprofile_pic(getCookie('profile_pic'));
+                    setname(getCookie('full_name'));
+                    // if full name is not set by user then use username instead
+                    if (name === null) {
+                        setname(getCookie('username'));
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+        fetchUserLoggedIn();
+    }, []);
+
+
+    // for frontend
     const [sidebarClose, setsidebarClose] = useState(false);
 
     const [messages, setMessages] = useState([]);
@@ -172,7 +219,7 @@ function Lumina() {
 
     return (
         <div className={`flex flex-row h-screen w-full overflow-hidden`}>
-            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} />
+            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} />
 
             <main className="w-full h-full flex flex-col justify-between items-center ">
 
@@ -186,7 +233,12 @@ function Lumina() {
                             <div>
                                 {messages.length === 0 ? (
                                     <div className={`text-5xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
-                                        <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey Buddy</h1>
+                                        <div className="flex">
+                                            <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey
+                                            </h1>
+                                            <h1 className="mx-4 bg-gradient-to-r py-4 from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent">{name}
+                                            </h1>
+                                        </div>
                                         <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
                                     </div>
                                 ) : (
@@ -282,7 +334,7 @@ function Lumina() {
                                 <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile = {UploadingFile} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile={UploadingFile} />
                     </div>
 
                     <WorkSpace files={Frontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />

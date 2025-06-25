@@ -63,7 +63,7 @@ function FooterNavItem({ href, children }) {
 
 function Footer() {
   return (
-    <footer className="bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10">
+    <footer className="bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-100">
 
       <div className="flex flex-row flex-wrap mx-4 my-2  h-full mt-10 justify-around">
 

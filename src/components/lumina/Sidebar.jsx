@@ -24,8 +24,6 @@ const navigationItems = [
 
   { href: "/home", label: "Home", icon: "/home.svg" },
   { href: "/playgrounds", label: "Playgrounds", icon: "/tools.svg" },
-  { href: "dashboard", label: "Dashboard", icon: "/dashboard.svg" },
-
 ];
 
 // let sidebarSvg = (
@@ -38,11 +36,13 @@ const navigationItems = [
 //   </svg>
 // );
 
-function Sidebar({ page, setsidebarClose }) {
+function Sidebar({ page, setsidebarClose, profile_pic }) {
   const [sidebar, setSidebar] = useState(true);
-
+  if(profile_pic===null){
+    profile_pic="/pfp-placeholder-2.svg";
+  }
   return (
-    <div className={`z-2 flex flex-row items-start justify-between min-h-screen  bg-black border-r-2 border-amber-50/10 text-white`}>
+    <div className={`z-2 flex flex-row items-start justify-between min-h-screen  bg-black border-r-2 border-white/20 text-white`}>
       <div
         className={
           // sidebar
@@ -64,12 +64,29 @@ function Sidebar({ page, setsidebarClose }) {
           <div className="flex flex-col items-start mx-5 m-4 absolute bottom-3">
             {navigationItems.map((items => (
               <Link href={items.href} key={items.label}>
-                <div className="flex items-center justify-center cursor-pointer border border-amber-50/10 rounded-2xl p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
+                <div className="flex items-center justify-center cursor-pointer border-2 border-white/50 rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
                   <Image src={items.icon} width={20} height={20} alt={items.label} className="cursor-pointer m-1 invert " />
                   <div className="px-4">{items.label}</div>
                 </div>
               </Link>
             )))}
+
+
+
+            <Link href={"/profile"}>
+              <div className="flex items-center justify-center cursor-pointer border-2 border-white/50 rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
+                <Image
+                  src={profile_pic}
+                  alt="Profile Picture"
+                  width={40}
+                  height={40}
+                  className="rounded-full aspectRatio-1/1"
+                  style={{ aspectRatio: "1/1" }}
+                />
+                <div className="px-4">Profile</div>
+              </div>
+            </Link>
+
           </div>
 
 
@@ -119,14 +136,28 @@ function Sidebar({ page, setsidebarClose }) {
         {
           !sidebar && (
 
-            <div className="flex flex-col items-center m-auto fixed bottom-0">
+            <div className="flex flex-col items-center fixed bottom-5">
               {navigationItems.map((items => (
                 <Link href={items.href} key={items.label}>
-                  <div className="flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 border border-amber-50/10 rounded-xl p-2 m-2 hover:bg-white/10 w-fit transition-all duration-400 ease-in-out">
+                  <div className="flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 border-2 border-white/50 rounded-lg p-2 py-1 m-2 hover:bg-white/10 w-fit transition-all duration-400 ease-in-out">
                     <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
                   </div>
                 </Link>
               )))}
+
+              <Link href={"/profile"}>
+                <div className="flex items-center justify-center cursor-pointer  border-2 border-white/50 rounded-full m-2 w-fit transition-all duration-400 ease-in-out">
+                  <Image
+                    src={profile_pic}
+                    alt="Profile Picture"
+                    width={50}
+                    height={50}
+                    className="rounded-full aspectRatio-1/1"
+                    style={{ aspectRatio: "1/1" }}
+                  />
+                </div>
+              </Link>
+
             </div>
           )
         }

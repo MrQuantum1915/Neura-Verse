@@ -32,10 +32,11 @@ export async function removeImage(fullName) {
     const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .update({
-            profile_pic: null, // remove the profile picture from the profile
+            profile_pic: null, // remove the profile picture url from the profile table 
         })
         .eq('user_id', user.id)
         .select();
+    
     if (profileError) {
         console.error('Error updating profile after removing image:', profileError);
         return { error: 'Failed to update profile after removing image' };

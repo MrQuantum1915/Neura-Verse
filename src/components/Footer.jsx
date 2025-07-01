@@ -63,7 +63,7 @@ function FooterNavItem({ href, children }) {
 
 function Footer() {
   return (
-    <footer className="bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-100">
+    <footer className="bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-1000">
 
       <div className="flex flex-row flex-wrap mx-4 my-2  h-full mt-10 justify-around">
 
@@ -73,8 +73,13 @@ function Footer() {
             NEURA VERSE
           </h1>
 
-          <div className="flex flex-row justify-center items-center">
-            <p className="text-sm text-white/50"> Sadly no [© 2025 Neura-Verse.] No rights reserved.</p>
+          <div className="flex flex-col justify-center items-center">
+            <p className="text-lg text-white/50"> &copy; 2025 Neura-Verse. All rights reserved.</p>
+            <p className="flex flex-col text-lg text-white/75 items-center my-6">
+              With ⚡
+              <strong> Darshan Patel (a.k.a Mr.Quantum_1915)</strong>
+              <strong>The Neura Verse Team</strong>
+            </p>
           </div>
 
           {/* Social */}

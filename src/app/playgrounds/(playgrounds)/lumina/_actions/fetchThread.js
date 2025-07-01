@@ -1,10 +1,7 @@
 'use server'
-
 import { createClient_server } from "@/utils/supabase/supabaseServer"
 
-export async function updateFullName(fullName) {
-    // console.log('Updating profile with FullName:', fullName);
-
+export async function fetchThread(thread_id) {
     const supabase = await createClient_server();
 
     const {
@@ -22,19 +19,19 @@ export async function updateFullName(fullName) {
     }
 
     const { data, error } = await supabase
-        .from('profiles')
-        .update({
-            full_name: fullName,
-        })
+        .from('lumina')
+        .select('role , content, ai_model')
+        .eq('thread_id', thread_id)
         .eq('user_id', user.id)
-        .select();
+        .order('created_at', { ascending: true });  // oldest first
 
-    // console.log('User ID: ', user.id);
-    // console.log('Profile update response:', data, error);
+    // const messages = (data)=>{
+        
+    // }
 
     if (error) {
-        console.error('Error updating profile:', error);
-        return { error: 'Failed to update profile' };
+        console.error('Error Fetching Thread', error);
+        return { error: 'Failed to Fetch Thread' };
     }
 
     return { data };

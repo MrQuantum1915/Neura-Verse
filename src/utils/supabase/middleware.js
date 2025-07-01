@@ -45,6 +45,14 @@ export async function updateSession(request) {
       .single()
     if (profile) {
 
+      if (!profile.username && request.nextUrl.pathname !== '/profile') {
+        // only redirect if not already on profile page, else it causes infinte redirect
+        const url = request.nextUrl.clone()
+        url.pathname = '/profile'
+        return NextResponse.redirect(url)
+      }
+
+
       if (profile.username) {
         supabaseResponse.cookies.set('username', profile.username, {
           // using http only makes it only availbale for server and not available to cleint component, but here username, profilepic are public asset so i removd httpOnly

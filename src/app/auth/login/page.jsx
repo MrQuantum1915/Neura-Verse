@@ -3,6 +3,9 @@ import Image from "next/image"
 import Link from "next/link";
 import { Roboto } from 'next/font/google';
 import { oAuth } from "../_actions/oAuth";
+import { loginWithEmail } from "../_actions/email_login";
+import MyAlert from "@/components/MyAlert";
+import { useState } from "react";
 // import { createClient_client } from "@/utils/supabase/supabaseClient";
 // import { redirect } from 'next/navigation'
 
@@ -24,32 +27,16 @@ const oAuthProviders = [
 
 function page() {
 
-  // const handleOAuth = async (providerID) => {
-  // oAuth(providerID);
-
-  // well this is not true, guess what because it is possible :) 
-  // we can't use server actions to handle OAuth because Server actions ('use server') run on the server and cannot open a browser window or redirect the user. OAuth requires the user to be redirected to the provider (Google, etc.) and then back to your app.
-
-  // const supabase = createClient_client();
-  // const {data, error } = await supabase.auth.signInWithOAuth({
-  //   provider: providerID,
-  //   options: {
-  //       redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`, // this is callback route to handle storing asession cookies in browser
-  //   },
-  // });
-
-  // if (error) {
-  //   console.error('Error during OAuth login:', error);
-  //   redirect('/auth/error');
-  // }
-
-
-  // }
-
+  const [alert, setalert] = useState(false);
+  const [alertMessage, setalertMessage] = useState("Alert");
 
   return (
-    <div className={`bg-black flex items-center justify-center w-full h-screen relative ${roboto.className}`}>
-
+    <div className={`bg-black flex items-center text-center justify-center w-full h-screen relative ${roboto.className}`}>
+      {
+        alert && (
+          <MyAlert message={alertMessage} alertHandler={setalert} />
+        )
+      }
       <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
         <div
           className="w-110 h-170 rounded-3xl opacity-70 blur-3xl"
@@ -62,7 +49,8 @@ function page() {
         <div className="px-6 py-4 items-center justify-center flex flex-col">
 
           <h1 className="text-4xl my-2 mb-4">Welcome back</h1>
-          
+          <h1 className="text-3xl my-2 mb-4">LOGIN To Gain Full Experience</h1>
+
           <div className="flex flex-col gap-4 w-full items-center justify-center">
             <div className="m-2 text-white/50 text-2xl font-bold">
               OAuth
@@ -97,39 +85,64 @@ function page() {
             <div className="flex-grow h-px bg-white/50"></div>
           </div>
 
-          <div className="flex flex-col gap-4 w-full max-w-md items-center justify-center">
-            <div className="text-white/50 text-2xl m-2 font-bold">
-              Email
-            </div>
-            <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-              <Image
-                src={"/email-1-svgrepo-com.svg"}
-                width={30}
-                height={30}
-                alt="Email"
-                className="opacity-50"
-              />
-              <input type="email" placeholder="Email" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" />
-            </div>
-            <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-              <Image
-                src={"/lock-alt-svgrepo-com.svg"}
-                width={30}
-                height={30}
-                alt="Email"
-                className="opacity-50"
-              />
-              <input type="password" placeholder="Password" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" />
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData;
+              formData.append('email', e.target.elements.email.value);
+              formData.append('password', e.target.elements.password.value);
+              const { error } = await loginWithEmail(formData);
+              if (error) {
+                if (error == "AuthApiError: Invalid login credentials") {
+                  setalertMessage("User credentials are invalid. Please enter correct Email and Password!")
+                  setalert(true);
+                }
+                else {
+                  setalertMessage("Login Failed. Try Again!")
+                  setalert(true);
+                }
+              }
+              else {
+                window.location.href = "/"
+              }
+            }}
+          >
+            <div className="flex flex-col gap-4 w-full max-w-md items-center justify-center">
+              <div className="text-white/50 text-2xl m-2 font-bold">
+                Email
+              </div>
+              <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
+                <Image
+                  src={"/email-1-svgrepo-com.svg"}
+                  width={30}
+                  height={30}
+                  alt="Email"
+                  className="opacity-50"
+                />
+                <input name="email" type="email" placeholder="Email" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
+              </div>
+              <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
+                <Image
+                  src={"/lock-alt-svgrepo-com.svg"}
+                  width={30}
+                  height={30}
+                  alt="Email"
+                  className="opacity-50"
+                />
+                <input name="password" type="password" placeholder="Password" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
+              </div>
+
+              <button type="submit" className="px-4 py-2 bg-white/90 text-black rounded-2xl m-4 text-2xl cursor-pointer transition-all duration-300 ease-in-out shadow-lg shadow-white/30 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-indigo-500 hover:text-white hover:scale-105 active:scale-95 focus:ring-2 focus:ring-cyan-400">
+                Login
+              </button>
             </div>
 
-            <button className="px-4 py-2 bg-white/90 text-black rounded-2xl m-4 text-2xl cursor-pointer transition-all duration-300 ease-in-out shadow-lg shadow-white/30 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-indigo-500 hover:text-white hover:scale-105 active:scale-95 focus:ring-2 focus:ring-cyan-400">
-              Login
-            </button>
-            <div>
-              <p className="text-white/50 text-lg">
-                Don't have an account? <Link href="/auth/signup" className="text-cyan-400 hover:underline">Sign Up</Link>
-              </p>
-            </div>
+          </form>
+
+          <div>
+            <p className="text-white/50 text-lg">
+              Don't have an account? <Link href="/auth/signup" className="text-cyan-400 hover:underline">Sign Up</Link>
+            </p>
           </div>
 
         </div>

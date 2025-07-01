@@ -7,18 +7,23 @@ import remarkGfm from 'remark-gfm';
 import Image from "next/image";
 import TopBar from "@/components/lumina/TopBar";
 import WorkSpace from "@/components/lumina/WorkSpace";
+import MyAlert from "@/components/MyAlert";
 
+// serve actions
 import { createClient_client } from "@/utils/supabase/supabaseClient"; // using browser client as this is a client side component
+import { fetchThread } from "./_actions/fetchThread";
+import { insertNewMessage } from "./_actions/insertNewMessage";
+import { createNewThread } from "./_actions/createNewThread";
 
 import MoreIcon from "@/components/icons/MoreIcon";
 import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
-
 // import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 import { Playfair_Display } from 'next/font/google';
+
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
     weight: ['400', '500', '600', '700', '800', '900'],
@@ -68,12 +73,12 @@ const CustomUl = ({ children }) => (
 );
 
 const CustomOl = ({ children }) => (
-    <ol className="list-decimal ml-6 py-2 space-y-2">{children}</ol>
+    <ol className="list-decimal ml-6 py-2 space-y-2 text-lg">{children}</ol>
 );
 
 
 const CustomLi = ({ children }) => (
-    <li className="py-1">{children}</li>
+    <li className="py-1 text-lg">{children}</li>
 );
 
 const defaultModel = {
@@ -88,6 +93,10 @@ const toolbar = [
 
 function Lumina() {
 
+    // for alerts
+    const [alert, setalert] = useState(false);
+    const [alertMessage, setalertMessage] = useState("Alert");
+
     // for user session and login
     const [name, setname] = useState("Visitor")
     const [profile_pic, setprofile_pic] = useState(null)
@@ -100,13 +109,13 @@ function Lumina() {
             try {
                 const supabase = createClient_client();
                 const { data: { session } } = await supabase.auth.getSession();
-                console.log(session);
-                console.log(session===null);
-                if(session === null){
+                // console.log(session);
+                // console.log(session===null);
+                if (session === null) {
                     router.push("/auth/login");
                 }
                 // if (!session || !session.user) {
-                    // redirect("/auth/login");
+                // redirect("/auth/login");
                 // }
                 else {
 
@@ -125,10 +134,11 @@ function Lumina() {
                     }
 
                     setprofile_pic(getCookie('profile_pic'));
-                    setname(getCookie('full_name'));
-                    // if full name is not set by user then use username instead
-                    if (name === null) {
+                    const fullName = getCookie('full_name');
+                    if (fullName === null) {
                         setname(getCookie('username'));
+                    } else {
+                        setname(fullName);
                     }
                 }
             } catch (error) {
@@ -148,20 +158,101 @@ function Lumina() {
     const [selectedFiles, setselectedFiles] = useState([]);
     const [UploadingFile, setUploadingFile] = useState(false);
 
-    const [gotResponse, setgotResponse] = useState(false);
+    const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mounts, we do not need this to trigger the insertAIResponse() function.
 
     const [Model, setModel] = useState(defaultModel);
 
 
 
+    // managing threads
+    const [CurrThreadID, setCurrThreadID] = useState(null);
+    const [CurrThreadName, setCurrThreadName] = useState("New Thread")
+    const [navigatingThread, setnavigatingThread] = useState(false)
+
+    // This block is implemented because here we are using CurrThreadName and ID in various operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
+    // create refs for thread ID/name
+    const currThreadIDRef = useRef(CurrThreadID);
+    const currThreadNameRef = useRef(CurrThreadName);
+
+    // update refs when thread ID/name change
+    useEffect(() => {
+        currThreadIDRef.current = CurrThreadID;
+        currThreadNameRef.current = CurrThreadName;
+    }, [CurrThreadID, CurrThreadName]);
+    //
+
+
+    // managing fetching of chat from threadID
+    useEffect(() => {
+        if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
+            setMessages([]);
+        }
+        else {
+            if (navigatingThread) {
+
+                setnavigatingThread(false);
+
+                const fetchChat = async () => {
+                    if (CurrThreadID == null) {
+                        return;
+                    }
+
+                    const { data, error } = await fetchThread(CurrThreadID);
+                    if (error) {
+                        setalertMessage(error);
+                        setalert(true);
+                        return;
+                    }
+                    setMessages(data);
+                }
+                fetchChat();
+            }
+        }
+    }, [CurrThreadID])
+
 
     // handlers to add user and AI messages
-    const handleNewPrompt = (userPrompt) => {
-        setMessages(prev => [
-            ...prev,
-            { role: "user", text: userPrompt },
-        ]);
-        setgotResponse(false);
+    const handleNewPrompt = async (userPrompt) => {
+        setresponseComplete(false);
+        const newMessages = [
+            ...messages,
+            { role: "user", content: userPrompt },
+        ];
+        setMessages(newMessages);
+
+
+
+        // if this is first message, update thread name
+        let tempThreadId;
+        if (messages.length === 0) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
+            const { data, error } = await createNewThread(userPrompt);
+
+            if (error) {
+                setalertMessage(error);
+                setalert(true);
+                return;
+            }
+            // setalertMessage(data[0].thread_id);
+            // setalert(true); 
+            setCurrThreadID(data[0].thread_id);
+            tempThreadId = data[0].thread_id;
+            setCurrThreadName(userPrompt);
+        }
+        else {
+
+            const threadNameToUse = messages.length === 0 ? userPrompt : CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
+
+            const { data, error } = await insertNewMessage( // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
+                CurrThreadID,
+                threadNameToUse,
+                { role: "user", content: userPrompt, ai_model: null }
+            );
+
+            if (error) {
+                setalertMessage(error);
+                setalert(true);
+            }
+        }
     };
 
     // appending stream responses
@@ -170,27 +261,52 @@ function Lumina() {
             // if last message is ai, update it; else, add new ai message
             if (prev.length > 0 && prev[prev.length - 1].role === "model") {
                 const updated = [...prev];
-                updated[updated.length - 1] = { ...updated[updated.length - 1], text: streamResponse };
+                updated[updated.length - 1] = { ...updated[updated.length - 1], content: streamResponse };
                 return updated;
             } else {
-                return [...prev, { role: "model", text: streamResponse, responseComplete: false, model: Model }];
+                return [...prev, { role: "model", content: streamResponse, ai_model: Model }];
             }
         });
     };
 
 
-    //handling updation of responseComplete key after gotresponse
-    const handleResponseComplete = () => {
-        setMessages(prev => {
-            const updated = [...prev];
+    // to insert the ai response to database after got response in currThread.
+    useEffect(() => {
 
-            // Create a copy to avoid direct mutation
-            // Becauses (https://react.dev/learn/updating-objects-in-state) and (https://react.dev/learn/updating-arrays-in-state)
+        const insertAIResponse = async () => {
+            try {
+                // here i used CurrThreadID insetaed of ref value because see this scenario : when user navigate to differetn thread while ai response in curr thread is pending, if we use ref value than it will insert the message in the new navaigated thread instead of previous, so here i am using stale value.
 
-            updated[updated.length - 1] = { ...updated[updated.length - 1], responseComplete: true };
-            return updated;
-        });
-    };
+                const { data, error } = await insertNewMessage(CurrThreadID, CurrThreadName, { role: "model", content: messages[messages.length - 1].content, ai_model: messages[messages.length - 1].ai_model }) // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
+                if (error) {
+                    setalertMessage(error);
+                    setalert(true);
+                }
+            } catch (err) {
+                setalertMessage(err.message);
+                setalert(true);
+            }
+        }
+
+        if (responseComplete) {
+            insertAIResponse();
+        }
+
+    }, [responseComplete])
+
+
+    // //handling updation of responseComplete key after gotresponse
+    // const handleResponseComplete = async () => {
+    //     setMessages(prev => {
+    //         const updated = [...prev];
+
+    //         // Create a copy to avoid direct mutation
+    //         // Becauses (https://react.dev/learn/updating-objects-in-state) and (https://react.dev/learn/updating-arrays-in-state)
+
+    //         updated[updated.length - 1] = { ...updated[updated.length - 1], responseComplete: true };
+    //         return updated;
+    //     });
+    // };
 
 
 
@@ -227,11 +343,14 @@ function Lumina() {
 
     return (
         <div className={`flex flex-row h-screen w-full overflow-hidden`}>
-            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} />
+            {
+                alert && <MyAlert message={alertMessage} alertHandler={setalert} />
+            }
+            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} CurrThreadID={CurrThreadID} setCurrThreadID={setCurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} responseComplete={responseComplete} navigatingThread={navigatingThread} />
 
             <main className="w-full h-full flex flex-col justify-between items-center ">
 
-                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" />
+                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} />
 
                 {/* Set height below TopBar to fill remaining space */}
                 <div className="flex w-full flex-row" style={{ height: "calc(100vh - 90px)" }}>
@@ -240,7 +359,7 @@ function Lumina() {
 
                             <div>
                                 {messages.length === 0 ? (
-                                    <div className={`text-5xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
+                                    <div className={`sm:text-5xl text-2xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
                                         <div className="flex">
                                             <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">Hey
                                             </h1>
@@ -256,13 +375,19 @@ function Lumina() {
                                             <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                                 {
                                                     ((msg.role === "model")) && (
-                                                        <div className="self-start flex-shrink-0 h-full rounded-full">
+                                                        <div className="my-4 self-start flex-shrink-0 h-full rounded-full">
                                                             <Image
-                                                                src={"/L_final.jpg"}
+                                                                src={"/ai_logo_orange-nobg.png"}
                                                                 alt="Lumina"
-                                                                width={58}
-                                                                height={58}
-                                                                className={`rounded-full ${((index === messages.length - 1) && (!gotResponse)) ? ("animate-pulse") : ("animate-none")}`}
+                                                                width={50}
+                                                                height={50}
+                                                                className=
+                                                                {`bg-black rounded-full 
+                                                                    ${(
+                                                                        ((index === messages.length - 1) && (!responseComplete && (responseComplete !== null)))
+                                                                            ? "animate-pulse" : "animate-none"
+                                                                    )}
+                                                                `}
                                                             />
                                                         </div>)
                                                 }
@@ -272,7 +397,7 @@ function Lumina() {
                                                         <div className="fixed left-[50%] top-[2%] flex-shrink-0 h-full">
 
                                                             {
-                                                                (!msg.responseComplete && !gotResponse) && (
+                                                                (!responseComplete && (responseComplete!==null)) && (
                                                                     <div className="flex items-center">
                                                                         <div className="loader">
                                                                             <div className="inner one"></div>
@@ -294,7 +419,7 @@ function Lumina() {
                                                     {
                                                         msg.role === "model" && (
                                                             <div className="flex flex-row w-fit h-fit rounded-2xl p-2 border border-white/50 text-cyan-400/85">
-                                                                {msg.model.itemName}
+                                                                {msg.ai_model.itemName}
                                                             </div>
                                                         )
                                                     }
@@ -314,7 +439,7 @@ function Lumina() {
                                                             a: CustomLink,
                                                         }
                                                     } remarkPlugins={[remarkGfm]}>
-                                                        {msg.text}
+                                                        {msg.content}
                                                     </ReactMarkdown>
 
 
@@ -339,10 +464,10 @@ function Lumina() {
                                     </div>
                                 )
                                 }
-                                <div className="w-full fixed bottom-0 h-[7vw] backdrop-blur-xs"></div>
+                                <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 z-20 bg-gradient-to-b from-transparent to-[#000000]/80" />
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} gotResponse={setgotResponse} handleResponseComplete={handleResponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile={UploadingFile} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile={UploadingFile} />
                     </div>
 
                     <WorkSpace files={Frontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />

@@ -1,4 +1,3 @@
-
 // made this a client component because to implement "change profile" feature. For this small page i dont think any significant performance declination will arise.
 
 'use client'
@@ -15,6 +14,10 @@ import { updateEmail } from './_actions/updateEmail';
 import { updateFullName } from './_actions/updateFullName';
 import { updateImage } from './_actions/updateImage';
 import { removeImage } from './_actions/removeImage';
+import { deleteAccountServerAction } from './_actions/deleteAccountServerAction';
+
+import ScreenWidePopUp from '@/components/ScreenWidePopUp';
+import MyAlert from '@/components/MyAlert';
 
 function Profile() {
 
@@ -29,6 +32,12 @@ function Profile() {
     const [changeEmail, setChangeEmail] = useState(false);
     const [changeFullName, setChangeFullName] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [deleteAccountConfirmation, setdeleteAccountConfirmation] = useState(false);
+    const [deleteAccount, setdeleteAccount] = useState(false);
+
+    const [alert, setalert] = useState(false);
+    const [alertMessage, setalertMessage] = useState("Alert");
+
 
     const router = useRouter();
 
@@ -56,6 +65,33 @@ function Profile() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        async function handleDeleteAccount() {
+            if (deleteAccount === true) {
+                const { error } = await deleteAccountServerAction();
+                if (error) {
+                    console.error('Error deleting account:', error);
+                    setalertMessage("Error deleting account");
+                    setalert(true);
+                    setdeleteAccount(false);
+                } else {
+                    // also delete all cookies
+                    const cookies = document.cookie.split(';');
+                    for (const cookie of cookies) {
+                        const eqPos = cookie.indexOf('=');
+                        const name = eqPos > -1 ? cookie.trim().substring(0, eqPos) : cookie.trim();
+                        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`; // its starting time of Linux epoch which used to define timestamps. This is past so essentially it deletes the cookie as it is expired
+
+                    }
+                    window.location.href = '/'; //force full page reload to home page
+                }
+            }
+        }
+
+        handleDeleteAccount();
+
+    }, [deleteAccount])
+
 
     if (!profile) {
         return (
@@ -75,7 +111,7 @@ function Profile() {
     const Profile_Picture = profile.profile_pic || "/pfp-placeholder-2.svg";
 
     return (
-        <div className="flex flex-col break-words">
+        <div className="flex flex-col break-words my-5">
             {
                 isUpdating && (
                     <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center z-50 h-full w-full">
@@ -90,8 +126,17 @@ function Profile() {
                     </div>
                 )
             }
-
-            <div className="mx-100 my-10 border-2 border-white/50 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/30">
+            {
+                deleteAccountConfirmation && (
+                    <ScreenWidePopUp headline={"Are You Sure?"} description={"All your Account Data and History with our Playgrounds will be deleted from our servers. You will not be able to access once you click this Confirmation Button."} color={"red-800"} bgcolor={"red-800/50"} buttonName={"Delete"} buttonAction={setdeleteAccount} triggerCause={setdeleteAccountConfirmation}></ScreenWidePopUp>
+                )
+            }
+            {
+                alert && (
+                    <MyAlert message={alertMessage} alertHandler={setalert} />
+                )
+            }
+            <div className="mx-100 my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
                 <div className="text-3xl">My Account</div>
                 <div className="h-0.5 bg-white/50"></div>
                 <div className="flex flex-col">
@@ -124,18 +169,22 @@ function Profile() {
                                                 formData.append("profile_pic", e.target.files[0]);
                                                 if (formData.get('profile_pic').size > 1 * 1024 * 1024) {
                                                     console.error('File size exceeds 1MB limit');
-                                                    alert("File size exceeds 1MB limit. Please upload a smaller image.");
+
+                                                    setalertMessage("File size exceeds 1MB limit. Please upload a smaller image.");
+                                                    setalert(true);
                                                     return;
                                                 }
                                                 const { publicUrl, error } = await updateImage(formData);
                                                 if (error) {
                                                     if (error == "File size exceeds 1MB limit") {
                                                         console.error('File size exceeds 1MB limit:', error);
-                                                        alert("File size exceeds 1MB limit. Please upload a smaller image.");
+                                                        setalertMessage("File size exceeds 1MB limit. Please upload a smaller image.");
+                                                        setalert(true);
                                                     }
                                                     else {
                                                         console.error('Error updating profile image:', error);
-                                                        alert("Error updating profile image. Please try again.");
+                                                        setalertMessage("Error updating profile image. Please try again.");
+                                                        setalert(true);
                                                     }
                                                 } else {
                                                     setProfile((prev) => ({
@@ -144,6 +193,7 @@ function Profile() {
                                                     }));
                                                 }
                                             } finally {
+                                                e.target.value = "";
                                                 setIsUpdating(false);
                                             }
                                         }
@@ -176,19 +226,23 @@ function Profile() {
                                 onClick={async () => {
                                     try {
                                         if (!profile.profile_pic) {
-                                            alert("No profile picture to remove.");
+                                            setalertMessage("No profile picture to remove.");
+                                            setalert(true);
                                             return;
                                         }
                                         setIsUpdating(true);
                                         const { error } = await removeImage();
                                         if (error) {
                                             console.error('Error removing profile picture:', error);
-                                            alert("Error removing profile picture. Please try again.");
+                                            setalertMessage("Error removing profile picture. Please try again.");
+                                            setalert(true);
                                         } else {
                                             setProfile((prev) => ({
                                                 ...prev,
                                                 profile_pic: null,
                                             }));
+                                            //also delete image url from cookies
+                                            document.cookie = `profile_pic=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
                                         }
                                     }
                                     finally {
@@ -212,7 +266,7 @@ function Profile() {
                                     className="border-b-2 border-white/50 outline-none text-2xl"
                                     placeholder='Enter your username'
                                     type='text'
-                                    defaultValue={profile.username ? (profile.username) : ("Guest")}
+                                    defaultValue={profile.username ? (profile.username) : ("")}
                                 />
                             ) : (
                                 <div className={`text-2xl ${profile.username ? "" : "text-red-500 animate-pulse border-2 border-red rounded-2xl px-4"}`}>
@@ -230,7 +284,7 @@ function Profile() {
                                 `}
                             onClick={
                                 async () => {
-                                    if (changeUsername) {
+                                    if (changeUsername) { // if previous state was changeUsername = true then this click is for saving operation 
                                         if (usernameRef.current) {
                                             setIsUpdating(true);
                                             try {
@@ -239,11 +293,13 @@ function Profile() {
                                                 if (error) {
                                                     if (error == "Username already exists") {
                                                         console.error('Username already exists:', error);
-                                                        alert("Username already exists. Please choose a different username.");
+                                                        setalertMessage("Username already exists. Please choose a different username.");
+                                                        setalert(true);
                                                     }
                                                     else {
                                                         console.error('Error updating username:', error);
-                                                        alert("Error updating username. Please try again.");
+                                                        setalertMessage("Error updating username. Please try again.");
+                                                        setalert(true);
                                                     }
                                                 }
                                                 else {
@@ -253,6 +309,7 @@ function Profile() {
                                                     }));
                                                 }
                                             } finally {
+                                                usernameRef.current.value = "";
                                                 setIsUpdating(false);
                                             }
                                         }
@@ -304,7 +361,8 @@ function Profile() {
                                                 const { error } = await updateFullName(newFullName);
                                                 if (error) {
                                                     console.error('Error updating full name:', error);
-                                                    alert("Error updating full name. Please try again.");
+                                                    setalertMessage("Error updating full name. Please try again.");
+                                                    setalert(true);
                                                 }
                                                 else {
                                                     setProfile((prev) => ({
@@ -313,6 +371,7 @@ function Profile() {
                                                     }));
                                                 }
                                             } finally {
+                                                fullNameRef.current.value = "";
                                                 setIsUpdating(false);
                                             }
                                         }
@@ -365,11 +424,13 @@ function Profile() {
                                                 if (error) {
                                                     if (error == "Email already exists") {
                                                         console.error('Email already exists:', error);
-                                                        alert("Email already exists. Please choose a different email.");
+                                                        setalertMessage("Email already exists. Please choose a different email.");
+                                                        setalert(true);
                                                     }
                                                     else {
                                                         console.error('Error updating email:', error);
-                                                        alert("Error updating email. Please try again.");
+                                                        setalertMessage("Error updating email. Please try again.");
+                                                        setalert(true);
                                                     }
                                                 }
                                                 else {
@@ -379,6 +440,7 @@ function Profile() {
                                                     }));
                                                 }
                                             } finally {
+                                                emailRef.current.value = "";
                                                 setIsUpdating(false);
                                             }
                                         }
@@ -397,7 +459,7 @@ function Profile() {
                 </div>
             </div>
 
-            <div className="mx-100 my-10 border-2 border-white/50 rounded-2xl p-6 bg-red-800/10 shadow-xl shadow-red-800/30">
+            <div className="mx-100 my-10 border-2 border-red-800 rounded-2xl p-6 bg-red-800/10 shadow-xl shadow-red-800/50">
                 <div className="text-3xl">Area-51</div>
                 <div className="h-0.5 bg-white/50"></div>
                 <div className="flex flex-col">
@@ -422,7 +484,8 @@ function Profile() {
 
                                     if (error) {
                                         console.error('Error signing out:', error);
-                                        alert("Error signing out. Please try again.");
+                                        setalertMessage("Error signing out. Please try again.");
+                                        setalert(true);
                                     } else {
                                         // Also delete all cookies
                                         const cookies = document.cookie.split(';');
@@ -455,7 +518,10 @@ function Profile() {
                                     transition-all duration-300 ease-in-out
                                     hover:bg-red-800/30
                                 `}
-                            onClick={() => console.log(`Action: Delete Account with ID: delete_account`)}
+                            onClick={() => {
+                                setdeleteAccountConfirmation(true);
+                            }
+                            }
                         >
                             Delete
                         </button>

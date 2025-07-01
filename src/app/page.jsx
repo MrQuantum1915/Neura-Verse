@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Share_Tech_Mono } from 'next/font/google';
-
 const shareTechMono = Share_Tech_Mono({
   subsets: ['latin'],
   weight: ['400'],
@@ -13,7 +12,7 @@ export default async function Home() {
 
 
   return (
-    <div className={`min-h-screen flex flex-col text-white font-sans ${shareTechMono.className}`}>
+    <div className={`min-h-screen flex flex-col  text-white font-sans ${shareTechMono.className}`}>
       {/* Fixed Gradient Background */}
       <div className="fixed inset-0 z-0 bg-gradient-to-tr from-black via-purple-900/50 to-black h-screen"></div>
 

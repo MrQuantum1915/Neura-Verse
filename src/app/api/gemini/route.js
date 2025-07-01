@@ -51,7 +51,7 @@ export async function POST(request) {
             contents: context.map((item, idx) => ({
                 role: item.role,
                 parts: [
-                    { text: item.text },
+                    { text: item.content },
                     ...((media.length>0 && idx === context.length - 1 && item.role === "user")
                         ? (media.map((file) => createPartFromUri(file.fileURI, file.mimeType)))
                         : [])

@@ -1,10 +1,7 @@
 'use server'
-
 import { createClient_server } from "@/utils/supabase/supabaseServer"
 
-export async function updateFullName(fullName) {
-    // console.log('Updating profile with FullName:', fullName);
-
+export async function updateThreadName(thread_name, thread_id) {
     const supabase = await createClient_server();
 
     const {
@@ -22,19 +19,18 @@ export async function updateFullName(fullName) {
     }
 
     const { data, error } = await supabase
-        .from('profiles')
-        .update({
-            full_name: fullName,
-        })
+        .from('lumina')
+        .update({ thread_name: thread_name })
+        .eq('thread_id', thread_id)
         .eq('user_id', user.id)
-        .select();
+        .select()
 
     // console.log('User ID: ', user.id);
     // console.log('Profile update response:', data, error);
 
     if (error) {
-        console.error('Error updating profile:', error);
-        return { error: 'Failed to update profile' };
+        console.error('Error updating Thread Name', error);
+        return { error: 'Failed to Rename Thread' };
     }
 
     return { data };

@@ -36,13 +36,13 @@ const navigationItems = [
 //   </svg>
 // );
 
-function Sidebar({ page, setsidebarClose, profile_pic }) {
+function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, setCurrThreadID, CurrThreadName, setCurrThreadName, navigatingThread, setnavigatingThread, responseComplete }) {
   const [sidebar, setSidebar] = useState(true);
-  if(profile_pic===null){
-    profile_pic="/pfp-placeholder-2.svg";
+  if (profile_pic === null) {
+    profile_pic = "/pfp-placeholder-2.svg";
   }
   return (
-    <div className={`z-2 flex flex-row items-start justify-between min-h-screen  bg-black border-r-2 border-white/20 text-white`}>
+    <div className={`z-100 flex flex-row items-start justify-between min-h-screen  bg-black border-r-2 border-white/20 text-white`}>
       <div
         className={
           // sidebar
@@ -50,13 +50,13 @@ function Sidebar({ page, setsidebarClose, profile_pic }) {
           // "flex flex-col h-screen items-start  transition-all duration-1000 ease-in-out"
         }
       >
-        <div className="w-fit">
+        <div className="w-full">
           <Link href="/playgrounds/lumina">
-            <h1 className={`text-5xl m-6  cursor-pointer hover:text-cyan-400 transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
+            <h1 className={`text-5xl m-6  cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
           </Link>
 
-          <div className="w-fit">
-            <HistoryTab />
+          <div className="w-full">
+            <HistoryTab CurrThreadID={CurrThreadID} setCurrThreadID={setCurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} navigatingThread={navigatingThread} responseComplete={responseComplete} />
           </div>
 
 
@@ -64,7 +64,7 @@ function Sidebar({ page, setsidebarClose, profile_pic }) {
           <div className="flex flex-col items-start mx-5 m-4 absolute bottom-3">
             {navigationItems.map((items => (
               <Link href={items.href} key={items.label}>
-                <div className="flex items-center justify-center cursor-pointer border-2 border-white/50 rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
+                <div className="flex items-center justify-center cursor-pointer border-2 border-white/50 rounded-lg p-2 m-2 hover:bg-white/20 w-fit opacity-75 hover:opacity-100 transition-all duration-300 ease-in-out">
                   <Image src={items.icon} width={20} height={20} alt={items.label} className="cursor-pointer m-1 invert " />
                   <div className="px-4">{items.label}</div>
                 </div>
@@ -137,9 +137,11 @@ function Sidebar({ page, setsidebarClose, profile_pic }) {
           !sidebar && (
 
             <div className="flex flex-col items-center fixed bottom-5">
+
+
               {navigationItems.map((items => (
                 <Link href={items.href} key={items.label}>
-                  <div className="flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 border-2 border-white/50 rounded-lg p-2 py-1 m-2 hover:bg-white/10 w-fit transition-all duration-400 ease-in-out">
+                  <div className="flex items-center justify-center cursor-pointer opacity-50 hover:opacity-100 border-2 border-white/50 rounded-lg p-2 py-1 m-2 hover:bg-white/20 w-fit transition-all duration-400 ease-in-out">
                     <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
                   </div>
                 </Link>

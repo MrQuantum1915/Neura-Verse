@@ -18,7 +18,7 @@ function WorkSpace({ files, setselectedFiles, selectedFiles, UploadingFile }) {
     const [WorkspaceOpen, setWorkspaceOpen] = useState(false)
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row z-50">
             <button
                 onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
                 className="my-15 cursor-pointer h-fit rounded-l-xl rounded-r-[-15px] click hover:bg-white/20 flex-shrink-0 transition-all duration-300 ease-in-out bg-white/10">
@@ -80,7 +80,6 @@ function WorkSpace({ files, setselectedFiles, selectedFiles, UploadingFile }) {
                         </div>
                     ))}
                 </div>
-
             </div>
         </div >
     )

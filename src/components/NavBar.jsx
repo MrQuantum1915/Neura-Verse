@@ -56,7 +56,7 @@ function NavBar() {
 
 
   return (
-    <nav className="px-4 h-16 flex items-center top-0 sticky border-b-1 border-b-white/10 bg-transparent backdrop-blur-sm z-100">
+    <nav className="px-4 h-16 flex items-center top-0 sticky border-b-1 border-b-white/10 bg-transparent backdrop-blur-sm z-1000">
       <div className="container mx-auto flex justify-between items-center h-full">
         <Link href="/" className={`text-white text-5xl font-bold font-italic  transition-colors duration-300`}>
           NEURA VERSE

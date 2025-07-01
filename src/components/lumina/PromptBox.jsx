@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 
 
-function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet, selectedFiles, setUploadingFile, UploadingFile,  }) {
+function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet, selectedFiles, setUploadingFile, UploadingFile, }) {
 
     const model = Model.id;
 
@@ -74,7 +74,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
             if (!Response.body) throw new Error("No response body");
 
             // array of {objects} is returned from server
-            Response.json().then((metadata) => { 
+            Response.json().then((metadata) => {
 
                 setFrontend_UploadedFiles((prev) => {
                     const updated = [...prev, ...metadata];
@@ -108,10 +108,11 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
     function sendToLLM() {
         const prompt = textareaRef.current.value;
         if (prompt.trim() !== "") {
-            onPrompt(prompt);
+            onPrompt(prompt); // react state updates are async and also bundling , so it does not update immediately. hence we can not rely on the frontend update of the message/context array, Hence we need to make new updatedContext array as below. 
             setawaitingResponse(true);
 
-            const updatedContext = [...context, { role: "user", text: prompt }]; // this is to be done to avoid abnormal behaviour of app, because react instructs to treat state objects or array as immutable, you should not directly change the original object itself. 
+            const updatedContext = [...context, { role: "user", content: prompt }]; // this is to be done to avoid abnormal behaviour of app, because react instructs to treat state objects or array as immutable, you should not directly change the original object itself. And another reason is mentioned above beside ```onPrompt(prompt);```
+
 
 
             let responseText = "";
@@ -140,14 +141,12 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                             onStreamResponse(responseText);
                         }
                     }
-                    gotResponse(true);
-                    handleResponseComplete();
+                    setresponseComplete(true);
                     setawaitingResponse(false);
                 })
                 .catch(error => {
                     setawaitingResponse(false);
-                    gotResponse(true);
-                    handleResponseComplete();
+                    setresponseComplete(true);
                     console.error("Error:", error);
                 });
         }
@@ -164,7 +163,7 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
     // }, []);
 
     return (
-        <div className=" fixed bottom-5 w-[40vw] bg-black rounded-xl flex flex-row items-center justify-between px-2 border-1 border-white/30">
+        <div className="bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-100 hover:border-cyan-400 transition-all duration-300 ease-in-out">
 
             {/* user uploads their damn media here , just whatever*/}
             <label className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
@@ -180,12 +179,14 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
             }
             {/* <button className="btn m-20 border-1 border-white/30 rounded-3xl"> */}
 
-            {/* </button> */}
 
             <textarea
                 ref={textareaRef}
+                id="prompt-input"
+                name="prompt"
                 role="take-user-prompt"
-                className="promptBoxTextarea  text-[1.25em] overflow-hidden p-3 m-3 w-[90%] bg-white/7 outline-none border-2 rounded-xl border-transparent focus:border-cyan-400 resize-none max-h-40 transition-all duration-700 ease-in-out"
+                className="text-[1.25em] overflow-hidden p-2 m-2 w-[90%]  outline-none rounded-xl border-transparent resize-none max-h-40  transition-all duration-700 ease-in-out"
+                rows={1}
                 onInput={handleInput}
                 placeholder="What's On Your Mind...?"
                 aria-label="Prompt Input"
@@ -197,25 +198,16 @@ function PromptBox({ onPrompt, onStreamResponse, gotResponse, handleResponseComp
                         handleInput();
                     }
                 }}
-            >
-            </textarea>
+            />
 
-            {/* <button className="relative rounded-sm p-1 bg-white/5 cursor-pointer active:translate-y-1 transition-all duration-200 ease-in-out">
-                <Image
-                    src={"/chip2.svg"}
-                    width={50}
-                    height={50}
-                    alt={"Model"}
-                />
-            </button> */}
 
             <button>
                 <Image
-                    src={`${awaitingResponse ? "/stop.svg" : "/submit.png"}`}
+                    src={`${awaitingResponse ? "/stop.svg" : "/send.svg"}`}
                     width={40}
                     height={40}
                     alt="Submit"
-                    className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105  hover:rotate-45 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-[linear-gradient(45deg,_#922bff,_#00d9ff)]"}`}
+                    className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/30 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-white/10"}`}
                     aria-label="Submit Prompt"
                     onClick={(e) => {
                         awaitingResponse ? (handleInput()) : (sendToLLM(), textareaRef.current.value = "", handleInput());

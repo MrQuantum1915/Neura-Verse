@@ -9,5 +9,5 @@
 # Tech Stack
  - React
  - Tailwind CSS
- - NextJs - (frontend and backend (server actions and api) )
- - Database - Supabase (Not deployed Yet) 
+ - NextJs - (frontend and backend (server actions and api) ) with all security implementations
+ - Database - Supabase

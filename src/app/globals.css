@@ -18,6 +18,36 @@
   }
 }
 
+@layer utilities {
+  @keyframes mypulse {
+    /* Tailwind doesn’t support custom animation-delay out of the box for arbitrary values like 0.2s, so we define our own utility classes (.animation-delay-*) in the custom CSS layer. */
+
+    0%,
+    100% {
+      transform: scale(0);
+    }
+
+    50% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-mypulse {
+    animation: mypulse 1.5s ease-in-out infinite;
+  }
+
+  .animation-delay-0 {
+    animation-delay: 0s;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+}
 
 
 body {
@@ -28,6 +58,7 @@ body {
 
 ::-webkit-scrollbar {
   width: 0.4em;
+  height: 0.4em;
 }
 
 html {
@@ -253,7 +284,7 @@ html {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  border-radius: 50%;  
+  border-radius: 50%;
 }
 
 .inner.one {
@@ -262,6 +293,7 @@ html {
   animation: rotate-one 1s linear infinite;
   border-bottom: 3px solid #EFEFFA;
 }
+
 .inner.two {
   right: 0%;
   top: 0%;
@@ -280,6 +312,7 @@ html {
   0% {
     transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
   }
+
   100% {
     transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
   }
@@ -289,6 +322,7 @@ html {
   0% {
     transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
   }
+
   100% {
     transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
   }
@@ -298,6 +332,7 @@ html {
   0% {
     transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
   }
+
   100% {
     transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
   }
@@ -307,4 +342,144 @@ html {
 
 
 
+/* I made component of this */
+/* ========== LOADING SCREEN 1: PULSE CIRCLES ========== */
+/* <div class="loader-1">
+      <div class="pulse-container">
+          <div class="pulse-circle"></div>
+          <div class="pulse-circle"></div>
+          <div class="pulse-circle"></div>
+      </div>
+      <div class="loader-text">Loading Content</div>
+  </div> */
+/* .loader-1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
+.Mypulse-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.Mypulse-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin: 0 8px;
+  transform: scale(0);
+  animation: pmyulse 1.5s ease-in-out infinite;
+  background: linear-gradient(145deg, #6366f1, #8b5cf6);
+}
+
+.Mypulse-circle:nth-child(2) {
+  animation-delay: 0.2s;
+  background: linear-gradient(145deg, #8b5cf6, #d946ef);
+}
+
+.Mypulse-circle:nth-child(3) {
+  animation-delay: 0.4s;
+  background: linear-gradient(145deg, #d946ef, #ec4899);
+} */
+
+/* see in @utilities above */
+
+/* @keyframes mypulse { 
+  0%,
+  100% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+} */
+
+/* .loader-text {
+  font-size: 1.1rem;
+  color: #ff7300;
+  letter-spacing: 1px;
+} */
+
+/* ========== LOADING SCREEN 4: WAVE EFFECT ========== */
+
+/*                  <div class="loader-4">
+                        <div class="wave-container">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                        <div class="wave-text">Content is Loading</div>
+                    </div> */
+
+.loader-4 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.wave-container {
+  display: flex;
+  align-items: flex-end;
+  height: 60px;
+}
+
+.wave-bar {
+  width: 6px;
+  height: 20px;
+  margin: 0 4px;
+  background: linear-gradient(180deg, #ff7300, #fffb00);
+  border-radius: 3px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.wave-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.wave-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.wave-bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+.wave-bar:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+.wave-bar:nth-child(7) {
+  animation-delay: 0.6s;
+}
+
+@keyframes wave {
+
+  0%,
+  100% {
+    height: 20px;
+  }
+
+  50% {
+    height: 50px;
+  }
+}
+
+.wave-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e57346;
+}

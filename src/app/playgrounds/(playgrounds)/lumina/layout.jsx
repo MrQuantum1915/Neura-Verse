@@ -1,4 +1,7 @@
+// named as [[...threadId]] because I want to catch all this routes /playground/lumina/ (no threadId), /playground/lumina/abc123 (with threadId)
+// to manage absence of any threadId parameter
 "use client"
+import React from "react";
 import Sidebar from "@/components/lumina/Sidebar"
 import PromptBox from "@/components/lumina/PromptBox";
 import ReactMarkdown from 'react-markdown';
@@ -19,10 +22,11 @@ import MoreIcon from "@/components/icons/MoreIcon";
 import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
-// import { redirect } from "next/navigation";
-import { useRouter } from "next/navigation";
+
 
 import { Playfair_Display } from 'next/font/google';
+import VerticalBarsLoader from "@/components/VerticalBarsLoader";
+import ThreadIdpage from "./[[...threadId]]/page";
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
@@ -91,7 +95,7 @@ const toolbar = [
     { itemName: "More", icon: <MoreIcon stroke="white" size={20} /> },
 ];
 
-function Lumina() {
+function Lumina({ children }) {
 
     // for alerts
     const [alert, setalert] = useState(false);
@@ -101,9 +105,8 @@ function Lumina() {
     const [name, setname] = useState("Visitor")
     const [profile_pic, setprofile_pic] = useState(null)
 
-    // this runs on every full render and checks if session is active or user logged in
-    const router = useRouter();
 
+    // this runs on every full render and checks if session is active or user logged in
     useEffect(() => {
         const fetchUserLoggedIn = async () => {
             try {
@@ -164,48 +167,60 @@ function Lumina() {
 
 
 
-    // managing threads
+
     const [CurrThreadID, setCurrThreadID] = useState(null);
-    const [CurrThreadName, setCurrThreadName] = useState("New Thread")
+    const [CurrThreadName, setCurrThreadName] = useState("Reason for New Thread")
     const [navigatingThread, setnavigatingThread] = useState(false)
+    const [newchat, setnewchat] = useState(false);
 
-    // This block is implemented because here we are using CurrThreadName and ID in various operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
+    // This block is implemented because here we are using CurrThreadName and ID in v   arious operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
     // create refs for thread ID/name
-    const currThreadIDRef = useRef(CurrThreadID);
-    const currThreadNameRef = useRef(CurrThreadName);
+    // const currThreadIDRef = useRef(CurrThreadID);
+    // const currThreadNameRef = useRef(CurrThreadName);
 
-    // update refs when thread ID/name change
-    useEffect(() => {
-        currThreadIDRef.current = CurrThreadID;
-        currThreadNameRef.current = CurrThreadName;
-    }, [CurrThreadID, CurrThreadName]);
-    //
+    // // update refs when thread ID/name change
+    // useEffect(() => {
+    //     currThreadIDRef.current = CurrThreadID;
+    //     currThreadNameRef.current = CurrThreadName;
+    // }, [CurrThreadID, CurrThreadName]);
+    // //
 
 
     // managing fetching of chat from threadID
+
+
+
     useEffect(() => {
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
             setMessages([]);
         }
         else {
-            if (navigatingThread) {
+            if (!newchat) {
 
-                setnavigatingThread(false);
+                setnavigatingThread(true);
 
-                const fetchChat = async () => {
-                    if (CurrThreadID == null) {
-                        return;
+                const getThread = async () => {
+                    try {
+                        const { data, error } = await fetchThread(CurrThreadID);
+                        if (error) {
+                            setalertMessage(error);
+                            setalert(true);
+                            return;
+                        }
+                        // console.log(data);
+                        setMessages(data);
                     }
 
-                    const { data, error } = await fetchThread(CurrThreadID);
-                    if (error) {
-                        setalertMessage(error);
-                        setalert(true);
-                        return;
+                    finally {
+                        setnavigatingThread(false);
                     }
-                    setMessages(data);
                 }
-                fetchChat();
+
+                getThread();
+
+            }
+            else {
+                setnewchat(false);
             }
         }
     }, [CurrThreadID])
@@ -213,6 +228,7 @@ function Lumina() {
 
     // handlers to add user and AI messages
     const handleNewPrompt = async (userPrompt) => {
+
         setresponseComplete(false);
         const newMessages = [
             ...messages,
@@ -223,7 +239,7 @@ function Lumina() {
 
 
         // if this is first message, update thread name
-        let tempThreadId;
+        // let tempThreadId;
         if (messages.length === 0) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
             const { data, error } = await createNewThread(userPrompt);
 
@@ -232,16 +248,14 @@ function Lumina() {
                 setalert(true);
                 return;
             }
-            // setalertMessage(data[0].thread_id);
-            // setalert(true); 
-            setCurrThreadID(data[0].thread_id);
-            tempThreadId = data[0].thread_id;
+            // setCurrThreadID(data[0].thread_id); // we are using dyanmic routes now so we will only update url, the current thread id will update due to useeffect of threadId, and also we donot wnat to fetch the thread from database, so we stop fetch in the useeffect of CurrThreadId by using newchat state :) I am genius huh?
+            setnewchat(true);
+            // tempThreadId = data[0].thread_id;
             setCurrThreadName(userPrompt);
+            router.push(`/playgrounds/lumina/${data[0].thread_id}`)
         }
         else {
-
-            const threadNameToUse = messages.length === 0 ? userPrompt : CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
-
+            const threadNameToUse = CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
             const { data, error } = await insertNewMessage( // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
                 CurrThreadID,
                 threadNameToUse,
@@ -343,20 +357,31 @@ function Lumina() {
 
     return (
         <div className={`flex flex-row h-screen w-full overflow-hidden`}>
+            <ThreadIdpage setCurrThreadID={setCurrThreadID} />
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} CurrThreadID={CurrThreadID} setCurrThreadID={setCurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} responseComplete={responseComplete} navigatingThread={navigatingThread} />
+
+            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} CurrThreadID={CurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} responseComplete={responseComplete} navigatingThread={navigatingThread} />
 
             <main className="w-full h-full flex flex-col justify-between items-center ">
 
                 <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} />
 
+
                 {/* Set height below TopBar to fill remaining space */}
                 <div className="flex w-full flex-row" style={{ height: "calc(100vh - 90px)" }}>
+
                     <div className="flex flex-col  w-full h-full items-center">
                         <div className=" w-full h-full pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
-
+                            {
+                                (navigatingThread) && (
+                                    <div className="loader-4 fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 h-full w-full">
+                                        <VerticalBarsLoader />
+                                        <div className="text-orange-400 text-sm">Fetching Thread...</div>
+                                    </div>
+                                )
+                            }
                             <div>
                                 {messages.length === 0 ? (
                                     <div className={`sm:text-5xl text-2xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
@@ -379,8 +404,8 @@ function Lumina() {
                                                             <Image
                                                                 src={"/ai_logo_orange-nobg.png"}
                                                                 alt="Lumina"
-                                                                width={50}
-                                                                height={50}
+                                                                width={40}
+                                                                height={40}
                                                                 className=
                                                                 {`bg-black rounded-full 
                                                                     ${(
@@ -397,7 +422,7 @@ function Lumina() {
                                                         <div className="fixed left-[50%] top-[2%] flex-shrink-0 h-full">
 
                                                             {
-                                                                (!responseComplete && (responseComplete!==null)) && (
+                                                                (!responseComplete && (responseComplete !== null)) && (
                                                                     <div className="flex items-center">
                                                                         <div className="loader">
                                                                             <div className="inner one"></div>
@@ -414,7 +439,7 @@ function Lumina() {
                                                     )
                                                 }
 
-                                                <div className={`inline-block px-10 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs max-w-150" : "text-white/85 rounded-tl-xs"}`}>
+                                                <div className={`inline-block px-7 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs max-w-150" : "text-white/85 rounded-tl-xs"}`}>
 
                                                     {
                                                         msg.role === "model" && (

@@ -3,7 +3,7 @@ import { createClient_server } from "@/utils/supabase/supabaseServer"
 
 export async function fetchThread(thread_id) {
     const supabase = await createClient_server();
-
+    console.log("received fetch request")
     const {
         data: { user },
         error: userError,
@@ -31,8 +31,8 @@ export async function fetchThread(thread_id) {
 
     if (error) {
         console.error('Error Fetching Thread', error);
-        return { error: 'Failed to Fetch Thread' };
+        return { error: 'Unable to fetch thread. It may have been deleted or does not exist.' };
     }
-
+    console.log("sent");
     return { data };
 }

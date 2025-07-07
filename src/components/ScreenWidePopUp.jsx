@@ -22,7 +22,7 @@ function ScreenWidePopUp({ headline, description, color, bgcolor, buttonName, bu
         setTimeout(() => {
             triggerCause(() => false);
             buttonAction(() => false);
-        }, 500); 
+        }, 500);
     };
 
     return (

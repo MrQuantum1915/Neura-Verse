@@ -163,7 +163,7 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
     // }, []);
 
     return (
-        <div className="bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-100 hover:border-cyan-400 transition-all duration-300 ease-in-out">
+        <div className="bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-85 hover:border-cyan-400 transition-all duration-300 ease-in-out">
 
             {/* user uploads their damn media here , just whatever*/}
             <label className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
@@ -207,7 +207,7 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
                     width={40}
                     height={40}
                     alt="Submit"
-                    className={`cursor-pointer rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/30 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-white/10"}`}
+                    className={`cursor-pointer opacity-90 rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/30 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-white/10"}`}
                     aria-label="Submit Prompt"
                     onClick={(e) => {
                         awaitingResponse ? (handleInput()) : (sendToLLM(), textareaRef.current.value = "", handleInput());

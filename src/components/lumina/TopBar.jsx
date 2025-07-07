@@ -73,7 +73,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
 
     return (
-        <div className={` relative flex flex-row flex-wrap justify-between  w-full h-23 border-b border-white/10 z-100`}>
+        <div className={` relative flex flex-row flex-wrap justify-between  w-full h-23 border-b border-white/10 z-75`}>
             {
                 sidebarClose ? (
                     <Link href="/playgrounds/lumina">
@@ -85,7 +85,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
             <div className="self-center flex flex-row items-center gap-2">
-                <Image src={"/hash.svg"} width={20} height={20} alt={"topic"} className="opacity-50 mx-2"/>
+                <Image src={"/hash.svg"} width={20} height={20} alt={"topic"} className="opacity-50 mx-2" />
                 <div className="overflow-x-hidden whitespace-nowrap text-center text-xl text-white w-fit max-w-100 overflow-y-hidden overflow-x-hidden text-ellipsis ">
                     {
                         !editThreadName ? (CurrThreadName) : (
@@ -128,10 +128,18 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                     }}
                     className="flex-shrink-0"
                 >
-                    <Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/20 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />
+                    {
+                        (CurrThreadID !== null) &&
+                        (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/20 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
+                    }
                 </button>
             </div>
-
+            
+            <button
+                className=" self-center p-2 bg-cyan-400 rounded text-black h-fit w-fit"
+            >Share
+            </button>
+            
             <div className="flex flex-col mx-5 items-end">
 
                 <div
@@ -156,7 +164,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                 </div>
             </div>
 
-            <div className="pointer-events-none absolute left-0 bottom-[-20] w-full h-5 z-20 bg-gradient-to-b from-[#000000]/80 to-transparent" />
+            <div className="pointer-events-none absolute left-0 bottom-[-20] w-full h-5 z-20 bg-gradient-to-b from-[#000000]/80 to-transparent z-50" />
 
         </div >
     )

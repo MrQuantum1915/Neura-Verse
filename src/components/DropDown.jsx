@@ -4,7 +4,7 @@ const DropDown = forwardRef(({ itemsArray, selectItem }, ref) => {
   return (
     <div
       ref={ref}
-      className="flex flex-col absolute  -translate-x-3/5 top-10 z-1000 text-white border-2 border-white/50 backdrop-blur-xs rounded w-auto min-w-fit max-w-max h-fit shadow-sm shadow-white whitespace-nowrap pointer-events-auto transition-all duration-300 ease-in-out"
+      className="flex flex-col absolute  -translate-x-3/5 top-10 z-[1000] text-white border-2 border-white/50 backdrop-blur-sm rounded-lg w-auto min-w-fit max-w-max h-fit shadow-sm shadow-white whitespace-nowrap pointer-events-auto transition-all duration-300 ease-in-out"
     >
       {itemsArray.map((item) => (
         <div

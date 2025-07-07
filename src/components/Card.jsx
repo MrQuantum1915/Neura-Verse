@@ -29,7 +29,7 @@ function Card({ Title, Description, ImageURL, Tags, pageLink }) {
                         className="cardButton"
                     >
                         Explore Now
-                        <Image src={"/open-in-new-tab.svg"} width={20} height={20} alt="Open in New tab" className="ml-2 mb-0.5" />
+                        <Image src={"/open-in-new-tab-cyan.svg"} width={20} height={20} alt="Open in New tab" className="ml-2 mb-0.5" />
                     </button>
                 </Link>
             </div>

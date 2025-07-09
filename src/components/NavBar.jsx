@@ -7,6 +7,17 @@ import { createClient_client } from "@/utils/supabase/supabaseClient";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
+import { Michroma } from "next/font/google"
+const michroma = Michroma({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal'],
+  display: 'swap',
+  variable: '--font-michroma',
+});
+
+
+
 const navItems = [
   { href: "/home", label: "Home" },
   { href: "/about", label: "About" },
@@ -56,12 +67,13 @@ function NavBar() {
 
 
   return (
-    <nav className="px-4 h-16 flex items-center top-0 sticky border-b-1 border-b-white/10 bg-transparent backdrop-blur-sm z-1000">
-      <div className="container mx-auto flex justify-between items-center h-full">
-        <Link href="/" className={`text-white text-5xl font-bold font-italic  transition-colors duration-300`}>
-          NEURA VERSE
+    <nav className="px-4 h-fit w-full flex items-center top-0 sticky border-b-1 border-b-white/10 bg-black/20 backdrop-blur-lg z-90">
+      <div className={`${michroma.className} w-full h-full flex flex-row justify-between items-center flex-wrap items-center`}>
+        <Link href="/">
+          <Image src={"/Neura Verse Logo (Self Made)-v3.0-nobg.png"} width={200} height={140} alt="logo" className="my-2 hover:scale-105 transition-all duration-500 ease-in-out"></Image>
         </Link>
-        <ul className="flex flex-row h-full items-center justify-around cursor-pointer">
+
+        <ul className="flex flex-row flex-wrap h-full items-center justify-around cursor-pointer">
           {navItems.map((items) => (
             <li key={items.label} className="h-full">
               <NavItem href={items.href}>
@@ -70,28 +82,28 @@ function NavBar() {
               </NavItem>
             </li>
           ))}
-          {
-            userLoggedIn ? (
-              <Link href={"/profile"}>
-                <li key={"profile"}>
-                  <Image 
-                  src={profile_pic || "/pfp-placeholder-2.svg"} 
-                  width={50} 
-                  height={50} 
-                  alt="Profile" 
-                  style={{ aspectRatio: "1/1" }} 
-                  className="ml-6 rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-cyan-400" />
-                </li>
-              </Link>
-            ) : (
-              <Link href={"/auth/login"}>
-                <li key={"SignIn"} className="ml-6 px-4 py-2 rounded-xl bg-white text-black">
-                  Sign In
-                </li>
-              </Link>
-            )
-          }
         </ul>
+        {
+          userLoggedIn ? (
+            <Link href={"/profile"}>
+              <div key={"profile"}>
+                <Image
+                  src={profile_pic || "/pfp-placeholder-2.svg"}
+                  width={55}
+                  height={55}
+                  alt="Profile"
+                  style={{ aspectRatio: "1/1" }}
+                  className="rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+              </div>
+            </Link>
+          ) : (
+            <Link href={"/auth/login"}>
+              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black">
+                Sign In
+              </div>
+            </Link>
+          )
+        }
       </div>
     </nav>
   );

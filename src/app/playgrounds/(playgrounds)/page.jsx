@@ -22,7 +22,7 @@ export default function PlaygroundsPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-blue-100 m-10">
       <h1 className="text-4xl font-bold mb-4">AI Playgrounds</h1>
-      <p className="text-lg text-blue-100/70 mb-8 max-w-xl text-center">
+      <p className="text-lg text-blue-100/70 mb-8 max-w-[70%] text-center">
         Welcome to the Playgrounds! Here you can experiment with various AI models, tools, and interactive demos. Select a playground from the menu or check back soon for new features.
       </p>
 

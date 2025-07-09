@@ -31,7 +31,7 @@ const MyAlert = ({ message, duration = 5000, alertHandler }) => {
 
     return (
         <div
-            className={`fixed left-150 right-150 border-2 border-red-500 bg-[#540101]   z-1000 rounded-lg  text-white p-2 text-center font-bold transition-all duration-1000 ease-in-out ${visible ? 'top-5' : '-top-24 pointer-events-none'}`}
+            className={`fixed left-150 right-150 border-2 border-red-500 bg-[#540101]   z-100 rounded-lg  text-white p-2 text-center font-bold transition-all duration-1000 ease-in-out ${visible ? 'top-5' : '-top-24 pointer-events-none'}`}
         >
             {message}
         </div>

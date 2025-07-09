@@ -3,17 +3,12 @@ import "./globals.css";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
 import {
-  Courier_Prime,
-  Oswald,
   Playfair_Display,
-  Roboto_Slab,
   Roboto,
-  Share_Tech_Mono,
-  Montserrat,
-  Poppins,
-  Inter,
-  DM_Sans,
+  Michroma,
+  Instrument_Serif
 } from 'next/font/google';
+import Image from "next/image";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -21,21 +16,6 @@ const roboto = Roboto({
   style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-roboto',
-});
-
-const courierPrime = Courier_Prime({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-courier-prime',
-});
-
-const oswald = Oswald({
-  subsets: ['latin'],
-  weight: ['200', '300', '400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-oswald',
 });
 
 const playfairDisplay = Playfair_Display({
@@ -46,50 +26,20 @@ const playfairDisplay = Playfair_Display({
   variable: '--font-playfair-display',
 });
 
-const robotoSlab = Roboto_Slab({
+const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
   display: 'swap',
-  variable: '--font-roboto-slab',
+  variable: '--font-instrument-serif',
 });
 
-const shareTechMono = Share_Tech_Mono({
+const michroma = Michroma({
   subsets: ['latin'],
   weight: ['400'],
   style: ['normal'],
   display: 'swap',
-  variable: '--font-share-tech-mono',
-});
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-montserrat',
-});
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-poppins',
-});
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  style: ['normal', 'italic'],
-  display: 'swap',
-  variable: '--font-dm-sans',
+  variable: '--font-michroma',
 });
 
 export const metadata = {
@@ -100,12 +50,24 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${roboto.variable} ${courierPrime.variable} ${oswald.variable} ${playfairDisplay.variable} ${robotoSlab.variable} ${shareTechMono.variable} ${montserrat.variable} ${poppins.variable} ${inter.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${roboto.variable} ${playfairDisplay.variable} ${instrumentSerif.variable}`}>
       <SpeedInsights />
-      <body className="min-h-screen flex flex-col">
+      <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <ConditionallyIncludeNavbar />
-        <main className={`flex-1 flex flex-col bg-black ${roboto.className}`}>
-          {children}
+        <main className="flex-1 flex flex-col bg-black relative">
+          <div className="fixed inset-0 z-0 h-full w-full opacity-0">
+            <Image
+              src={"/main-bg-10.jpg"}
+              width={1920}
+              height={1080}
+              alt="Main background"
+              className="w-full h-full object-cover"
+              priority
+            />
+          </div>
+          <div className="relative z-10">
+            {children}
+          </div>
         </main>
         <ConditionallyIncludeFooter />
       </body>

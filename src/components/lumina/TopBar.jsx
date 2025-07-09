@@ -136,7 +136,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
             </div>
             
             <button
-                className=" self-center p-2 bg-cyan-400 rounded text-black h-fit w-fit"
+                className="self-center p-2 bg-cyan-400 rounded text-black h-fit w-fit"
             >Share
             </button>
             

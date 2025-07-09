@@ -24,10 +24,10 @@ import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
 
 
-import { Playfair_Display } from 'next/font/google';
 import VerticalBarsLoader from "@/components/VerticalBarsLoader";
 import ThreadIdpage from "./[[...threadId]]/page";
 
+import { Playfair_Display, Roboto } from 'next/font/google';
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
     weight: ['400', '500', '600', '700', '800', '900'],
@@ -35,6 +35,15 @@ const playfairDisplay = Playfair_Display({
     display: 'swap',
     variable: '--font-playfair-display',
 });
+const roboto = Roboto({
+    subsets: ['latin'],
+    weight: ['100', '300', '400', '500', '700', '900'],
+    style: ['normal', 'italic'],
+    display: 'swap',
+    variable: '--font-roboto',
+});
+
+
 
 function CustomLink({ href, children }) {
     return (
@@ -356,7 +365,7 @@ function Lumina({ children }) {
 
 
     return (
-        <div className={`flex flex-row h-screen w-full overflow-hidden`}>
+        <div className={`${roboto.className} flex flex-row h-screen w-full overflow-hidden z-1 bg-black`}>
             <ThreadIdpage setCurrThreadID={setCurrThreadID} />
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />

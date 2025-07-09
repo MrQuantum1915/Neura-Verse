@@ -1,6 +1,15 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image';
+import { Michroma } from 'next/font/google';
+const michroma = Michroma({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal'],
+  display: 'swap',
+  variable: '--font-michroma',
+});
+
 
 const iconMap = {
   github: (
@@ -63,7 +72,7 @@ function FooterNavItem({ href, children }) {
 
 function Footer() {
   return (
-    <footer className="bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-1000">
+    <footer className={`bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-1000 ${michroma.className}`}>
 
       <div className="flex flex-row flex-wrap mx-4 my-2  h-full mt-10 justify-around">
 

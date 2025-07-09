@@ -70,7 +70,7 @@ function NavBar() {
     <nav className="px-4 h-fit w-full flex items-center top-0 sticky border-b-1 border-b-white/10 bg-black/20 backdrop-blur-lg z-90">
       <div className={`${michroma.className} w-full h-full flex flex-row justify-between items-center flex-wrap items-center`}>
         <Link href="/">
-          <Image src={"/Neura Verse Logo (Self Made)-v3.0-nobg.png"} width={200} height={140} alt="logo" className="my-2 hover:scale-105 transition-all duration-500 ease-in-out"></Image>
+          <Image src={"/Neura Verse Logo (Self Made)-v3.0-nobg.png"} width={200} height={55} alt="logo" className="my-2 hover:scale-105 transition-all duration-500 ease-in-out"></Image>
         </Link>
 
         <ul className="flex flex-row flex-wrap h-full items-center justify-around cursor-pointer">

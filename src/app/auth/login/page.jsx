@@ -50,7 +50,7 @@ function page() {
 
           <h1 className="text-4xl my-2 mb-4">Welcome back</h1>
           <h1 className="text-3xl my-2 mb-4">LOGIN To Gain Full Experience</h1>
-
+          <h2 className="text-green-400">It'll only take mere seconds</h2>
           <div className="flex flex-col gap-4 w-full items-center justify-center">
             <div className="m-2 text-white/50 text-2xl font-bold">
               OAuth

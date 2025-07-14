@@ -111,7 +111,7 @@ function Profile() {
     const Profile_Picture = profile.profile_pic || "/pfp-placeholder-2.svg";
 
     return (
-        <div className="flex flex-col break-words my-5">
+        <div className="flex flex-col items-center justify-center break-words my-5">
             {
                 isUpdating && (
                     <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center z-50 h-full w-full">
@@ -136,15 +136,15 @@ function Profile() {
                     <MyAlert message={alertMessage} alertHandler={setalert} />
                 )
             }
-            <div className="mx-100 my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
+            <div className="md:w-[60vw] w-[80vw] my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
                 <div className="text-3xl">My Account</div>
                 <div className="h-0.5 bg-white/50"></div>
                 <div className="flex flex-col">
                     <div className="text-xl mt-4 mb-2 opacity-50">
                         Profile Picture
                     </div>
-                    <div className="flex  flex-row justify-between items-center">
-                        <div className="relative w-[200px] h-[200px]">
+                    <div className="flex flex-row flex-wrap justify-between items-center">
+                        <div className="relative w-[200px] h-[200px] flex-shrink-0">
                             <Image
                                 src={Profile_Picture}
                                 fill
@@ -153,7 +153,7 @@ function Profile() {
                                 style={{ aspectRatio: "1/1" }}
                             />
                         </div>
-                        <div className='flex flex-row items-center gap-4'>
+                        <div className='flex flex-row flex-wrap items-center gap-4'>
 
                             <label className="cursor-pointer">
                                 <input
@@ -258,29 +258,31 @@ function Profile() {
                     <div className="text-xl mt-4 mb-2 opacity-50">
                         Username
                     </div>
-                    <div className="flex  flex-row justify-between items-center">
+                    <div className="flex flex-row flex-wrap justify-between items-center w-full">
                         {
                             changeUsername ? (
                                 <input
                                     ref={usernameRef}
-                                    className="border-b-2 border-white/50 outline-none text-2xl"
+                                    className="border-b-2 border-white/50 outline-none text-[1.5em]"
                                     placeholder='Enter your username'
                                     type='text'
                                     defaultValue={profile.username ? (profile.username) : ("")}
                                 />
                             ) : (
-                                <div className={`text-2xl ${profile.username ? "" : "text-red-500 animate-pulse border-2 border-red rounded-2xl px-4"}`}>
+                                <div className={`text-[1.5em] overflow-scroll ${profile.username ? "" : "text-red-500 animate-pulse border-2 border-red rounded-2xl px-4"}`}>
                                     {profile.username ? profile.username : "Please Set a Username to continue"}
                                 </div>
                             )
                         }
                         <button
                             className={`
-                                    px-4 py-2 cursor-pointer border-2
+                                    px-4 py-2 mx-2 cursor-pointer border-2
                                     bg-cyan-400/10
                                     border-cyan-400 rounded-lg
                                     transition-all duration-300 ease-in-out
                                     hover:bg-cyan-400/20
+                                    flex-shrink-0
+                                    whitespace-nowrap
                                 `}
                             onClick={
                                 async () => {
@@ -327,18 +329,18 @@ function Profile() {
                     <div className="text-xl mt-4 mb-2 opacity-50">
                         Full Name
                     </div>
-                    <div className="flex  flex-row justify-between items-center">
+                    <div className="flex  flex-row flex-wrap justify-between items-center">
                         {
                             changeFullName ? (
                                 <input
                                     ref={fullNameRef}
-                                    className="border-b-2 border-white/50 outline-none text-2xl"
+                                    className="border-b-2 border-white/50 outline-none text-[1.5em]"
                                     placeholder='Enter your full name'
                                     type='text'
                                     defaultValue={profile.full_name ? (profile.full_name) : ("")}
                                 />
                             ) : (
-                                <div className={`text-2xl`}>
+                                <div className={`text-[1.5em] overflow-scroll`}>
                                     {profile.full_name ? profile.full_name : "Not Set"}
                                 </div>
                             )
@@ -350,6 +352,7 @@ function Profile() {
                                     border-cyan-400 rounded-lg
                                     transition-all duration-300 ease-in-out
                                     hover:bg-cyan-400/20
+                                    flex-shrink-0
                                 `}
                             onClick={
                                 async () => {
@@ -389,18 +392,18 @@ function Profile() {
                     <div className="text-xl mt-4 mb-2 opacity-50">
                         Email
                     </div>
-                    <div className="flex  flex-row justify-between items-center">
+                    <div className="flex  flex-row flex-wrap justify-between items-center">
                         {
                             changeEmail ? (
                                 <input
                                     ref={emailRef}
-                                    className="border-b-2 border-white/50 outline-none text-2xl w-3/4"
+                                    className="border-b-2 border-white/50 outline-none text-[1.5  em] w-3/4"
                                     placeholder='Enter your email'
                                     type='email'
                                     defaultValue={profile.email_id}
                                 />
                             ) : (
-                                <div className="text-2xl break-words">
+                                <div className="text-[1.5em] break-words overflow-scroll">
                                     {profile.email_id}
                                 </div>
                             )
@@ -412,6 +415,7 @@ function Profile() {
                                     border-cyan-400 rounded-lg
                                     transition-all duration-300 ease-in-out
                                     hover:bg-cyan-400/20
+                                    flex-shrink-0
                                 `}
                             onClick={
                                 async () => {
@@ -459,13 +463,13 @@ function Profile() {
                 </div>
             </div>
 
-            <div className="mx-100 my-10 border-2 border-red-800 rounded-2xl p-6 bg-red-800/10 shadow-xl shadow-red-800/50">
+            <div className="md:w-[60vw] w-[80vw] my-10 border-2 border-red-800 rounded-2xl p-6 bg-red-800/10 shadow-xl shadow-red-800/50">
                 <div className="text-3xl">Area-51</div>
                 <div className="h-0.5 bg-white/50"></div>
                 <div className="flex flex-col">
 
-                    <div className='flex flex-row items-center justify-between'>
-                        <div className="flex  flex-row justify-between gap-5 items-center my-4">
+                    <div className='flex flex-row flex-wrap items-center justify-between'>
+                        <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
                             <Image src={"/signOut.svg"} width={30} height={30} alt="Warning" className="" />
                             <div className="opacity-75 text-xl">Sign out of this session</div>
                         </div>
@@ -505,8 +509,8 @@ function Profile() {
                         </button>
                     </div>
 
-                    <div className='flex flex-row items-center justify-between'>
-                        <div className="flex  flex-row justify-between gap-5 items-center my-4">
+                    <div className='flex flex-row flex-wrap items-center justify-between'>
+                        <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
                             <Image src={"/warning.svg"} width={30} height={30} alt="Warning" className="" />
                             <div className="opacity-75 text-xl">Delete Your Account</div>
                         </div>

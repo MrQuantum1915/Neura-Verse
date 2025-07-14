@@ -55,7 +55,7 @@ export default function RootLayout({ children }) {
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
-          <div className="fixed inset-0 z-0 h-full w-full opacity-0">
+          <div className="fixed inset-0 z-0 h-full w-full opacity-50">
             <Image
               src={"/main-bg-10.jpg"}
               width={1920}

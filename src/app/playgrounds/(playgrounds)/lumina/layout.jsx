@@ -17,15 +17,19 @@ import { createClient_client } from "@/utils/supabase/supabaseClient"; // using 
 import { fetchThread } from "./_actions/fetchThread";
 import { insertNewMessage } from "./_actions/insertNewMessage";
 import { createNewThread } from "./_actions/createNewThread";
+import { deleteMessage } from "./_actions/deleteMessage";
 
 import MoreIcon from "@/components/icons/MoreIcon";
 import LikeIcon from "@/components/icons/LikeIcon";
 import DislikeIcon from "@/components/icons/DislikeIcon";
 import CopyIcon from "@/components/icons/CopyIcon";
+import TickIcon from "@/components/icons/TickIcon";
 
 
 import VerticalBarsLoader from "@/components/VerticalBarsLoader";
 import ThreadIdpage from "./[[...threadId]]/page";
+
+import { redirect, useRouter } from "next/navigation";
 
 import { Playfair_Display, Roboto } from 'next/font/google';
 const playfairDisplay = Playfair_Display({
@@ -98,20 +102,21 @@ const defaultModel = {
     itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash"
 }
 const toolbar = [
-    { itemName: "Like", icon: <LikeIcon fill="white" size={20} /> },
-    { itemName: "Dislike", icon: <DislikeIcon fill="white" size={20} /> },
-    { itemName: "Copy", icon: <CopyIcon fill="white" size={20} /> },
-    { itemName: "More", icon: <MoreIcon stroke="white" size={20} /> },
+    // { itemName: "Like", icon: <LikeIcon fill="white" size={20} /> },
+    // { itemName: "Dislike", icon: <DislikeIcon fill="white" size={20} /> },
+    // { itemName: "More", icon: <MoreIcon stroke="white" size={20} /> },
 ];
 
 function Lumina({ children }) {
+
+    const router = useRouter();
 
     // for alerts
     const [alert, setalert] = useState(false);
     const [alertMessage, setalertMessage] = useState("Alert");
 
     // for user session and login
-    const [name, setname] = useState("Visitor")
+    const [name, setname] = useState("Mystery Guest")
     const [profile_pic, setprofile_pic] = useState(null)
 
 
@@ -120,11 +125,12 @@ function Lumina({ children }) {
         const fetchUserLoggedIn = async () => {
             try {
                 const supabase = createClient_client();
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabase.auth.getSession(); // only client side authentication
                 // console.log(session);
                 // console.log(session===null);
                 if (session === null) {
-                    router.push("/auth/login");
+                    // router.push("/auth/login");
+                    return;
                 }
                 // if (!session || !session.user) {
                 // redirect("/auth/login");
@@ -170,7 +176,7 @@ function Lumina({ children }) {
     const [selectedFiles, setselectedFiles] = useState([]);
     const [UploadingFile, setUploadingFile] = useState(false);
 
-    const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mounts, we do not need this to trigger the insertAIResponse() function.
+    const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mou nts, we do not need this to trigger the insertAIResponse() function.
 
     const [Model, setModel] = useState(defaultModel);
 
@@ -178,8 +184,9 @@ function Lumina({ children }) {
 
 
     const [CurrThreadID, setCurrThreadID] = useState(null);
-    const [CurrThreadName, setCurrThreadName] = useState("Reason for New Thread")
-    const [navigatingThread, setnavigatingThread] = useState(false)
+    const [CurrThreadName, setCurrThreadName] = useState("New Thread");
+    const [navigatingThread, setnavigatingThread] = useState(false);
+    const [ThreadPublic, setThreadPublic] = useState(false);
     const [newchat, setnewchat] = useState(false);
 
     // This block is implemented because here we are using CurrThreadName and ID in v   arious operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
@@ -196,16 +203,13 @@ function Lumina({ children }) {
 
 
     // managing fetching of chat from threadID
-
-
-
     useEffect(() => {
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
+            setCurrThreadName("New Thread");
             setMessages([]);
         }
         else {
             if (!newchat) {
-
                 setnavigatingThread(true);
 
                 const getThread = async () => {
@@ -216,7 +220,12 @@ function Lumina({ children }) {
                             setalert(true);
                             return;
                         }
-                        // console.log(data);
+                        if (data[0].is_public === true) {
+                            setThreadPublic(true);
+                        }
+                        else {
+                            setThreadPublic(false);
+                        }
                         setMessages(data);
                     }
 
@@ -250,18 +259,27 @@ function Lumina({ children }) {
         // if this is first message, update thread name
         // let tempThreadId;
         if (messages.length === 0) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
-            const { data, error } = await createNewThread(userPrompt);
-
-            if (error) {
-                setalertMessage(error);
-                setalert(true);
-                return;
+            const supabase = createClient_client();
+            // if the user is not logged in ...
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session === null) {
+                redirect("/auth/login");
             }
-            // setCurrThreadID(data[0].thread_id); // we are using dyanmic routes now so we will only update url, the current thread id will update due to useeffect of threadId, and also we donot wnat to fetch the thread from database, so we stop fetch in the useeffect of CurrThreadId by using newchat state :) I am genius huh?
-            setnewchat(true);
-            // tempThreadId = data[0].thread_id;
-            setCurrThreadName(userPrompt);
-            router.push(`/playgrounds/lumina/${data[0].thread_id}`)
+
+            else {
+                const { data, error } = await createNewThread(userPrompt);
+
+                if (error) {
+                    setalertMessage(error);
+                    setalert(true);
+                    return;
+                }
+                // setCurrThreadID(data[0].thread_id); // we are using dyanmic routes now so we will only update url, the current thread id will update due to useeffect of threadId, and also we donot wnat to fetch the thread from database, so we stop fetch in the useeffect of CurrThreadId by using newchat state :) I am genius huh?
+                setnewchat(true);
+                // tempThreadId = data[0].thread_id;
+                setCurrThreadName(userPrompt);
+                router.push(`/playgrounds/lumina/${data[0].thread_id}`)
+            }
         }
         else {
             const threadNameToUse = CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
@@ -364,6 +382,42 @@ function Lumina({ children }) {
     }, [])
 
 
+    // toolbar related
+    const [CopyContent, setCopyContent] = useState(false);
+    const [ToolbarTriggerIndex, setToolbarTriggerIndex] = useState(null);
+    const handleCopy = (content) => {
+        setCopyContent(true);
+        setTimeout(() => {
+            setCopyContent(false);
+        }, 2000);
+        navigator.clipboard.writeText(content);
+    }
+
+    const [MoreMenu, setMoreMenu] = useState(false);
+    const MoreMenuRef = useRef(null);
+    // handling dropdown closing on click outside
+    useEffect(() => {
+        if (!MoreMenu) {
+            return;
+        }
+
+        function handleClickOutside(event) {
+            if (
+                MoreMenuRef.current && !MoreMenuRef.current.contains(event.target)
+                // dropdownMenuRef.current && !dropdownMenuRef.current.contains(event.target)
+            ) {
+                setMoreMenu(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [MoreMenu, setMoreMenu]);
+
+
+
     return (
         <div className={`${roboto.className} flex flex-row h-screen w-full overflow-hidden z-1 bg-black`}>
             <ThreadIdpage setCurrThreadID={setCurrThreadID} />
@@ -375,13 +429,13 @@ function Lumina({ children }) {
 
             <main className="w-full h-full flex flex-col justify-between items-center ">
 
-                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} />
+                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} />
 
 
                 {/* Set height below TopBar to fill remaining space */}
                 <div className="flex w-full flex-row" style={{ height: "calc(100vh - 90px)" }}>
 
-                    <div className="flex flex-col  w-full h-full items-center">
+                    <div className="flex flex-col w-full h-full items-center">
                         <div className=" w-full h-full pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
                             {
                                 (navigatingThread) && (
@@ -403,7 +457,7 @@ function Lumina({ children }) {
                                         <h1 className="bg-gradient-to-r py-4 from-green-400 to-cyan-400 bg-clip-text text-transparent">What can I help you with Today ?</h1>
                                     </div>
                                 ) : (
-                                    <div className="w-240 py-4">
+                                    <div className="w-full min-w-250 py-4 px-0 md:px-30">
 
                                         {messages.map((msg, index) => (
                                             <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -448,7 +502,7 @@ function Lumina({ children }) {
                                                     )
                                                 }
 
-                                                <div className={`inline-block px-7 py-3 rounded-2xl ${msg.role === "user" ? "bg-white/10 text-white/85 rounded-tr-xs max-w-150" : "text-white/85 rounded-tl-xs"}`}>
+                                                <div className={`flex flex-col px-7 py-3 rounded-2xl text-white/85 rounded-tl-xs"}`}>
 
                                                     {
                                                         msg.role === "model" && (
@@ -457,39 +511,73 @@ function Lumina({ children }) {
                                                             </div>
                                                         )
                                                     }
-
-                                                    <ReactMarkdown components={
-                                                        {
-                                                            h1: CustomH1,
-                                                            h2: CustomH2,
-                                                            h3: CustomH3,
-                                                            h4: CustomH4,
-                                                            h5: CustomH5,
-                                                            h6: CustomH6,
-                                                            p: CustomParagraph,
-                                                            ul: CustomUl,
-                                                            ol: CustomOl,
-                                                            li: CustomLi,
-                                                            a: CustomLink,
-                                                        }
-                                                    } remarkPlugins={[remarkGfm]}>
-                                                        {msg.content}
-                                                    </ReactMarkdown>
-
+                                                    <div className={`${msg.role === "user" && "px-7 py-3 rounded-2xl  max-w-150 bg-white/10 text-white/85 rounded-tr-xs"}`}>
+                                                        <ReactMarkdown components={
+                                                            {
+                                                                h1: CustomH1,
+                                                                h2: CustomH2,
+                                                                h3: CustomH3,
+                                                                h4: CustomH4,
+                                                                h5: CustomH5,
+                                                                h6: CustomH6,
+                                                                p: CustomParagraph,
+                                                                ul: CustomUl,
+                                                                ol: CustomOl,
+                                                                li: CustomLi,
+                                                                a: CustomLink,
+                                                            }
+                                                        } remarkPlugins={[remarkGfm]}>
+                                                            {msg.content}
+                                                        </ReactMarkdown>
+                                                    </div>
 
                                                     {/* toolbar */}
-                                                    {
 
-                                                        msg.role === "model" && (
-                                                            <div className="flex flex-row w-fit h-fit p-2 mx-0 m-2 rounded-2xl bg-white/10">
-                                                                {toolbar.map((item) => (
-                                                                    <div key={item.itemName} className="mx-2 cursor-pointer opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out">
-                                                                        {item.icon}
+                                                    <div className={`flex flex-row w-fit h-fit p-2 mx-0 m-2 ${msg.role === "user" ? ("self-end") : ("self-start")}`}>
+                                                        {/* toolbar from the map */}
+                                                        <button
+                                                            onClick={() => {
+                                                                handleCopy(msg.content);
+                                                                setToolbarTriggerIndex(index);
+                                                            }}
+                                                            className="mx-2 cursor-pointer opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out">
+                                                            {(CopyContent && (ToolbarTriggerIndex === index)) ? (<TickIcon fill="white" size={20} />) : (<CopyIcon fill="white" size={20} />)}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setMoreMenu((prev) => (!prev))
+                                                                setToolbarTriggerIndex(index);
+                                                            }}
+                                                            className="relative mx-2 cursor-pointer p-1 hover:opacity-100 opacity-50 hover:bg-white/20 rounded-full"
+                                                        >
+                                                            <Image src={"/more.svg"} width={20} height={20} alt={"more menu"} />
+                                                            {
+                                                                MoreMenu && (index === ToolbarTriggerIndex) && (
+                                                                    <div ref={MoreMenuRef} className="absolute left-2 mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-100 flex flex-col">
+                                                                        <div
+                                                                            onClick={async () => {
+                                                                                const { data, error } = await deleteMessage(CurrThreadID, index);
+                                                                                if (error) {
+                                                                                    setalertMessage(error);
+                                                                                    setalert(true);
+                                                                                    return;
+                                                                                }
+                                                                                
+                                                                                setMessages((prev) => prev.filter((_, index) => index !== ToolbarTriggerIndex));
+
+                                                                                setMoreMenu(false);
+                                                                            }}
+                                                                            className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
+                                                                        >
+                                                                            <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
+                                                                            <div>Delete</div>
+                                                                        </div>
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        )
-                                                    }
+                                                                )
+                                                            }
+                                                        </button>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         ))}

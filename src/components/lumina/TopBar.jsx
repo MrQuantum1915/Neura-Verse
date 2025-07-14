@@ -6,6 +6,11 @@ import DropDown from "@/components/DropDown";
 import { useState, useEffect, useRef } from "react";
 import { updateThreadName } from "@/app/playgrounds/(playgrounds)/lumina/_actions/updateThreadName";
 import MyAlert from "../MyAlert";
+import { editThreadVisibility } from "@/app/playgrounds/(playgrounds)/lumina/_actions/editThreadVisibility";
+import DropdownIcon from "../icons/DropdownIcon";
+import LinkIcon from "../icons/LinkIcon";
+import LockIcon from "../icons/LockIcon";
+import GlobeIcon from "../icons/GlobeIcon";
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
@@ -16,34 +21,48 @@ const playfairDisplay = Playfair_Display({
 });
 
 const models = [
-    { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash" },
-    { itemName: "Gemini 2.0 Flash-Lite", id: "gemini-2.0-flash-lite" },
-    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20" },
+    { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.0 Flash-Lite", id: "gemini-2.0-flash-lite", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20", icon: "/gemini.svg" },
     // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
 ];
 
-function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID }) {
+const visibility = [
+    { itemName: "Public", id: "public", icon: "/globe.svg" },
+    { itemName: "Private", id: "private", icon: "/lock.svg" },
+];
 
-    const [Open, setOpen] = useState(false);
+function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic }) {
+
+    const [modelDropdownOpen, setmodelDropdownOpen] = useState(false);
     const [editThreadName, seteditThreadName] = useState(false);
-    const triggerRef = useRef(null);
-    const dropdownMenuRef = useRef(null);
+    const modelButtonRef = useRef(null);
+    const modelDropdownMenuRef = useRef(null);
+
+    const VisibilityDropdownMenuRef = useRef(null);
+    const [VisibilityDropdownOpen, setVisibilityDropdownOpen] = useState(false);
+    const VisibilityButtonRef = useRef(null);
+
 
     const threadNameRef = useRef(null)
     const [alert, setalert] = useState(false);
     const [alertMessage, setalertMessage] = useState("Alert");
 
+
+    const [copied, setCopied] = useState(false);
+
+
     useEffect(() => {
-        if (!Open) {
+        if (!modelDropdownOpen) {
             return;
         }
 
         function handleClickOutside(event) {
             if (
-                triggerRef.current && !triggerRef.current.contains(event.target) &&
-                dropdownMenuRef.current && !dropdownMenuRef.current.contains(event.target)
+                modelButtonRef.current && !modelButtonRef.current.contains(event.target) &&
+                modelDropdownMenuRef.current && !modelDropdownMenuRef.current.contains(event.target)
             ) {
-                setOpen(false);
+                setmodelDropdownOpen(false);
             }
         }
 
@@ -51,8 +70,27 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [Open, setOpen]);
+    }, [modelDropdownOpen, setmodelDropdownOpen]);
 
+    useEffect(() => {
+        if (!VisibilityDropdownOpen) {
+            return;
+        }
+
+        function handleClickOutside(event) {
+            if (
+                VisibilityButtonRef.current && !VisibilityButtonRef.current.contains(event.target) &&
+                VisibilityDropdownMenuRef.current && !VisibilityDropdownMenuRef.current.contains(event.target)
+            ) {
+                setVisibilityDropdownOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [VisibilityDropdownOpen, setVisibilityDropdownOpen]);
 
     // when user navigate to new thread, halt the operation of change thread name
     useEffect(() => {
@@ -67,99 +105,175 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
     const handleSelectItem = (item) => {
         setModel(item);
-        setOpen(false);
+        setmodelDropdownOpen(false);
     };
 
+    const handleVisibilityEdit = async (selectedItem) => {
+        setVisibilityDropdownOpen(false);
+        let value = false;
+        // (if threadPublic is true and selected item is public) or (if ThreadPublic is false and selected item is private) then return; else we need to change the Visibility. 
+        if ((ThreadPublic === (selectedItem.id === "public")) || (!ThreadPublic === (selectedItem.id === "private"))) {
+            return;
+        }
 
+        if (selectedItem.id === "public") {
+            value = true;
+            setThreadPublic(true);
+        }
+        else {
+            value = false;
+            setThreadPublic(false);
+        }
+        const { data, error } = await editThreadVisibility(CurrThreadID, value);
+        if (error) {
+            setalertMessage(error);
+            setalert(true);
+            return;
+        }
+    }
+
+
+
+    const handleCopy = () => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.location.href);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 3000);
+        } else {
+            alert("Clipboard API not supported");
+        }
+    };
 
     return (
-        <div className={` relative flex flex-row flex-wrap justify-between  w-full h-23 border-b border-white/10 z-75`}>
+        <div className={`relative flex flex-row flex-wrap justify-between w-full h-23 border-b border-white/10 z-75`}>
             {
                 sidebarClose ? (
                     <Link href="/playgrounds/lumina">
                         <h1 className={`text-5xl m-6  cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
                     </Link>
-                ) : (<div></div>) // dummy element to make thread name at center in both sidebar open and close
+                ) : (<div></div>) // dummy element to make thread name at center in both sidebar modelDropdownopen and close
             }
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <div className="self-center flex flex-row items-center gap-2">
-                <Image src={"/hash.svg"} width={20} height={20} alt={"topic"} className="opacity-50 mx-2" />
-                <div className="overflow-x-hidden whitespace-nowrap text-center text-xl text-white w-fit max-w-100 overflow-y-hidden overflow-x-hidden text-ellipsis ">
-                    {
-                        !editThreadName ? (CurrThreadName) : (
-                            <input
-                                ref={threadNameRef}
-                                className="border-b-2 border-cyan-400 outline-none text-2xl w-fit"
-                                placeholder='Enter Thread Name'
-                                type='text'
-                                defaultValue={CurrThreadName}
-                            />
-                        )
-                    }
-                </div>
 
-                <button
-                    onClick={async () => {
+            <div className="flex flex-row gap-8">
+                <div className="self-center flex flex-row items-center gap-2">
+                    <Image src={"/hash.svg"} width={20} height={20} alt={"topic"} className="opacity-50 mx-2" />
+                    <div className="overflow-x-hidden whitespace-nowrap text-center text-xl text-orange-400 w-fit max-w-100 overflow-y-hidden overflow-x-hidden text-ellipsis ">
+                        {
+                            !editThreadName ? (CurrThreadName) : (
+                                <input
+                                    ref={threadNameRef}
+                                    className="border-b-2 border-cyan-400 outline-none text-2xl w-fit"
+                                    placeholder='Enter Thread Name'
+                                    type='text'
+                                    defaultValue={CurrThreadName}
+                                />
+                            )
+                        }
+                    </div>
 
-                        if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation 
-                            try {
-                                const newThreadName = threadNameRef.current.value;
-                                const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
-                                if (error) {
-                                    setalertMessage(`Error renaming thread title :  ${error}`);
-                                    setalert(true);
-                                    return;
+                    <button
+                        onClick={async () => {
+
+                            if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation 
+                                try {
+                                    const newThreadName = threadNameRef.current.value;
+                                    const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
+                                    if (error) {
+                                        setalertMessage(`Error renaming thread title :  ${error}`);
+                                        setalert(true);
+                                        return;
+                                    }
+                                    setCurrThreadName(newThreadName);
                                 }
-                                setCurrThreadName(newThreadName);
+                                finally {
+                                    seteditThreadName((prev) => {
+                                        return !prev;
+                                    });
+                                }
                             }
-                            finally {
+                            else {
                                 seteditThreadName((prev) => {
                                     return !prev;
-                                });
+                                })
                             }
+                        }}
+                        className="flex-shrink-0"
+                    >
+                        {
+                            (CurrThreadID !== null) &&
+                            (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/20 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
                         }
-                        else {
-                            seteditThreadName((prev) => {
-                                return !prev;
-                            })
-                        }
-                    }}
-                    className="flex-shrink-0"
-                >
-                    {
-                        (CurrThreadID !== null) &&
-                        (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/20 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
-                    }
-                </button>
+                    </button>
+                </div>
+                {
+                    (CurrThreadID !== null) && (
+
+                        <button
+                            className="relative self-center p-1 bg-cyan-400/90 rounded text-black h-fit w-fit cursor-pointer"
+                            onClick={() => { setVisibilityDropdownOpen(prev => !prev) }}
+                            ref={VisibilityButtonRef}
+                        >
+                            <div className="flex flex-row gap-1 font-bold">
+                                {
+                                    ThreadPublic ? (
+                                        <GlobeIcon size={22} alt="Public" fill="black" />
+                                    ) : (
+                                        <LockIcon size={22} alt="Private" fill="black" />
+                                    )
+                                }
+                                <div>{ThreadPublic ? ("Public") : ("Private")}</div>
+                                <DropdownIcon fill="black" size={24} alt="Choose who can access this Thread" open={VisibilityDropdownOpen} className={`${(VisibilityDropdownOpen) ? ("rotate-180") : ("")} transition-all duration-200 ease-in-out`} />
+                            </div>
+                            {
+                                VisibilityDropdownOpen &&
+                                <DropDown width="w-[100%]" top={35} left={0} color={"cyan-400"} itemsArray={visibility} selectItem={handleVisibilityEdit} ref={VisibilityDropdownMenuRef} currentSelectedItemID={ThreadPublic ? ("public") : ("private")} />
+                            }
+                        </button>
+
+                    )
+                }
+                {
+                    (CurrThreadID!==null) && ThreadPublic && (
+                        <button
+                            type="button"
+                            onClick={handleCopy}
+                            aria-label="Copy thread link to clipboard"
+                            className="self-center opacity-50 hover:opacity-80 hover:text-cyan-400 flex flex-row gap-1 items-center h-fit w-fit cursor-pointer border-1 border-white/50 rounded-lg p-1 transition-all duration-300 ease-in-out"
+                        >
+                            <LinkIcon size={24} fill={`${copied ? ("cyan") : ("white")}`} />
+                            <span className={`${copied ? ("text-cyan-400") : ("text-white")}`}>{copied ? "Copied!" : "Copy Link"}</span>
+                        </button>
+                    )
+                }
             </div>
-            
-            <button
-                className="self-center p-2 bg-cyan-400 rounded text-black h-fit w-fit"
-            >Share
-            </button>
-            
+
+
+
+
             <div className="flex flex-col mx-5 items-end">
 
                 <div
-                    onClick={() => { setOpen(prevOpen => !prevOpen) }}
-                    className='relative flex flex-grow-0 items-center cursor-pointer rounded border-2 border-white/10 w-fit px-2 py-1 my-2  hover:bg-white/5 transition-all duration-300 ease-in-out'
-                    ref={triggerRef}
+                    onClick={() => { setmodelDropdownOpen(prevmodelDropdownOpen => !prevmodelDropdownOpen) }}
+                    className='relative flex flex-row items-center justify-center flex-grow-0 items-center cursor-pointer rounded w-fit pl-2 my-2 transition-all duration-300 ease-in-out text-black font-semibold bg-cyan-400/90'
+                    ref={modelButtonRef}
                 >
 
-                    <div className="mx-2 font-extrabold">
+                    <div>
                         Models
                     </div>
-                    <Image src={"/dropdown.svg"} width={20} height={20} alt="Dropdown" className="mt-1"></Image>
+                    <DropdownIcon fill="black" size={28} width={20} height={20} alt="Choose Model" open={modelDropdownOpen} className={`${(modelDropdownOpen) ? ("rotate-180") : ("")} transition-all duration-200 ease-in-out`} />
+
                     {
-                        Open &&
-                        <DropDown itemsArray={models} selectItem={handleSelectItem} ref={dropdownMenuRef} />
+                        modelDropdownOpen &&
+                        <DropDown width={"w-[200%]"} top={35} right={0} color={"cyan-400"} itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
                     }
                 </div>
 
 
-                <div className="border border-white/10 rounded-xl px-4 mb-1 text-cyan-400">
+                <div className="border border-white/20 rounded-xl px-4 mb-1 text-cyan-400">
                     {Model.itemName}
                 </div>
             </div>

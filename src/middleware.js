@@ -16,5 +16,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-    matcher: ['/', '/profile', '/login', '/playgrounds/lumina'],
+    matcher: ['/', '/profile', '/login'],
 };

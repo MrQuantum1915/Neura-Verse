@@ -10,8 +10,16 @@ export async function fetchThread(thread_id) {
     } = await supabase.auth.getUser();
 
     if (userError) {
-        console.error('Error fetching user:', userError);
-        return { error: 'Failed to fetch user' };
+        const { data, error } = await supabase
+            .from('lumina')
+            .select('role , content, ai_model, is_public')
+            .eq('thread_id', thread_id)
+            .eq('is_public', true)
+            .order('created_at', { ascending: true });  // oldest first
+        if (error || !data || data.length === 0) {
+            return { error: 'No messages found or thread is Private. If this is your thread then please Login to view.' };
+        }
+        return { data };
     }
 
     if (!user) {
@@ -20,19 +28,17 @@ export async function fetchThread(thread_id) {
 
     const { data, error } = await supabase
         .from('lumina')
-        .select('role , content, ai_model')
+        .select('role , content, ai_model, is_public')
         .eq('thread_id', thread_id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });  // oldest first
 
-    // const messages = (data)=>{
-        
-    // }
 
     if (error) {
         console.error('Error Fetching Thread', error);
         return { error: 'Unable to fetch thread. It may have been deleted or does not exist.' };
     }
-    console.log("sent");
+    // console.log(data);
+    // console.log("sent");
     return { data };
 }

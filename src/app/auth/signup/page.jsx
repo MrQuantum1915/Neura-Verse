@@ -80,8 +80,8 @@ function page() {
             <div className="z-50 bg-black/50 rounded-2xl p-4 shadow-md shadow-white w-fit max-w-120 h-fit flex flex-col items-center">
                 <div className="px-6 py-4 items-center justify-center flex flex-col">
 
-                    <h1 className="text-4xl my-2 mb-4">Enter Into Neura Verse</h1>
-
+                    <h1 className="text-4xl my-2 mb-4 text-center">Enter the Universe <br></br> Neura Verse</h1>
+                    <h2 className="text-green-400">Get full experience in mere seconds. It's quick</h2>
                     <div className="flex items-center text-center w-90  my-6 ">
                         <div className="flex-grow h-px bg-white/50"></div>
                     </div>
@@ -89,6 +89,7 @@ function page() {
                     <div className="flex flex-col gap-4 w-full items-center justify-center">
                         <div className="m-2 text-white/50 text-2xl font-bold">
                             OAuth
+                            <h1 className="text-sm text-green-400 text-center">Faster</h1>
                         </div>
                         <div className="flex flex-row flex-wrap gap-4 items-center justify-center">
                             {oAuthProviders.map((item) => (

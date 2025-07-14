@@ -98,7 +98,7 @@ function NavBar() {
             </Link>
           ) : (
             <Link href={"/auth/login"}>
-              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black">
+              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black font-bold">
                 Sign In
               </div>
             </Link>

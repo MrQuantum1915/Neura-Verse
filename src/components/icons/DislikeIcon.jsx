@@ -1,4 +1,3 @@
-// /home/mr-quantum/Windows/1_Darshan/CS/Web and Network/My WebDev Projects/AI-Playground-NextJS/ai-playground/src/components/icons/DislikeIcon.jsx
 const DislikeIcon = ({ className, size = 30, fill = "currentColor", ...props }) => {
   return (
     <svg

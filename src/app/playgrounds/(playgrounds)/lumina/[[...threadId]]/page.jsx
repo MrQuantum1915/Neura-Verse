@@ -11,14 +11,11 @@ function ThreadIdpage({ setCurrThreadID }) {
   const threadIdValue = Array.isArray(threadId) ? threadId[0] : threadId;
 
   useEffect(() => {
-    console.log("007")
     if (typeof threadIdValue !== "undefined") {
       setCurrThreadID(threadIdValue);
     } else {
       setCurrThreadID(null);
     }
-    console.log(threadId);
-    console.log(threadIdValue);
   }, [threadIdValue]);
 
   return null; // :) this component renders nothing

@@ -5,7 +5,7 @@ const OpenInNewTab = ({ className, size = 30, fill = "currentColor", ...props })
             height={size}
             viewBox="0 0 48 48"
             xmlns="http://www.w3.org/2000/svg"
-            className={className}
+            className={`flex-shrink-0 ${className}}`}
             {...props}
             fill={fill}
         >

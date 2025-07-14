@@ -22,7 +22,7 @@ function WorkSpace({ files, setselectedFiles, selectedFiles, UploadingFile }) {
 
     const [WorkspaceOpen, setWorkspaceOpen] = useState(false);
     const [currFileType, setcurrFileType] = useState("image/*")
-    {console.log("workspace remounted")}
+    // {console.log("workspace remounted")}
 
     return (
         <div className="flex flex-row z-50 ">
@@ -42,7 +42,7 @@ function WorkSpace({ files, setselectedFiles, selectedFiles, UploadingFile }) {
             }
 
 
-            <div className={`bg-[#101010] rounded-l-2xl h-full ${WorkspaceOpen ? ("w-80 max-w-80") : ("w-0  translate-x-[100%] pointer-events-none  text-wrap-none overflow-hidden opacity-0")} flex flex-col items-center  transition-translate duration-1000 ease-in-out`}>
+            <div className={`bg-[#101010] rounded-l-2xl h-full ${WorkspaceOpen ? ("w-80 max-w-80") : ("w-0  translate-x-[100%] pointer-events-none  whitespace-nowrap overflow-hidden opacity-0")} flex flex-col items-center  transition-translate duration-1000 ease-in-out`}>
 
                 <div className='bg-[#212121]  rounded-b-xl w-[95%] top-0 sticky flex flex-col items-center'>
 

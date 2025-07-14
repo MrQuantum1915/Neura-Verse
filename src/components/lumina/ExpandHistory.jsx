@@ -5,6 +5,7 @@ import { deleteThread } from "@/app/playgrounds/(playgrounds)/lumina/_actions/de
 import MyAlert from "../MyAlert";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpand, setnavigatingThread }) {
 
@@ -25,13 +26,13 @@ function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpan
                         onClick={() => {
                             setHistoryExpand(false);
                         }}
-                        className="rounded-full opacity-50 hover:opacity-100 hover:bg-white/10  p-1 cursor-pointer transition-all duration-300 ease-out "
+                        className="hover:rotate-90 rounded-full opacity-50 hover:opacity-100 hover:bg-white/10  p-1 cursor-pointer transition-all duration-300 ease-out "
                     >
                         <Image src={"/cross.svg"} width={30} height={30} alt={"close"}></Image>
                     </button>
                 </div>
                 <div className="h-[1px] bg-white/20 w-full" ></div>
-                <div className="text-2xl overflow-y-scroll text-wrap flex flex-col mx-4 my-1">
+                <div className="w-full h-full text-2xl overflow-y-scroll text-wrap flex flex-col mx-4 my-1">
                     {
                         (History.map((item) => {
                             return (
@@ -54,12 +55,14 @@ function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpan
 
                                         {/*tools */}
                                         <div className="flex flex-row gap-1 mx-4 items-center justify-center">
-                                            <button
+                                            <Link href={`${process.env.NEXT_PUBLIC_BASE_URL}/playgrounds/lumina/${item.thread_id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
                                                 className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/20 cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
                                                 style={{ minWidth: '2rem', minHeight: '2rem' }}
                                             >
                                                 <OpenInNewTab fill="white" size={24} className={"p-0.5"} />
-                                            </button>
+                                            </Link>
                                             <button
                                                 onClick={async () => {
                                                     const { data, error } = await deleteThread(item.thread_id);

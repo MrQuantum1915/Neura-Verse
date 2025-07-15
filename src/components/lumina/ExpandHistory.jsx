@@ -18,7 +18,7 @@ function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpan
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <div className="flex flex-col justify-start rounded-3xl w-3/4 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
+            <div className="flex flex-col justify-start rounded-xl w-3/4 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
 
                 <div className="flex flex-row text-3xl m-2 w-full px-4 justify-between py-2">
                     <h1 className="text-orange-400">Library</h1>

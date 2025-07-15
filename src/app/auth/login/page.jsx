@@ -123,7 +123,7 @@ function page() {
               </div>
               <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
                 <Image
-                  src={"/lock-alt-svgrepo-com.svg"}
+                  src={"/lock.svg"}
                   width={30}
                   height={30}
                   alt="Email"

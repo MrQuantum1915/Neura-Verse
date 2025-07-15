@@ -44,7 +44,7 @@ export async function POST(request) {
 
         // I am not using the gemini SDK feature of ai.chats.create() because under the hood it is doing same sh*t as i am doing here
         // so i'll just pass the messages array as context.
-        // also i am passing the current use rompt in context array.
+        // also i am passing the current user prompt in context array.
         const response = await ai.models.generateContentStream({
             model: model,
             //remember bro here "key" is not needed bcz we are not rendering anything in react here

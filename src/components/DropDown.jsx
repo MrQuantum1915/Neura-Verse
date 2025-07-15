@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import Image from "next/image";
 
-const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem, currentSelectedItemID, color = "cyan-400", width}, ref) => {
+const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem, currentSelectedItemID, color = "cyan-400", width }, ref) => {
 
   const style = {
     ...(top !== undefined ? { top } : {}),
@@ -22,18 +22,19 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
       role="menu"
     >
       {itemsArray.map((item) => (
-        <div key={item.id} className={`flex flex-row items-center gap-2 ${(item.id === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}>
+        <div
+          onClick={(e) => {
+            selectItem(item);
+            e.stopPropagation();
+          }}
+          key={item.id}
+          className={`flex flex-row p-2 items-center gap-2 ${(item.id === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}
+        >
           <Image src={item.icon} width={20} height={20} alt="icon" />
-          <div
-            type="div"
-            onClick={(e) => {
-              selectItem(item);
-              e.stopPropagation();
-            }}
-            role="menuitem"
-          >
+          <div>
             {item.itemName}
           </div>
+
         </div>
       ))}
     </div>

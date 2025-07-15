@@ -98,9 +98,8 @@ const CustomLi = ({ children }) => (
     <li className="py-1 text-lg">{children}</li>
 );
 
-const defaultModel = {
-    itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash"
-}
+const defaultModel = { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash", icon: "/gemini.svg" }
+
 const toolbar = [
     // { itemName: "Like", icon: <LikeIcon fill="white" size={20} /> },
     // { itemName: "Dislike", icon: <DislikeIcon fill="white" size={20} /> },
@@ -226,6 +225,7 @@ function Lumina({ children }) {
                         else {
                             setThreadPublic(false);
                         }
+                        // console.log(data);
                         setMessages(data);
                     }
 
@@ -329,7 +329,8 @@ function Lumina({ children }) {
             }
         }
 
-        if (responseComplete) {
+        // extra check for last role to be model, because if the LLM does not send the response than we set response Complete to true and we does not want to perform insert new message operation.
+        if (responseComplete && messages[messages.length - 1].role === "model") {
             insertAIResponse();
         }
 
@@ -433,7 +434,7 @@ function Lumina({ children }) {
 
 
                 {/* Set height below TopBar to fill remaining space */}
-                <div className="flex w-full flex-row" style={{ height: "calc(100vh - 90px)" }}>
+                <div className="flex w-full flex-row" style={{ height: "calc(100vh - 50px)" }}>
 
                     <div className="flex flex-col w-full h-full items-center">
                         <div className=" w-full h-full pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
@@ -562,7 +563,7 @@ function Lumina({ children }) {
                                                                                     setalert(true);
                                                                                     return;
                                                                                 }
-                                                                                
+
                                                                                 setMessages((prev) => prev.filter((_, index) => index !== ToolbarTriggerIndex));
 
                                                                                 setMoreMenu(false);
@@ -592,7 +593,7 @@ function Lumina({ children }) {
                         <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile={UploadingFile} />
                     </div>
 
-                    <WorkSpace files={Frontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />
+                    <WorkSpace files={Frontend_UploadedFiles} setFiles={setFrontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />
 
                 </div>
 

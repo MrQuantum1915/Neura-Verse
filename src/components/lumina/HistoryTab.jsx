@@ -158,7 +158,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                     {History && History.map(items => (
                         <div key={items.thread_id} className="flex flex-row justify-between items-center my-0.5">
                             <button
-                                className={`overflow-x-hidden text-ellipsis  whitespace-nowrap ${items.thread_id === CurrThreadID
+                                className={`overflow-x-hidden text-ellipsis w-full whitespace-nowrap ${items.thread_id === CurrThreadID
                                     ? "opacity-100 bg-white/20"
                                     : "opacity-50"
                                     } hover:opacity-100 transition-all duration-300 ease-in-out hover:bg-white/10 text-white rounded-lg px-2 py-2 cursor-pointer text-start font-semibold`}

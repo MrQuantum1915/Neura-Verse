@@ -23,6 +23,9 @@ const playfairDisplay = Playfair_Display({
 const models = [
     { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash", icon: "/gemini.svg" },
     { itemName: "Gemini 2.0 Flash-Lite", id: "gemini-2.0-flash-lite", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Pro", id: "gemini-2.5-pro", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash-Lite Preview 06-17", id: "gemini-2.5-flash-lite-preview-06-17", icon: "/gemini.svg" },
     { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20", icon: "/gemini.svg" },
     // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
 ];
@@ -145,11 +148,11 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
     };
 
     return (
-        <div className={`relative flex flex-row flex-wrap justify-between w-full h-23 border-b border-white/10 z-75`}>
+        <div className={`relative flex flex-row flex-wrap justify-between w-full h-12 border-b-1 border-white/70 z-75`}>
             {
                 sidebarClose ? (
                     <Link href="/playgrounds/lumina">
-                        <h1 className={`text-5xl m-6  cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
+                        <h1 className={`text-4xl m-1 mx-2 cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
                     </Link>
                 ) : (<div></div>) // dummy element to make thread name at center in both sidebar modelDropdownopen and close
             }
@@ -236,7 +239,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                     )
                 }
                 {
-                    (CurrThreadID!==null) && ThreadPublic && (
+                    (CurrThreadID !== null) && ThreadPublic && (
                         <button
                             type="button"
                             onClick={handleCopy}
@@ -253,11 +256,15 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
 
 
-            <div className="flex flex-col mx-5 items-end">
+            <div className="flex flex-row mx-5 items-center justify-center  gap-4">
+
+                <div className="border border-white/20 rounded-xl px-4 text-cyan-400">
+                    {Model.itemName}
+                </div>
 
                 <div
                     onClick={() => { setmodelDropdownOpen(prevmodelDropdownOpen => !prevmodelDropdownOpen) }}
-                    className='relative flex flex-row items-center justify-center flex-grow-0 items-center cursor-pointer rounded w-fit pl-2 my-2 transition-all duration-300 ease-in-out text-black font-semibold bg-cyan-400/90'
+                    className='relative flex flex-row items-center justify-center flex-grow-0 items-center cursor-pointer rounded w-fit pl-2 transition-all duration-300 ease-in-out text-black font-semibold bg-cyan-400/90'
                     ref={modelButtonRef}
                 >
 
@@ -268,17 +275,14 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
                     {
                         modelDropdownOpen &&
-                        <DropDown width={"w-[200%]"} top={35} right={0} color={"cyan-400"} itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
+                        <DropDown width={"w-[250%]"} top={35} right={0} color={"cyan-400"} itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
                     }
                 </div>
 
 
-                <div className="border border-white/20 rounded-xl px-4 mb-1 text-cyan-400">
-                    {Model.itemName}
-                </div>
             </div>
 
-            <div className="pointer-events-none absolute left-0 bottom-[-20] w-full h-5 z-20 bg-gradient-to-b from-[#000000]/80 to-transparent z-50" />
+            <div className="pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
 
         </div >
     )

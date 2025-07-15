@@ -47,7 +47,7 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
         <div className="w-full flex flex-col">
           <div className="flex flex-row justify-between items-center">
             <Link href="/playgrounds/lumina">
-              <h1 className={`text-5xl m-4  cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-300 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
+              <h1 className={`text-4xl mx-4 my-2 cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-300 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
             </Link>
             <button
               className={`cursor-pointer px-2 opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out`}

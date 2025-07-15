@@ -1,13 +1,15 @@
 "use client";
 import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
-
+import MyAlert from "../MyAlert";
 
 function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet, selectedFiles, setUploadingFile, UploadingFile, }) {
 
     const model = Model.id;
 
     const [awaitingResponse, setawaitingResponse] = useState(false);
+    const [alert, setalert] = useState(false);
+    const [alertMessage, setalertMessage] = useState("Alert");
 
 
     // auto-resizing textarea with max height
@@ -32,7 +34,8 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
 
         for (const item of e.target.files) {
             if (UploadedFiles_middlewareSet.has(item.name)) {
-                alert(`Discarded ${item.name} as it is already uploaded to workspace`)
+                setalertMessage(`Discarded ${item.name} as it is already uploaded to workspace`);
+                setalert(true);
                 continue;
             }
 
@@ -85,7 +88,8 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
 
             }).catch(error => {
                 setUploadingFile(false);
-                alert("Error parsing the server response!")
+                setalertMessage("Error parsing the server response!")
+                setalert(true);
                 console.error("Error parsing JSON:", error);
             });
 
@@ -148,11 +152,14 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
                     setawaitingResponse(false);
                     setresponseComplete(true);
                     console.error("Error:", error);
+
                 });
         }
 
         else {
-            alert("Please enter a prompt.");
+
+            setalertMessage("Please enter a prompt.");
+            setalert(true);
             setawaitingResponse(false);
             // { console.log("awaitingResponse", awaitingResponse) }
         }
@@ -164,7 +171,9 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
 
     return (
         <div className="bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-85 hover:border-cyan-400 transition-all duration-300 ease-in-out">
-
+            {
+                alert && <MyAlert message={alertMessage} alertHandler={setalert} />
+            }
             {/* user uploads their damn media here , just whatever*/}
             <label className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
                 <input onChange={handleMediaUpload} type="file" className="hidden" multiple accept="image/*" />
@@ -173,7 +182,7 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
             {
                 (Frontend_UploadedFiles.length != 0) &&
                 (
-                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{Frontend_UploadedFiles.length}
+                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{selectedFiles.length}
                     </div>
                 )
             }

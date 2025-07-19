@@ -171,9 +171,7 @@ function Lumina({ children }) {
 
     const [messages, setMessages] = useState([]);
     const [Frontend_UploadedFiles, setFrontend_UploadedFiles] = useState([]);
-    const [UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet] = useState(new Set());
     const [selectedFiles, setselectedFiles] = useState([]);
-    const [UploadingFile, setUploadingFile] = useState(false);
 
     const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mou nts, we do not need this to trigger the insertAIResponse() function.
 
@@ -405,7 +403,6 @@ function Lumina({ children }) {
         function handleClickOutside(event) {
             if (
                 MoreMenuRef.current && !MoreMenuRef.current.contains(event.target)
-                // dropdownMenuRef.current && !dropdownMenuRef.current.contains(event.target)
             ) {
                 setMoreMenu(false);
             }
@@ -420,7 +417,7 @@ function Lumina({ children }) {
 
 
     return (
-        <div className={`${roboto.className} flex flex-row h-screen w-full overflow-hidden z-1 bg-black`}>
+        <div className={`${roboto.className} flex flex-row h-screen w-full overflow-hidden bg-black`}>
             <ThreadIdpage setCurrThreadID={setCurrThreadID} />
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
@@ -549,9 +546,9 @@ function Lumina({ children }) {
                                                                 setMoreMenu((prev) => (!prev))
                                                                 setToolbarTriggerIndex(index);
                                                             }}
-                                                            className="relative mx-2 cursor-pointer p-1 hover:opacity-100 opacity-50 hover:bg-white/20 rounded-full"
+                                                            className="relative mx-2 cursor-pointer p-1 h hover:bg-white/20 rounded-full"
                                                         >
-                                                            <Image src={"/more.svg"} width={20} height={20} alt={"more menu"} />
+                                                            <Image src={"/more.svg"} width={20} height={20} alt={"more menu"} className="over:opacity-100 opacity-50" />
                                                             {
                                                                 MoreMenu && (index === ToolbarTriggerIndex) && (
                                                                     <div ref={MoreMenuRef} className="absolute left-2 mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-100 flex flex-col">
@@ -587,13 +584,13 @@ function Lumina({ children }) {
                                     </div>
                                 )
                                 }
-                                <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 z-20 bg-gradient-to-b from-transparent to-[#000000]/80" />
+                                <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 bg-gradient-to-b from-transparent to-[#000000]/80" />
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} UploadedFiles_middlewareSet={UploadedFiles_middlewareSet} setUploadedFiles_middlewareSet={setUploadedFiles_middlewareSet} selectedFiles={selectedFiles} setUploadingFile={setUploadingFile} UploadingFile={UploadingFile} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} selectedFiles={selectedFiles} />
                     </div>
 
-                    <WorkSpace files={Frontend_UploadedFiles} setFiles={setFrontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} UploadingFile={UploadingFile} />
+                    <WorkSpace files={Frontend_UploadedFiles} setFiles={setFrontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles}  CurrThreadID={CurrThreadID} />
 
                 </div>
 

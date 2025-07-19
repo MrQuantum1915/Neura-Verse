@@ -62,8 +62,8 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
         function handleClickOutside(event) {
             if (
-                modelButtonRef.current && !modelButtonRef.current.contains(event.target) &&
-                modelDropdownMenuRef.current && !modelDropdownMenuRef.current.contains(event.target)
+                modelButtonRef.current && !modelButtonRef.current.contains(event.target)
+                 && modelDropdownMenuRef.current && !modelDropdownMenuRef.current.contains(event.target)
             ) {
                 setmodelDropdownOpen(false);
             }
@@ -148,7 +148,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
     };
 
     return (
-        <div className={`relative flex flex-row flex-wrap justify-between w-full h-12 border-b-1 border-white/70 z-75`}>
+        <div className={`relative flex flex-row flex-wrap justify-between w-full h-12 border-b-1 border-white/70 z-50`}>
             {
                 sidebarClose ? (
                     <Link href="/playgrounds/lumina">
@@ -215,7 +215,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                     (CurrThreadID !== null) && (
 
                         <button
-                            className="relative self-center p-1 bg-cyan-400/90 rounded text-black h-fit w-fit cursor-pointer"
+                            className="z-50 relative self-center p-1 bg-cyan-400/90 rounded text-black h-fit w-fit cursor-pointer"
                             onClick={() => { setVisibilityDropdownOpen(prev => !prev) }}
                             ref={VisibilityButtonRef}
                         >
@@ -282,7 +282,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
             </div>
 
-            <div className="pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
+            <div className="z-50 pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
 
         </div >
     )

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
 
-function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, UploadedFiles_middlewareSet, setUploadedFiles_middlewareSet, selectedFiles, setUploadingFile, UploadingFile, }) {
+function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, selectedFiles, setUploadingFile, UploadingFile, }) {
 
     const model = Model.id;
 
@@ -24,84 +24,48 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
     };
 
 
-    const handleMediaUpload = (e) => {
-
-        setUploadingFile(true);
-        //array is object in js
-
-        const Backend_UploadedFiles = [];
-        const tempUploadedFiles_middlewareSet = new Set();
-
-        for (const item of e.target.files) {
-            if (UploadedFiles_middlewareSet.has(item.name)) {
-                setalertMessage(`Discarded ${item.name} as it is already uploaded to workspace`);
-                setalert(true);
-                continue;
-            }
-
-            // doing this as below is not recommneded bcz : in React (and similar frameworks), state updates are "asynchronous" and may be batched, so multiple calls inside a loop may not update the state usign set state.
-            // setUploadedFiles_middlewareSet((prev) => {
-            //     return new Set([...prev, item.name])
-            // });
-            //hence update the set after the for loop
-
-            tempUploadedFiles_middlewareSet.add(item.name);
-            Backend_UploadedFiles.push(item);
-        }
-
-        setUploadedFiles_middlewareSet((prev) => {
-            return new Set([...prev, ...tempUploadedFiles_middlewareSet]); //merging previous and new file names into a single array, then passing this iterable (array) to the Set constructor which generates a new Set from iterating through the array
-        });
+    // const handleMediaUpload = (e) => {
 
 
-        // to send a file from a client to a server using the Fetch API, the recommended approach is to use the FormData object. as using json.stringify would likely result in empty object as it cant handle comp[lex data like a file. It only serialize objects and array in string.
+    // fetch("/api/uploadFilesToGemini", {
+    //     method: "POST",
+    //     // headers: {
+    //     //     "Content-Type": "application/json",
+    //     // },
+    //     // headers not needed becuase browser manages that automatocally for formData
+    //     body: formData,
+    // }).then((Response) => {
+    //     if (!Response.ok) {
+    //         throw new Error("Network response was not ok");
+    //     }
+    //     if (!Response.body) throw new Error("No response body");
 
-        const formData = new FormData();
-        // FormData.append() expects a string or Blob/File, not an array. Hence we need to Loop and append each file individually. Otherwise "it tries to convert the entire array into a string, which usually results in a comma-separated string representation of the array's elements."
+    //     // array of {objects} is returned from server
+    //     Response.json().then((metadata) => {
 
-        for (const item of Backend_UploadedFiles) {
-            formData.append('file', item);
-        }
+    //         setFrontend_UploadedFiles((prev) => {
+    //             const updated = [...prev, ...metadata];
+    //             return updated;
+    //         });
 
-        fetch("/api/uploadFilesToGemini", {
-            method: "POST",
-            // headers: {
-            //     "Content-Type": "application/json",
-            // },
-            // headers not needed becuase browser manages that automatocally for formData
-            body: formData,
-        }).then((Response) => {
-            if (!Response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            if (!Response.body) throw new Error("No response body");
+    //         setUploadingFile(false);
 
-            // array of {objects} is returned from server
-            Response.json().then((metadata) => {
+    //     }).catch(error => {
+    //         setUploadingFile(false);
+    //         setalertMessage("Error parsing the server response!")
+    //         setalert(true);
+    //         console.error("Error parsing JSON:", error);
+    //     });
 
-                setFrontend_UploadedFiles((prev) => {
-                    const updated = [...prev, ...metadata];
-                    return updated;
-                });
-
-                setUploadingFile(false);
-
-            }).catch(error => {
-                setUploadingFile(false);
-                setalertMessage("Error parsing the server response!")
-                setalert(true);
-                console.error("Error parsing JSON:", error);
-            });
-
-        }).catch(error => {
-            setUploadingFile(false);
-            console.error("Error:", error);
-        });
+    // }).catch(error => {
+    //     setUploadingFile(false);
+    //     console.error("Error:", error);
+    // });
 
 
 
-        // console.log(e.target.files);
-    };
+    // console.log(e.target.files);
+    // };
 
     // const handleUploadChange = () => {
     //     mediaUploadRef.current.click();
@@ -175,17 +139,17 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
             {/* user uploads their damn media here , just whatever*/}
-            <label className="m-3 p-3 cursor-pointer opacity-50 hover:opacity-100 active:translate-y-1 transition-all duration-300 ease-in-out">
-                <input onChange={handleMediaUpload} type="file" className="hidden" multiple accept="image/*" />
-                <Image src={"/file-upload-icon.svg"} width={30} height={30} alt="Upload Media" />
+            <label className="relative m-1 opacity-50">
+                {/* <input onChange={handleMediaUpload} type="file" className="hidden" multiple /> */}
+                <Image src={"/files.svg"} width={40} height={40} alt="Upload Media" />
+                {/* {
+                    (Frontend_UploadedFiles.length != 0) &&
+                    (
+                        <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{selectedFiles.length}
+                        </div>
+                    )
+                } */}
             </label>
-            {
-                (Frontend_UploadedFiles.length != 0) &&
-                (
-                    <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{selectedFiles.length}
-                    </div>
-                )
-            }
             {/* <button className="btn m-20 border-1 border-white/30 rounded-3xl"> */}
 
 

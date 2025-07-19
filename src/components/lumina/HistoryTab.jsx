@@ -141,13 +141,14 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                                 router.push(`/playgrounds/lumina/`);
                             }
                         }}
+                        className="rounded-full mr-4"
                     >
                         <Image
                             src={"/plus.svg"}
                             width={40}
                             height={40}
                             alt={"new thread"}
-                            className={`p-2 mr-4 opacity-50 hover:opacity-100 rounded-full bg-white/20 cursor-pointer transition-all duration-300 ease-in-out`}
+                            className={`p-2 opacity-50 hover:opacity-100 rounded-full bg-white/20 cursor-pointer transition-all duration-300 ease-in-out`}
                         />
                     </button>
                 </div>

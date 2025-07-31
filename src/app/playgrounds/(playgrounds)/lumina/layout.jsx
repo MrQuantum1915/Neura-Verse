@@ -179,7 +179,7 @@ function Lumina({ children }) {
     const [files, setfiles] = useState([]);
     const [selectedFiles, setselectedFiles] = useState([]);
 
-    const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mou nts, we do not need this to trigger the insertAIResponse() function.
+    const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mounts, we do not need this to trigger the insertAIResponse() function.
 
     const [Model, setModel] = useState(defaultModel);
 
@@ -207,6 +207,7 @@ function Lumina({ children }) {
 
     // managing fetching of chat from threadID
     useEffect(() => {
+        // setresponseComplete(null)
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
             setCurrThreadName("New Thread");
             setMessages([]);
@@ -214,7 +215,6 @@ function Lumina({ children }) {
         else {
             if (!newchat) {
                 setnavigatingThread(true);
-
                 const getThread = async () => {
                     try {
                         const { data, error } = await fetchThread(CurrThreadID);
@@ -317,7 +317,6 @@ function Lumina({ children }) {
 
     // to insert the ai response to database after got response in currThread.
     useEffect(() => {
-
         const insertAIResponse = async () => {
             try {
                 // here i used CurrThreadID insetaed of ref value because see this scenario : when user navigate to differetn thread while ai response in curr thread is pending, if we use ref value than it will insert the message in the new navaigated thread instead of previous, so here i am using stale value.
@@ -593,7 +592,7 @@ function Lumina({ children }) {
                                 <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 bg-gradient-to-b from-transparent to-[#000000]/80" />
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
+                        <PromptBox navigatingThread={navigatingThread} onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
                     </div>
 
                     <WorkSpace files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />

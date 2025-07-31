@@ -164,16 +164,20 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                                     : "opacity-50"
                                     } hover:opacity-100 transition-all duration-300 ease-in-out hover:bg-white/10 text-white rounded-lg px-2 py-2 cursor-pointer text-start font-semibold`}
                                 onClick={() => {
-                                    if (!responseComplete && (responseComplete !== null)) { // null check to allow navigation when page load happened
-                                        setalertMessage("Please Wait for AI response for current Thread");
-                                        setalert(true);
+                                    if (CurrThreadID !== items.thread_id) {
+
+                                        if (!responseComplete && (responseComplete !== null)) { // null check to allow navigation when page load happened
+                                            setalertMessage("Please Wait for AI response for current Thread");
+                                            setalert(true);
+                                        }
+                                        else {
+                                            router.push(`/playgrounds/lumina/${items.thread_id}`);
+                                            setnavigatingThread(true);
+                                            setCurrThreadName(items.thread_name);
+                                        }
                                     }
-                                    else {
-                                        router.push(`/playgrounds/lumina/${items.thread_id}`);
-                                        setnavigatingThread(true);
-                                        setCurrThreadName(items.thread_name);
-                                    }
-                                }}
+                                }
+                                }
                             >
                                 <span>{items.thread_name}</span>
                             </button>

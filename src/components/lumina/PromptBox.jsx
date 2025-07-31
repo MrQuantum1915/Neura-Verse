@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 
-function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, selectedFiles, CurrThreadID }) {
+function PromptBox({ onPrompt, navigatingThread, onStreamResponse, setresponseComplete, Model, context, selectedFiles, CurrThreadID }) {
 
     const model = Model.id;
 
@@ -50,40 +50,41 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
                 }
                 let responseText = "";
 
-                fetch("/api/gemini", {
+                // we need to awiat the fetch because otherwise the finally block will run immediately after the code run without awaiting the response
+                const response = await fetch("/api/gemini", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ model, context: updatedContext, mediaURLs: signedURLs }),
-                })
-                    .then(async (Response) => {
-                        if (!Response.ok) {
-                            throw new Error("Network response was not ok");
-                        }
-                        if (!Response.body) throw new Error("No response body");
-                        const reader = Response.body.getReader();
-                        const decoder = new TextDecoder();
-                        let done = false;
-                        while (!done) {
-                            const { value, done: doneReading } = await reader.read();
-                            done = doneReading;
-                            if (value) {
-                                const chunk = decoder.decode(value);
-                                responseText += chunk;
-                                onStreamResponse(responseText);
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error in fetch:", error);
-                        setalertMessage("An error occurred while processing your request.");
-                        setalert(true);
-                    });
-            }
-            finally {
-                setresponseComplete(true);
+                });
+
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                if (!response.body) {
+                    throw new Error("No response body");
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let done = false;
+
+                while (!done) {
+                    const { value, done: doneReading } = await reader.read();
+                    done = doneReading;
+                    if (value) {
+                        const chunk = decoder.decode(value);
+                        responseText += chunk;
+                        onStreamResponse(responseText);
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error in fetch:", error);
+                setalertMessage("An error occurred while processing your request.");
+                setalert(true);
+            } finally {
                 setawaitingResponse(false);
+                setresponseComplete(true);
             }
         }
 
@@ -101,7 +102,7 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
     // }, []);
 
     return (
-        <div className="bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-85 hover:border-cyan-400 transition-all duration-300 ease-in-out">
+        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-85 hover:border-cyan-400 transition-all duration-300 ease-in-out`}>
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }

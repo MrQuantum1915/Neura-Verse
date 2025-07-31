@@ -54,7 +54,7 @@ function NavBar() {
           }
         }
         setprofile_pic(getCookie('profile_pic'));
-        // console.log("pfp",profile_pic)
+        console.log("pfp",profile_pic)
       }
     };
 

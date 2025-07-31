@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpand, setnavigatingThread }) {
+function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, setHistoryExpand, setnavigatingThread }) {
 
     const router = useRouter();
     const [alert, setalert] = useState(false);
@@ -41,10 +41,16 @@ function ExpandHistory({ History, setCurrThreadName, setHistory, setHistoryExpan
                                     <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/10 rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-3 w-full">
                                         <button
                                             onClick={() => {
-                                                router.push(`/playgrounds/lumina/${item.thread_id}`);
-                                                setnavigatingThread(true);
-                                                setCurrThreadName(item.thread_name);
-                                                setHistoryExpand(false);
+                                                if (CurrThreadID !== item.thread_id) {
+
+                                                    router.push(`/playgrounds/lumina/${item.thread_id}`);
+                                                    setnavigatingThread(true);
+                                                    setCurrThreadName(item.thread_name);
+                                                    setHistoryExpand(false);
+                                                }
+                                                else {
+                                                    setHistoryExpand(false);
+                                                }
                                             }}
                                             className="w-full cursor-pointer mx-4 text-start"
                                         >

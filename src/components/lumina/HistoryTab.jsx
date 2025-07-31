@@ -105,7 +105,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
             {
                 HistoryExpand &&
 
-                <ExpandHistory History={History} setCurrThreadName={setCurrThreadName} setHistory={setHistory} setHistoryExpand={setHistoryExpand} setnavigatingThread={setnavigatingThread} />
+                <ExpandHistory CurrThreadID={CurrThreadID} History={History} setCurrThreadName={setCurrThreadName} setHistory={setHistory} setHistoryExpand={setHistoryExpand} setnavigatingThread={setnavigatingThread} />
 
             }
             <div className="relative flex flex-col w-[95%] h-160 ml-3 mt-4">

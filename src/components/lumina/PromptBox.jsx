@@ -2,8 +2,9 @@
 import Image from "next/image";
 import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
+import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 
-function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, Frontend_UploadedFiles, setFrontend_UploadedFiles, selectedFiles, setUploadingFile, UploadingFile, }) {
+function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, context, selectedFiles, CurrThreadID }) {
 
     const model = Model.id;
 
@@ -24,56 +25,8 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
     };
 
 
-    // const handleMediaUpload = (e) => {
 
-
-    // fetch("/api/uploadFilesToGemini", {
-    //     method: "POST",
-    //     // headers: {
-    //     //     "Content-Type": "application/json",
-    //     // },
-    //     // headers not needed becuase browser manages that automatocally for formData
-    //     body: formData,
-    // }).then((Response) => {
-    //     if (!Response.ok) {
-    //         throw new Error("Network response was not ok");
-    //     }
-    //     if (!Response.body) throw new Error("No response body");
-
-    //     // array of {objects} is returned from server
-    //     Response.json().then((metadata) => {
-
-    //         setFrontend_UploadedFiles((prev) => {
-    //             const updated = [...prev, ...metadata];
-    //             return updated;
-    //         });
-
-    //         setUploadingFile(false);
-
-    //     }).catch(error => {
-    //         setUploadingFile(false);
-    //         setalertMessage("Error parsing the server response!")
-    //         setalert(true);
-    //         console.error("Error parsing JSON:", error);
-    //     });
-
-    // }).catch(error => {
-    //     setUploadingFile(false);
-    //     console.error("Error:", error);
-    // });
-
-
-
-    // console.log(e.target.files);
-    // };
-
-    // const handleUploadChange = () => {
-    //     mediaUploadRef.current.click();
-    // };
-
-
-
-    function sendToLLM() {
+    async function sendToLLM() {
         const prompt = textareaRef.current.value;
         if (prompt.trim() !== "") {
             onPrompt(prompt); // react state updates are async and also bundling , so it does not update immediately. hence we can not rely on the frontend update of the message/context array, Hence we need to make new updatedContext array as below. 
@@ -81,43 +34,57 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
 
             const updatedContext = [...context, { role: "user", content: prompt }]; // this is to be done to avoid abnormal behaviour of app, because react instructs to treat state objects or array as immutable, you should not directly change the original object itself. And another reason is mentioned above beside ```onPrompt(prompt);```
 
+            try {
 
+                let signedURLs = [];
+                if (selectedFiles && selectedFiles.length > 0) {
+                    const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, selectedFiles);
+                    if (error) {
 
-            let responseText = "";
-
-            fetch("/api/gemini", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ model, context: updatedContext, mediaList: selectedFiles }),
-            })
-                .then(async (Response) => {
-                    if (!Response.ok) {
-                        throw new Error("Network response was not ok");
+                        setalertMessage("Failed to fetch signed URLs for files.");
+                        setalert(true);
+                        return;
                     }
-                    if (!Response.body) throw new Error("No response body");
-                    const reader = Response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let done = false;
-                    while (!done) {
-                        const { value, done: doneReading } = await reader.read();
-                        done = doneReading;
-                        if (value) {
-                            const chunk = decoder.decode(value);
-                            responseText += chunk;
-                            onStreamResponse(responseText);
-                        }
-                    }
-                    setresponseComplete(true);
-                    setawaitingResponse(false);
+                    let signedURLs = data.map(file => file.signedUrl);
+                    console.log("Signed URLs:", signedURLs);
+                }
+                let responseText = "";
+
+                fetch("/api/gemini", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ model, context: updatedContext, mediaURLs: signedURLs }),
                 })
-                .catch(error => {
-                    setawaitingResponse(false);
-                    setresponseComplete(true);
-                    console.error("Error:", error);
-
-                });
+                    .then(async (Response) => {
+                        if (!Response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        if (!Response.body) throw new Error("No response body");
+                        const reader = Response.body.getReader();
+                        const decoder = new TextDecoder();
+                        let done = false;
+                        while (!done) {
+                            const { value, done: doneReading } = await reader.read();
+                            done = doneReading;
+                            if (value) {
+                                const chunk = decoder.decode(value);
+                                responseText += chunk;
+                                onStreamResponse(responseText);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error in fetch:", error);
+                        setalertMessage("An error occurred while processing your request.");
+                        setalert(true);
+                    });
+            }
+            finally {
+                setresponseComplete(true);
+                setawaitingResponse(false);
+            }
         }
 
         else {
@@ -143,7 +110,7 @@ function PromptBox({ onPrompt, onStreamResponse, setresponseComplete, Model, con
                 {/* <input onChange={handleMediaUpload} type="file" className="hidden" multiple /> */}
                 <Image src={"/files.svg"} width={40} height={40} alt="Upload Media" />
                 {/* {
-                    (Frontend_UploadedFiles.length != 0) &&
+                    (files.length != 0) &&
                     (
                         <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{selectedFiles.length}
                         </div>

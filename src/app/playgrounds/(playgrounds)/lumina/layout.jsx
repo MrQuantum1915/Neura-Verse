@@ -51,7 +51,13 @@ const roboto = Roboto({
 
 function CustomLink({ href, children }) {
     return (
-        <a target="_blank" rel="noopener noreferrer" href={href} className="text-cyan-400 hover:text-blue-400">
+        <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={href}
+            className="text-cyan-400 hover:text-blue-400 break-words whitespace-normal"
+            style={{ wordBreak: "break-word", overflowWrap: "break-word" }}
+        >
             {children}
         </a>
     );
@@ -170,7 +176,7 @@ function Lumina({ children }) {
     const [sidebarClose, setsidebarClose] = useState(false);
 
     const [messages, setMessages] = useState([]);
-    const [Frontend_UploadedFiles, setFrontend_UploadedFiles] = useState([]);
+    const [files, setfiles] = useState([]);
     const [selectedFiles, setselectedFiles] = useState([]);
 
     const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mou nts, we do not need this to trigger the insertAIResponse() function.
@@ -458,7 +464,7 @@ function Lumina({ children }) {
                                     <div className="w-full min-w-250 py-4 px-0 md:px-30">
 
                                         {messages.map((msg, index) => (
-                                            <div key={index} className={`mb-4 flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                            <div key={index} className={`mb-4 break-words flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                                 {
                                                     ((msg.role === "model")) && (
                                                         <div className="my-4 self-start flex-shrink-0 h-full rounded-full">
@@ -587,10 +593,10 @@ function Lumina({ children }) {
                                 <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 bg-gradient-to-b from-transparent to-[#000000]/80" />
                             </div >
                         </div >
-                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} Frontend_UploadedFiles={Frontend_UploadedFiles} setFrontend_UploadedFiles={setFrontend_UploadedFiles} selectedFiles={selectedFiles} />
+                        <PromptBox onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
                     </div>
 
-                    <WorkSpace files={Frontend_UploadedFiles} setFiles={setFrontend_UploadedFiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles}  CurrThreadID={CurrThreadID} />
+                    <WorkSpace files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
 
                 </div>
 

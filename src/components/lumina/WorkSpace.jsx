@@ -293,18 +293,19 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
                                                 // can't use .inlcudes() because .includes() compares objects and arrays by reference, not by value. If you have two different objects in memory, even if they have the same properties and values, .includes() will return false
 
-                                                if (prev.some(f => f.name === item.name && f.mimeType === item.mimeType)) {
-                                                    return prev.filter(f => !(f.name === item.name && f.mimeType === item.mimeType));
+                                                if (prev.some(name => name === item.name)) {
+                                                    return prev.filter(name => !(name === item.name));
                                                 }
                                                 else {
-                                                    return [...prev, item];
+                                                    console.log("selectedFiles");
+                                                    return [...prev, item.name];
                                                 }
                                             });
                                         }}
                                     >
 
                                         <Image
-                                            src={`${selectedFiles.some(f => f.name === item.name && f.mimeType === item.mimeType) ? ("/checkbox-checked.svg") : ("/checkbox-unchecked.svg")}`}
+                                            src={`${selectedFiles.some(name => name === item.name) ? ("/checkbox-checked.svg") : ("/checkbox-unchecked.svg")}`}
                                             width={25}
                                             height={25}
                                             alt={'checkbox'}

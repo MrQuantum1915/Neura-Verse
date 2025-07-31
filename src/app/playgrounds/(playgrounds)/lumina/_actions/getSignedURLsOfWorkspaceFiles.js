@@ -15,7 +15,7 @@ export async function getSignedURLsOfWorkspaceFiles(thread_id,filenames) {
     
     const { data, error } = await supabase.storage
         .from('lumina-workspace-files')
-        .createSignedUrls(filepaths, 60);
+        .createSignedUrls(filepaths, 120);
         
     if (error) {
         return { error: "Failed to fetch workspace data" }

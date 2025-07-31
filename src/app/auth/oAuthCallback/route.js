@@ -30,12 +30,12 @@ export async function GET(request) {
           .eq('user_id', user.id)
           .single()
 
-          if (!profile || !profile.username) {
+        if (!profile || !profile.username) {
           return NextResponse.redirect(`${origin}/profile`)
         }
       }
 
-
+      return NextResponse.redirect(`${origin}/profile`)
 
 
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer

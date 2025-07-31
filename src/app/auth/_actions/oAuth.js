@@ -12,6 +12,7 @@ export async function oAuth(providerID) {
     })
 
     if (data.url) {
+        console.log("bsdk",data);
         return redirect(data.url);
     }
     else {
@@ -19,7 +20,7 @@ export async function oAuth(providerID) {
         return redirect("/auth/error");
     }
 }
-// gotcha explain how it worked out.
+// need to explain how it worked out :)
 
 // first i had misunderstanding that oAuth can't be handles from server.
 // like [we can't use server actions to handle OAuth because Server actions ('use server') run on the server and cannot open a browser window or redirect the user. OAuth requires the user to be redirected to the provider (Google, etc.) and then back to your app.]

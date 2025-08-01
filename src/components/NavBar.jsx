@@ -93,7 +93,7 @@ function NavBar() {
                   height={55}
                   alt="Profile"
                   style={{ aspectRatio: "1/1" }}
-                  className="rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                  className=" object-cover rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
               </div>
             </Link>
           ) : (

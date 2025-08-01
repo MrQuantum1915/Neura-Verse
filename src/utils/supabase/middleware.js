@@ -63,7 +63,7 @@ export async function updateSession(request) {
           sameSite: 'lax', // cookie is sent only with same-site or top-level navigation; prevents some CSRF -  Cross-Site Request Forgery
           // only send cookie over HTTPS in production for secure transmission
           // secure: process.env.NODE_ENV === 'production',
-          // maxAge: 60 * 60 * 24 * 7  // 1 week
+          maxAge: 60 * 60 * 24 * 365   // 1 year same as supabase session cookie
         })
       }
 
@@ -73,6 +73,7 @@ export async function updateSession(request) {
           path: "/",
           sameSite: "lax",
           // secure: process.env.NODE_ENV === "production",
+           maxAge: 60 * 60 * 24 * 365
         })
       }
 
@@ -82,6 +83,7 @@ export async function updateSession(request) {
           path: "/",
           sameSite: "lax",
           // secure: process.env.NODE_ENV === "production",
+           maxAge: 60 * 60 * 24 * 365
         })
       }
 

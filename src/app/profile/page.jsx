@@ -155,8 +155,7 @@ function Profile() {
                                     src={Profile_Picture}
                                     fill
                                     alt="Profile Picture"
-                                    className="rounded-full border-2 border-white object-cover"
-                                    style={{ aspectRatio: "1/1" }}
+                                    className="rounded-full border-2 border-white object-cover aspect-square"
                                 />
                             </div>
                             <div className='flex flex-row flex-wrap items-center gap-4'>

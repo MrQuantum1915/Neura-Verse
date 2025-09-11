@@ -38,6 +38,5 @@ export async function uploadWorkspaceFiles(formData) {
         console.error(listError);
         return { error: 'Failed to fetch updated file list' };
     }
-
     return { data: listData };
 }

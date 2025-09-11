@@ -28,7 +28,7 @@ export async function fetchThread(thread_id) {
 
     const { data, error } = await supabase
         .from('lumina')
-        .select('role , content, ai_model, is_public')
+        .select('role , content, ai_model, is_public, thread_name')
         .eq('thread_id', thread_id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });  // oldest first

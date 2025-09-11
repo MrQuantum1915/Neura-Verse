@@ -55,15 +55,18 @@ export default function RootLayout({ children }) {
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
-          <div className="fixed inset-0 z-0 h-full w-full opacity-50">
-            <Image
+          <div className="fixed inset-0 z-0 h-full w-full opacity-90">
+            {/* <Image
               src={"/main-bg-10.jpg"}
               width={1920}
               height={1080}
               alt="Main background"
               className="w-full h-full object-cover"
               priority
-            />
+            /> */}
+
+            <video src="/Wave_green.mp4" type="video/mp4" autoPlay loop muted className="w-full h-auto z-0" />
+
           </div>
           <div className="relative z-10">
             {children}

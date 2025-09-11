@@ -105,7 +105,7 @@ function Profile() {
                         <div className="inner three"></div>
                     </div>
                     <h1 className='text-3xl text-cyan-400 mx-4 mt-4'>
-                        Fetching Profile...
+                        Compiling your awesomeness...
                     </h1>
                 </div>
             </>
@@ -162,6 +162,7 @@ function Profile() {
 
                                 <label className="cursor-pointer">
                                     <input
+                                        id='imageInput'
                                         type="file"
                                         accept="image/*"
                                         className="hidden"
@@ -267,6 +268,7 @@ function Profile() {
                             {
                                 changeUsername ? (
                                     <input
+                                        id='usernameInput'
                                         ref={usernameRef}
                                         className="border-b-2 border-white/50 outline-none text-[1.5em]"
                                         placeholder='Enter your username'
@@ -338,6 +340,7 @@ function Profile() {
                             {
                                 changeFullName ? (
                                     <input
+                                        id='fullNameInput'
                                         ref={fullNameRef}
                                         className="border-b-2 border-white/50 outline-none text-[1.5em]"
                                         placeholder='Enter your full name'
@@ -401,6 +404,7 @@ function Profile() {
                             {
                                 changeEmail ? (
                                     <input
+                                        id='emailInput'
                                         ref={emailRef}
                                         className="border-b-2 border-white/50 outline-none text-[1.5  em] w-3/4"
                                         placeholder='Enter your email'

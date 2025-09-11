@@ -24,15 +24,15 @@ export default async function Home() {
     <>
       <div className={`min-h-screen flex flex-col  text-white font-sans ${michroma.className}`}>
         {/* Hero Section */}
-        <section className="flex-1 flex flex-col items-center justify-center text-center relative overflow-hidden mt-20">
+        <section className="flex-1 flex flex-col items-center  text-center relative overflow-hidden mt-20">
           {/* Layered/3D Background Accent */}
           {/* <div className="absolute inset-0 -z-10 pointer-events-none">
           <div className="absolute left-1/2 top-1/2 w-[600px] h-[600px] bg-gradient-to-tr from-purple-700/20 via-blue-500/10 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
           </div> */}
           <h1 className="text-7xl font-extrabold tracking-tight leading-tight animate-fade-in z-0">
-            Welcome to
+             Neura Verse
           </h1>
-          <Image src={"/Neura Verse Logo (Self Made)-v2.0.png"} width={1000} height={500} alt="logo"></Image>
+          {/* <Image src={"/Neura Verse Logo (Self Made)-v2.0.png"} width={1000} height={500} alt="logo"></Image> */}
         </section>
 
         {/* Call to Action */}

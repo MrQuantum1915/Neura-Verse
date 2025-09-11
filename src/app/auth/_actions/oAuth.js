@@ -12,7 +12,6 @@ export async function oAuth(providerID) {
     })
 
     if (data.url) {
-        console.log("bsdk",data);
         return redirect(data.url);
     }
     else {

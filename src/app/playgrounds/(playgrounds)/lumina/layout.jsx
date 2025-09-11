@@ -125,7 +125,7 @@ function Lumina({ children }) {
     const [profile_pic, setprofile_pic] = useState(null)
 
 
-    // this runs on every full render and checks if session is active or user logged in
+    // this runs on every full render and checks if session is active or user logged in (client side)
     useEffect(() => {
         const fetchUserLoggedIn = async () => {
             try {
@@ -223,14 +223,21 @@ function Lumina({ children }) {
                             setalert(true);
                             return;
                         }
-                        if (data[0].is_public === true) {
-                            setThreadPublic(true);
-                        }
                         else {
-                            setThreadPublic(false);
+
+                            setCurrThreadName(data[0].thread_name);
+                            if (data[0].is_public === true) {
+                                setThreadPublic(true);
+                            }
+                            else {
+                                setThreadPublic(false);
+                            }
+                            // console.log(data);
+                            setMessages(data);
                         }
-                        // console.log(data);
-                        setMessages(data);
+                    } catch (err) {
+                        setalertMessage(err.message);
+                        setalert(true);
                     }
 
                     finally {
@@ -250,7 +257,6 @@ function Lumina({ children }) {
 
     // handlers to add user and AI messages
     const handleNewPrompt = async (userPrompt) => {
-
         setresponseComplete(false);
         const newMessages = [
             ...messages,
@@ -262,7 +268,8 @@ function Lumina({ children }) {
 
         // if this is first message, update thread name
         // let tempThreadId;
-        if (messages.length === 0) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
+        if (messages.length === 0 && CurrThreadID === null) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
+            const threadName = (userPrompt.length > 60) ? (userPrompt.substring(0, 60) + "...") : (userPrompt);
             const supabase = createClient_client();
             // if the user is not logged in ...
             const { data: { session } } = await supabase.auth.getSession();
@@ -271,7 +278,7 @@ function Lumina({ children }) {
             }
 
             else {
-                const { data, error } = await createNewThread(userPrompt);
+                const { data, error } = await createNewThread(threadName);
 
                 if (error) {
                     setalertMessage(error);
@@ -281,15 +288,15 @@ function Lumina({ children }) {
                 // setCurrThreadID(data[0].thread_id); // we are using dyanmic routes now so we will only update url, the current thread id will update due to useeffect of threadId, and also we donot wnat to fetch the thread from database, so we stop fetch in the useeffect of CurrThreadId by using newchat state :) I am genius huh?
                 setnewchat(true);
                 // tempThreadId = data[0].thread_id;
-                setCurrThreadName(userPrompt);
+                setCurrThreadName(threadName);
                 router.push(`/playgrounds/lumina/${data[0].thread_id}`)
             }
         }
         else {
-            const threadNameToUse = CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
+            const threadName = CurrThreadName; //  we cant rely on CurrThreadName to use it when thread name is updated in above if(). bcz state update are async
             const { data, error } = await insertNewMessage( // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
                 CurrThreadID,
-                threadNameToUse,
+                threadName,
                 { role: "user", content: userPrompt, ai_model: null }
             );
 
@@ -435,7 +442,7 @@ function Lumina({ children }) {
                 <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} />
 
 
-                {/* Set height below TopBar to fill remaining space */}
+                {/* set height below topbar to fill remaining space */}
                 <div className="flex w-full flex-row" style={{ height: "calc(100vh - 50px)" }}>
 
                     <div className="flex flex-col w-full h-full items-center">
@@ -595,7 +602,7 @@ function Lumina({ children }) {
                         <PromptBox navigatingThread={navigatingThread} onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
                     </div>
 
-                    <WorkSpace files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
+                    <WorkSpace setnewchat={setnewchat} files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
 
                 </div>
 

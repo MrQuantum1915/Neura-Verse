@@ -63,7 +63,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
         function handleClickOutside(event) {
             if (
                 modelButtonRef.current && !modelButtonRef.current.contains(event.target)
-                 && modelDropdownMenuRef.current && !modelDropdownMenuRef.current.contains(event.target)
+                && modelDropdownMenuRef.current && !modelDropdownMenuRef.current.contains(event.target)
             ) {
                 setmodelDropdownOpen(false);
             }
@@ -167,6 +167,32 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                         {
                             !editThreadName ? (CurrThreadName) : (
                                 <input
+                                    onKeyDown={async (e) => {
+                                        if (e.key === 'Enter') {
+                                            if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation
+                                                try {
+                                                    const newThreadName = threadNameRef.current.value;
+                                                    const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
+                                                    if (error) {
+                                                        setalertMessage(`Error renaming thread title :  ${error}`);
+                                                        setalert(true);
+                                                        return;
+                                                    }
+                                                    setCurrThreadName(newThreadName);
+                                                }
+                                                finally {
+                                                    seteditThreadName((prev) => {
+                                                        return !prev;
+                                                    });
+                                                }
+                                            }
+                                            else {
+                                                seteditThreadName((prev) => {
+                                                    return !prev;
+                                                })
+                                            }
+                                        }
+                                    }}
                                     ref={threadNameRef}
                                     className="border-b-2 border-cyan-400 outline-none text-2xl w-fit"
                                     placeholder='Enter Thread Name'
@@ -178,6 +204,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                     </div>
 
                     <button
+
                         onClick={async () => {
 
                             if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation 
@@ -282,7 +309,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
 
             </div>
 
-            <div className="z-50 pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
+            <div className="z-5 pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
 
         </div >
     )

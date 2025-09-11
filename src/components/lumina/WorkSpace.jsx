@@ -14,6 +14,9 @@ import { fetchListOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumin
 import { getSignedURLsOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles';
 import CircularLoader from '../CircularLoader';
 import { deleteWorkspaceFile } from '@/app/playgrounds/(playgrounds)/lumina/_actions/deleteWorkspaceFile';
+import { createNewThread } from '@/app/playgrounds/(playgrounds)/lumina/_actions/createNewThread';
+import { sendFilesToGemini } from '@/app/playgrounds/(playgrounds)/lumina/_actions/sendFilesToGemini';
+import { useRouter } from 'next/navigation';
 
 const robotoSlab = Roboto_Slab({
     subsets: ['latin'],
@@ -31,8 +34,9 @@ const fileTypes = [
 ];
 
 
-function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThreadID }) {
+function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThreadID, setnewchat }) {
 
+    const router = useRouter();
     const [WorkspaceOpen, setWorkspaceOpen] = useState(false);
     const [currFileType, setcurrFileType] = useState({ itemName: "Images", type: "image/*", id: "image/*", icon: "/image.svg" })
     // {console.log("workspace remounted")}
@@ -100,8 +104,21 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
         setUploadingFile(true);
 
         try {
+            if (CurrThreadID === null) {
+
+                const { data: newThreadData, error: newThreaderr } = await createNewThread("MultiModal Chat");
+                if (newThreaderr) {
+                    setalertMessage(newThreaderr);
+                    setalert(true);
+                }
+                else {
+                    setnewchat(true);
+                    router.push(`/playgrounds/lumina/${newThreadData[0].thread_id}`)
+                }
+            }
+
             const tempfiles = e.target.files;
-            // to send a file from a client to a server,  the recommended approach is to use the FormData object. as using json.stringify would likely result in empty object as it cant handle complex data like a file. It only serialize objects and array in string.
+            // to sendingToGemini a file from a client to a server,  the recommended approach is to use the FormData object. as using json.stringify would likely result in empty object as it cant handle complex data like a file. It only serialize objects and array in string.
 
             const formData = new FormData();
             // FormData.append() expects a string or Blob/File, not an array. Hence we need to Loop and append each file individually. Otherwise "it tries to convert the entire array into a string, which usually results in a comma-separated string representation of the array's elements."
@@ -116,6 +133,8 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
             formData.append('thread_id', CurrThreadID);
             const { data, error } = await uploadWorkspaceFiles(formData);
+            console.log("log")
+
             if (error) {
                 setalertMessage(error);
                 setalert(true);
@@ -149,6 +168,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
     }, [CurrThreadID]);
 
     const [UploadingFile, setUploadingFile] = useState(false);
+    const [sendingToGemini, setSend] = useState(false);
     const [CreatingFileURL, setCreatingFileURL] = useState(false);
     const [DeletingFile, setDeletingFile] = useState(false);
 
@@ -255,6 +275,25 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                             <Image src={`${currFileType.icon}`} width={25} height={25} alt={'icon'}></Image>
                             {currFileType.itemName}
                         </div>
+                        <button
+                            onClick={async () => {
+                                setSend(true);
+
+                                try {
+                                    const { data, error } = await sendFilesToGemini();
+                                    if (error) {
+                                        setalertMessage(error);
+                                        setalert(true);
+                                    }
+                                }
+                                finally {
+                                    setSend(false);
+                                }
+                            }}
+                            className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-cyan-400 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center transition-all duration-300 ease-in-out`}>
+                            <div>{`${sendingToGemini ? ("Sending...") : ("Sent")}`}</div>
+                        </button>
+
 
                         <button
                             ref={fileTypesMenuRef}
@@ -297,7 +336,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                                     return prev.filter(name => !(name === item.name));
                                                 }
                                                 else {
-                                                    console.log("selectedFiles");
+                                                    // console.log("selectedFiles");
                                                     return [...prev, item.name];
                                                 }
                                             });

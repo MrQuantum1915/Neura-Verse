@@ -1,0 +1,82 @@
+name: Weekly Database Ping
+
+on:
+  schedule:
+    # Runs every Sunday at 12:00 UTC (weekly)
+    - cron: '0 12 * * 0'
+  workflow_dispatch: # Allow manual triggering for testing
+
+jobs:
+  ping-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Ping Supabase Database
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          node -e "
+          const { createClient } = require('@supabase/supabase-js');
+          
+          async function pingDatabase() {
+            try {
+              console.log('🔄 Pinging Supabase database...');
+              
+              if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                throw new Error('Missing required environment variables');
+              }
+              
+              const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL,
+                process.env.SUPABASE_SERVICE_ROLE_KEY
+              );
+              
+              // Perform a simple SQL query to test connection
+              const { data, error } = await supabase.rpc('version');
+              
+              if (error) {
+                console.log('📋 PostgreSQL version query failed, trying basic connectivity test...');
+                // Fallback: Try to list tables as a connectivity test
+                const { data: tables, error: tablesError } = await supabase
+                  .from('information_schema.tables')
+                  .select('table_name')
+                  .limit(1);
+                
+                if (tablesError) {
+                  throw tablesError;
+                }
+              }
+              
+              console.log('✅ Database ping successful!');
+              console.log('📊 Connection status: Active');
+              console.log('⏰ Ping time:', new Date().toISOString());
+              console.log('🌐 Database URL:', process.env.NEXT_PUBLIC_SUPABASE_URL.replace(/\/\/.*@/, '//***@'));
+              
+            } catch (error) {
+              console.error('❌ Database ping failed:', error.message);
+              if (error.details) console.error('Details:', error.details);
+              process.exit(1);
+            }
+          }
+          
+          pingDatabase();
+          "
+      
+      - name: Report Success
+        if: success()
+        run: |
+          echo "✅ Weekly database ping completed successfully"
+          echo "Next ping scheduled for next Sunday at 12:00 UTC"

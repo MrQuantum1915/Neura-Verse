@@ -26,7 +26,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                         onClick={() => {
                             setHistoryExpand(false);
                         }}
-                        className="hover:rotate-90 rounded-full opacity-50 hover:opacity-100 hover:bg-white/10  p-1 cursor-pointer transition-all duration-300 ease-out "
+                        className="hover:rotate-90 rounded-full opacity-50 hover:opacity-100 hover:bg-white/10  border border-white/0 hover:border-white/30  p-1 cursor-pointer transition-all duration-300 ease-out "
                     >
                         <Image src={"/cross.svg"} width={30} height={30} alt={"close"}></Image>
                     </button>
@@ -38,7 +38,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                             return (
                                 <div key={item.thread_id} className="flex flex-col">
 
-                                    <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/10 rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-3 w-full">
+                                    <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/5 border border-white/0 hover:border-white/30  rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-3 w-full">
                                         <button
                                             onClick={() => {
                                                 if (CurrThreadID !== item.thread_id) {
@@ -64,7 +64,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                             <Link href={`${process.env.NEXT_PUBLIC_BASE_URL}/playgrounds/lumina/${item.thread_id}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/20 cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
                                                 style={{ minWidth: '2rem', minHeight: '2rem' }}
                                             >
                                                 <OpenInNewTab fill="white" size={24} className={"p-0.5"} />
@@ -82,7 +82,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                                         return prev.filter((array) => item.thread_id != array.thread_id)
                                                     })
                                                 }}
-                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/20 cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
                                                 style={{ minWidth: '2rem', minHeight: '2rem' }}
                                             >
                                                 <Image src={"/delete.svg"} width={24} height={24} alt={"more"} className="p-1" />

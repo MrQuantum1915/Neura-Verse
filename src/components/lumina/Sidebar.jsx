@@ -23,8 +23,8 @@ const oswald = Oswald({
 
 const navigationItems = [
 
-    { href: "/home", label: "Home", icon: "/home.svg" },
-    { href: "/playgrounds", label: "Playgrounds", icon: "/tools.svg" },
+  { href: "/home", label: "Home", icon: "/home.svg" },
+  { href: "/playgrounds", label: "Playgrounds", icon: "/tools.svg" },
 ];
 
 function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadName, setCurrThreadName, navigatingThread, setnavigatingThread, responseComplete }) {
@@ -36,21 +36,21 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
     profile_pic = "/pfp-placeholder-2.svg";
   }
   return (
-    <div className={`z-100 flex flex-row items-start justify-between min-h-screen bg-black border-r-2 border-white/20 text-white`}>
+    <div className={`z-100 flex flex-row items-start justify-between h-full bg-black border-r-2 border-white/20 text-white`}>
       <div
         className={
           // sidebar
-          `flex flex-col h-screen items-start ${sidebar ? ("w-70") : ("opacity-0 w-0 translate-x-[-100%] pointer-events-none")} bg-black transition-all duration-1000 ease-in-out`
+          `flex flex-col h-full items-start ${sidebar ? ("w-70") : ("opacity-0 w-0 translate-x-[-100%] pointer-events-none")} bg-black transition-all duration-1000 ease-in-out`
           // "flex flex-col h-screen items-start  transition-all duration-1000 ease-in-out"
         }
       >
-        <div className="w-full flex flex-col">
+        <div className="w-full h-full flex flex-col gap-1 justify-between">
           <div className="flex flex-row justify-between items-center">
             <Link href="/playgrounds/lumina">
-              <h1 className={`text-4xl mx-4 my-2 cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-300 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
+              <h1 className={`text-4xl mx-4 my-2 cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-200 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
             </Link>
             <button
-              className={`cursor-pointer px-2 opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out`}
+              className={`cursor-pointer px-2 opacity-50 hover:opacity-100 transition-all duration-200 ease-in-out`}
               onClick={() => {
                 setSidebar(false);
                 setsidebarClose(true);
@@ -61,9 +61,9 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
               <svg width="50px" height="50px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ffffff" strokeWidth="1">
 
                 <>
-                  <line x1="21" y1="10" x2="7" y2="10" className="transition-all duration-300" />
-                  <line x1="21" y1="15" x2="10" y2="15" className="transition-all duration-300" />
-                  <line x1="21" y1="20" x2="4" y2="20" className="transition-all duration-300" />
+                  <line x1="21" y1="10" x2="7" y2="10" className="transition-all duration-200" />
+                  <line x1="21" y1="15" x2="10" y2="15" className="transition-all duration-200" />
+                  <line x1="21" y1="20" x2="4" y2="20" className="transition-all duration-200" />
                 </>
 
               </svg>
@@ -72,7 +72,36 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
           </div>
 
 
-          <HistoryTab CurrThreadID={CurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} navigatingThread={navigatingThread} responseComplete={responseComplete} profile_pic={profile_pic} />
+          <div className="flex-1 min-h-0 w-full">
+            <HistoryTab CurrThreadID={CurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} navigatingThread={navigatingThread} responseComplete={responseComplete} profile_pic={profile_pic} />
+          </div>
+
+          {/* navigation */}
+          <div className="flex flex-col">
+            {navigationItems.map((items => (
+              <Link href={items.href} key={items.label}>
+                <div className="flex items-center justify-center cursor-pointer rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
+                  <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
+                  <div className="px-4">{items.label}</div>
+                </div>
+              </Link>
+            )))}
+
+            <Link href={"/profile"}>
+              <div className="flex items-center justify-center cursor-pointer rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
+                <Image
+                  src={profile_pic}
+                  alt="Profile Picture"
+                  width={40}
+                  height={40}
+                  className="rounded-full aspectRatio-1/1"
+                  style={{ aspectRatio: "1/1" }}
+                />
+                <div className="px-4">Profile</div>
+              </div>
+            </Link>
+
+          </div>
         </div>
       </div>
 
@@ -80,7 +109,7 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
         !sidebar && (
           <div className="flex flex-col justify-between items-center w-fit relative">
             <button
-              className="mt-5 cursor-pointer w-12 w-16 px-2 rounded-full opacity-50   hover:opacity-100 transition-all duration-300 ease-in-out"
+              className="mt-5 cursor-pointer w-12 w-16 px-2 rounded-full opacity-50   hover:opacity-100 transition-all duration-200 ease-in-out"
               onClick={() => {
                 setSidebar(true);
                 setsidebarClose(false);
@@ -91,9 +120,9 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
               <svg width="50px" height="50px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#ffffff" strokeWidth="1">
 
                 <>
-                  <line x1="19" y1="10" x2="3" y2="10" className="transition-all duration-300" />
-                  <line x1="14" y1="15" x2="3" y2="15" className="transition-all duration-300" />
-                  <line x1="20" y1="20" x2="3" y2="20" className="transition-all duration-300" />
+                  <line x1="19" y1="10" x2="3" y2="10" className="transition-all duration-200" />
+                  <line x1="14" y1="15" x2="3" y2="15" className="transition-all duration-200" />
+                  <line x1="20" y1="20" x2="3" y2="20" className="transition-all duration-200" />
                 </>
 
 
@@ -122,22 +151,23 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
                     width={40}
                     height={40}
                     alt={"new thread"}
-                    className={`p-2 opacity-50 hover:opacity-100 rounded-full bg-white/20 cursor-pointer transition-all duration-300 ease-in-out`}
+                    className={`p-2 opacity-50 hover:opacity-100 rounded-full bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-200 ease-in-out`}
                   />
                 </button>
               </div>
+
               <div>
 
                 {navigationItems.map((items => (
                   <Link href={items.href} key={items.label}>
-                    <div className="flex items-center justify-center cursor-pointer hover:bg-white/20 opacity-75 hover:opacity-100  rounded-lg p-2 py-1 m-2  w-fit transition-all duration-400 ease-in-out">
+                    <div className="flex items-center justify-center cursor-pointer hover:bg-white/10 opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30   rounded-lg p-2 py-1 m-2  w-fit transition-all duration-200 ease-in-out">
                       <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
                     </div>
                   </Link>
                 )))}
 
                 <Link href={"/profile"}>
-                  <div className="flex items-center justify-center cursor-pointer border-2 opacity-75 hover:opacity-100 rounded-full m-2 w-fit transition-all duration-400 ease-in-out">
+                  <div className="flex items-center justify-center cursor-pointer border-2 opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  rounded-full m-2 w-fit transition-all duration-200 ease-in-out">
                     <Image
                       src={profile_pic}
                       alt="Profile Picture"

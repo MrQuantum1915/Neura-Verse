@@ -234,7 +234,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                     >
                         {
                             (CurrThreadID !== null) &&
-                            (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/20 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
+                            (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
                         }
                     </button>
                 </div>

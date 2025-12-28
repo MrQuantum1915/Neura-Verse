@@ -78,6 +78,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
     // dropdowm for each item
     const [fileMenu, setFileMenu] = useState(false);
     const [selectedFileMenu, setselectedFileMenu] = useState(null);
+    const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
     const fileMenuRef = useRef(null);
     useEffect(() => {
@@ -178,7 +179,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                 !WorkspaceOpen &&
                 <button
                     onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
-                    className={`mt-4 bg-[#212121] hover:bg-white/30 rounded-lg p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out ${WorkspaceOpen ? ("") : ("mr-4")}`}>
+                    className={`mt-4 bg-[#212121] hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-lg p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out ${WorkspaceOpen ? ("") : ("mr-4")}`}>
 
                     <Image
                         src={"/stacks.svg"}
@@ -199,7 +200,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     <div className='flex flex-row items-center'>
                         <button
                             onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
-                            className="absolute left-0 opacity-50 hover:opacity-100 bg-[#212121] hover:bg-white/10 hover:rotate-90 rounded-full p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out">
+                            className="absolute left-0 opacity-50 hover:opacity-100 bg-[#212121] hover:bg-white/5 border border-white/0 hover:border-white/30 hover:rotate-90 rounded-full p-1 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out">
 
                             <Image
                                 src={"/cross.svg"}
@@ -315,7 +316,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     </div>
 
                     {/* files */}
-                    <div className='overflow-y-scroll overflow-x-scroll h-full w-full'>
+                    <div className='overflow-y-scroll overflow-x-scroll h-full w-full' onScroll={() => setFileMenu(false)}>
                         {files
                             .filter((file) => file.mimeType.split('/')[0] === currFileType.id.split('/')[0]) // filter out acc to curr file type selected
                             .map((item) => (
@@ -353,7 +354,9 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                     </button>
                                     <div className='overflow-x-hidden text-ellipsis w-full whitespace-nowrap'>{item.name}</div>
                                     <div
-                                        onClick={() => {
+                                        onClick={(e) => {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setMenuPosition({ top: rect.bottom, left: rect.right - 160 });
                                             if (fileMenu && selectedFileMenu === item.name) {
                                                 setFileMenu(false);
                                                 setselectedFileMenu(null);
@@ -363,58 +366,9 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                             }
                                         }}
 
-                                        className='flex-shrink-0 relative cursor-pointer transition-all duration-300 ease-in-out hover:bg-white/20 rounded-full'
+                                        className='flex-shrink-0 relative cursor-pointer transition-all duration-300 ease-in-out hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-full'
                                     >
                                         <Image src={"/more.svg"} width={30} height={30} alt='more options' className='opacity-50 hover:opacity-100' />
-                                        {
-                                            fileMenu && (item.name === selectedFileMenu) && (
-                                                <div
-                                                    ref={fileMenuRef}
-                                                    className="absolute right-0 mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-100 flex flex-col p-1 w-[400%]">
-                                                    <button
-                                                        onClick={async () => {
-                                                            setDeletingFile(true);
-                                                            try {
-                                                                const { data, error } = await deleteWorkspaceFile(CurrThreadID, item.name);
-                                                                if (error) {
-                                                                    setalertMessage(error);
-                                                                    setalert(true);
-                                                                    return;
-                                                                }
-                                                                setFiles((prev) => {
-                                                                    return prev.filter((element) => item.name != element.name)
-                                                                })
-                                                            }
-                                                            finally {
-                                                                setDeletingFile(false);
-                                                            }
-                                                        }}
-                                                        className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
-                                                    >
-                                                        <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
-                                                        <div>Delete</div>
-                                                    </button>
-                                                    <button
-                                                        onClick={async (e) => {
-                                                            setCreatingFileURL(true);
-                                                            const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, [item.name]);
-                                                            if (error) {
-                                                                setalertMessage("Failed to fetch the file");
-                                                                setalert(true);
-                                                                return;
-                                                            }
-                                                            setCreatingFileURL(false);
-                                                            window.open(data[0].signedUrl, '_blank');
-                                                        }}
-                                                        className="p-1 rounded-lg w-full h-fit flex flex-row  items-center gap-2 hover:bg-cyan-400/20 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-400"
-                                                        style={{ minWidth: '2rem', minHeight: '2rem' }}
-                                                    >
-                                                        <OpenInNewTab fill="cyan" size={20} />
-                                                        <h1>View</h1>
-                                                    </button>
-                                                </div>
-                                            )
-                                        }
                                     </div>
                                 </div>
                             ))}
@@ -422,6 +376,58 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
                 </div>
             </div>
+            {
+                fileMenu && selectedFileMenu && (
+                    <div
+                        ref={fileMenuRef}
+                        className="fixed mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-40"
+                        style={{ top: menuPosition.top, left: menuPosition.left }}>
+                        <button
+                            onClick={async () => {
+                                setDeletingFile(true);
+                                try {
+                                    const { data, error } = await deleteWorkspaceFile(CurrThreadID, selectedFileMenu);
+                                    if (error) {
+                                        setalertMessage(error);
+                                        setalert(true);
+                                        return;
+                                    }
+                                    setFiles((prev) => {
+                                        return prev.filter((element) => selectedFileMenu != element.name)
+                                    })
+                                }
+                                finally {
+                                    setDeletingFile(false);
+                                    setFileMenu(false);
+                                }
+                            }}
+                            className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
+                        >
+                            <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
+                            <div>Delete</div>
+                        </button>
+                        <button
+                            onClick={async (e) => {
+                                setCreatingFileURL(true);
+                                const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, [selectedFileMenu]);
+                                if (error) {
+                                    setalertMessage("Failed to fetch the file");
+                                    setalert(true);
+                                    return;
+                                }
+                                setCreatingFileURL(false);
+                                setFileMenu(false);
+                                window.open(data[0].signedUrl, '_blank');
+                            }}
+                            className="p-1 rounded-lg w-full h-fit flex flex-row  items-center gap-2 hover:bg-cyan-400/20 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-400"
+                            style={{ minWidth: '2rem', minHeight: '2rem' }}
+                        >
+                            <OpenInNewTab fill="cyan" size={20} />
+                            <h1>View</h1>
+                        </button>
+                    </div>
+                )
+            }
         </div >
     )
 }

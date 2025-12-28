@@ -39,10 +39,10 @@ export async function uploadWorkspaceFiles(formData) {
     }
 
 
-    for (const item of clientFiles) {
-        console.log(item, item?.name);
-        // ...
-    }
+    // for (const item of clientFiles) {
+    //     console.log(item, item?.name);
+    //     // ...
+    // }
 
     const uploadedFiles_Metadata = [];
 

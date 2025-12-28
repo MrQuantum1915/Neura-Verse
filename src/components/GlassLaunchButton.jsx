@@ -3,7 +3,7 @@ import './glassbutton.css'
 
 export default function GlassLaunchButton({ text, link, className = "" }) {
     return (
-        <div className={`button-wrap-glasslaunch  ${className}`}>
+        <div className={`button-wrap-glasslaunch cursor-pointer ${className}`}>
             <button
                 type="button"
                 onClick={() => window.open(link, '_blank')}

@@ -148,7 +148,7 @@ function PromptBox({ onPrompt, navigatingThread, onStreamResponse, setresponseCo
                     width={40}
                     height={40}
                     alt="Submit"
-                    className={`cursor-pointer opacity-90 rounded-full p-2 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/30 active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : " bg-white/10"}`}
+                    className={`cursor-pointer opacity-90 rounded-full p-1.5 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/5 border border-white/0 hover:border-white/30  active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : ""}`}
                     aria-label="Submit Prompt"
                     onClick={(e) => {
                         awaitingResponse ? (handleInput()) : (sendToLLM(), textareaRef.current.value = "", handleInput());

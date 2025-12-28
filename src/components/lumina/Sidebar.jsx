@@ -77,10 +77,10 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
           </div>
 
           {/* navigation */}
-          <div className="flex flex-col">
+          <div className="flex flex-col m-4">
             {navigationItems.map((items => (
               <Link href={items.href} key={items.label}>
-                <div className="flex items-center justify-center cursor-pointer rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
+                <div className="flex items-center justify-center cursor-pointer rounded-lg p-2  hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
                   <Image src={items.icon} width={30} height={30} alt={items.label} className="cursor-pointer m-1 invert " />
                   <div className="px-4">{items.label}</div>
                 </div>
@@ -88,7 +88,7 @@ function Sidebar({ page, setsidebarClose, profile_pic, CurrThreadID, CurrThreadN
             )))}
 
             <Link href={"/profile"}>
-              <div className="flex items-center justify-center cursor-pointer rounded-lg p-2 m-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
+              <div className="flex items-center justify-center cursor-pointer rounded-lg p-2 hover:bg-white/10 w-fit opacity-75 hover:opacity-100 border border-white/0 hover:border-white/30  transition-all duration-200 ease-in-out">
                 <Image
                   src={profile_pic}
                   alt="Profile Picture"

@@ -8,7 +8,8 @@ import {
   Michroma,
   Instrument_Serif
 } from 'next/font/google';
-import Image from "next/image";
+import LightPillar from "@/components/LightPillar";
+import GradualBlur from "@/components/GradualBlur";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -55,21 +56,36 @@ export default function RootLayout({ children }) {
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
-          <div className="fixed inset-0 z-0 h-full w-full opacity-90">
-            {/* <Image
-              src={"/main-bg-10.jpg"}
-              width={1920}
-              height={1080}
-              alt="Main background"
-              className="w-full h-full object-cover"
-              priority
-            /> */}
+          <div className="fixed inset-0 z-0">
+            <LightPillar
+              topColor="#5227FF"
+              bottomColor="#FF9FFC"
+              intensity={0.9}
+              rotationSpeed={0.5}
+              glowAmount={0.002}
+              pillarWidth={3.0}
+              pillarHeight={0.4}
+              noiseIntensity={0.5}
+              pillarRotation={45}
+              interactive={true}
+              mixBlendMode="normal"
+            />
 
-            <video src="/Wave_green.mp4" type="video/mp4" autoPlay loop muted className="w-full h-auto z-0" />
+
 
           </div>
           <div className="relative z-10">
             {children}
+            {/* <GradualBlur
+              target="page"
+              position="bottom"
+              height="6rem"
+              strength={2}
+              divCount={5}
+              curve="bezier"
+              exponential={true}
+              opacity={1}
+            /> */}
           </div>
         </main>
         <ConditionallyIncludeFooter />

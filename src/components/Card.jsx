@@ -13,12 +13,12 @@ function Card({ Title, Description, ImageURL, Tags, pageLink }) {
                     alt={Title}
                     width={400}
                     height={350}
-                    className="rounded-2xl mb-4 object-cover w-full"
+                    className="mb-4 object-cover w-full"
                 />
                 <h2 className="text-3xl font-bold mb-2">{Title}</h2>
                 <div className="flex flex-wrap gap-2 m-4 items-center justify-center">
                     {Tags.map((tag, index) => (
-                        <span key={index} className="bg-gray-800 text-gray-100 rounded-full px-3 py-1 text-sm font-semibold">
+                        <span key={index} className="bg-gray-800 text-gray-100 px-3 py-1 text-sm font-semibold">
                             {tag}
                         </span>
                     ))}
@@ -28,7 +28,7 @@ function Card({ Title, Description, ImageURL, Tags, pageLink }) {
                     <button
                         className="cardButton"
                     >
-                        Explore Now
+                        Launch
                         <Image src={"/open-in-new-tab-cyan.svg"} width={20} height={20} alt="Open in New tab" className="ml-2 mb-0.5" />
                     </button>
                 </Link>

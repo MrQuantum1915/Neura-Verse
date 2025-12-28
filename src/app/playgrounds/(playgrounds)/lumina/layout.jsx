@@ -141,7 +141,6 @@ function Lumina({ children }) {
                 // redirect("/auth/login");
                 // }
                 else {
-
                     function getCookie(name) {
                         const value = `; ${document.cookie}`; // prepend a semicolon and space to all cookies to make splitting easier
 
@@ -150,12 +149,10 @@ function Lumina({ children }) {
                         if (parts.length === 2) {
                             // pop the last part (after the cookie name), split at the next semicolon, and get the first value (the cookie value itself)
                             return decodeURIComponent(parts.pop().split(';').shift()); // because cookie stores the url in encoded version due to certain characters, so we need to decode it first.
-                        }
-                        else {
+                        } else {
                             return null;
                         }
                     }
-
                     setprofile_pic(getCookie('profile_pic'));
                     const fullName = getCookie('full_name');
                     if (fullName === null) {

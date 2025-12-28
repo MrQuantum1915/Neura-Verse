@@ -1,14 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image';
-import { Michroma } from 'next/font/google';
-const michroma = Michroma({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal'],
-  display: 'swap',
-  variable: '--font-michroma',
-});
 
 
 const iconMap = {
@@ -45,7 +37,6 @@ const socialItem = [
 
 const footerNavItem = [
   { href: "/home", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/playgrounds", label: "Playgrounds" },
   { href: "/contact", label: "Contact" },
 ];
@@ -72,28 +63,13 @@ function FooterNavItem({ href, children }) {
 
 function Footer() {
   return (
-    <footer className={`bg-black text-white items-center justify-center w-full border-t-1 border-t-white/10 z-1000 ${michroma.className}`}>
+    <footer className={`flex flex-col items-center gap-4 bg-gradient-to-b from-black/20 via-black/60 to-black text-white items-center justify-center border-t-1 border-t-white/40 w-full z-[100]`}>
 
-      <div className="flex flex-row flex-wrap mx-4 my-2  h-full mt-10 justify-around">
+      <div className="flex flex-row flex-wrap justify-around w-full mt-10">
 
-        {/* Brand and social */}
-        <div className="flex flex-col justify-between items-center">
-          <h1 className='text-4xl'>
-            NEURA VERSE
-          </h1>
-
-          <div className="flex flex-col justify-center items-center">
-            <p className="text-lg text-white/50"> &copy; 2025 Neura-Verse. All rights reserved.</p>
-            <p className="flex flex-col text-lg text-white/75 items-center my-6">
-              With ⚡
-              <strong> Darshan Patel (a.k.a Mr.Quantum_1915)</strong>
-              <strong>The Neura Verse Team</strong>
-            </p>
-          </div>
-
-          {/* Social */}
+        <div className="flex flex-col items-center gap-2 mt-4">
+          <p className='text-xl text-white/70 font-black '>Mr. Quantum_1915</p>
           <div>
-            <p className="text-xl text-white/75 flex items-center justify-center">Connect</p>
             <ul className="flex flex-row flex-wrap items-center justify-between">
               {socialItem.map((item) => (
                 <SocialItem key={item.href} href={item.href} icon={item.icon} />
@@ -103,13 +79,12 @@ function Footer() {
         </div>
 
 
-        {/* Links */}
-        <div className="flex flex-col px-4 mx-10 justify-between">
-          <h2 className="text-2xl mb-3">
+        <div className="flex flex-col px-4 mx-10 justify-between items-center">
+          <h2 className="text-2xl mb-3 underline">
             Links
           </h2>
 
-          <ul className="flex flex-col h-full items-start text-xl">
+          <ul className="flex flex-col items-center h-full text-xl">
             {footerNavItem.map((item) => (
               <FooterNavItem key={item.label} href={item.href}>
                 {item.label}
@@ -118,6 +93,11 @@ function Footer() {
           </ul>
         </div>
 
+      </div>
+
+      <div >
+        <p className="text-lg text-white/50 font-bold ml-2"> &copy; 2025 Neura-Verse. All rights reserved.</p>
+        <p className='text-8xl mb-5 text-center font-black text-[#575757] tracking-[2.5rem]'>NEURA VERSE</p>
       </div>
 
     </footer>

@@ -99,7 +99,7 @@ html {
   --list: #03a9f4, #ff0058;
   --grad: linear-gradient(45deg, var(--list));
   position: relative;
-  border: solid 4px #0000;
+  border: solid 2px #0000;
   border-radius: 1em;
   background: conic-gradient(rgb(0 0 0/ .75) 0 0) padding-box, var(--grad) border-box;
   border-radius: 15px;
@@ -249,22 +249,6 @@ html {
   outline: none;
   transition: 1s ease-in-out;
 } */
-
-
-
-#buttonSvg {
-  stroke-width: 2;
-  stroke-dasharray: 150 480;
-  stroke-dashoffset: 150;
-  transition: 1s ease-in-out;
-}
-
-.btn:hover #buttonSvg {
-  stroke-dashoffset: -480;
-}
-
-
-
 
 
 
@@ -482,4 +466,75 @@ html {
   font-size: 1rem;
   font-weight: 500;
   color: #e57346;
+}
+
+
+
+/* ========== END OF LOADING SCREENS ========== */
+
+
+/* ========== 4 CORNER borders========== */
+.corner-box {
+  position: relative;
+  /* anchor for corners */
+  /* [web:12] */
+  width: fit-content;
+  height: fit-content;
+  /* any size */
+  /* [web:12] */
+}
+
+.corner-box::before,
+.corner-box::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* [web:12] */
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.5s ease-in-out;
+  /* [web:12] */
+}
+
+.corner-box:hover::before,
+.corner-box:hover::after {
+  opacity: 1;
+}
+
+/* top-left & bottom-right */
+.corner-box::before {
+  background:
+    linear-gradient(#fff 0 0) left top/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) left top/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) left bottom/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) left bottom/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) right top/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) right top/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) right bottom/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) right bottom/2px 16px no-repeat;
+  /* [web:12] */
+}
+
+/* top-right & bottom-left (optional thicker color) */
+.corner-box::after {
+  background:
+    linear-gradient(#fff 0 0) right top/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) right top/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) right bottom/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) right bottom/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) left top/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) left top/2px 16px no-repeat,
+    linear-gradient(#fff 0 0) left bottom/16px 2px no-repeat,
+    linear-gradient(#fff 0 0) left bottom/2px 16px no-repeat;
+  /* [web:12] */
+}
+
+.plus {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font: 700 24px/1 sans-serif;
+  /* [web:12] */
 }

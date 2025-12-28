@@ -19,7 +19,7 @@ export async function POST(request) {
         const uploadedFiles_Metadata = [];
 
         for (const item of clientFiles) {
-            let ext = item.name.split('.').pop();
+            // let ext = item.name.split('.').pop();
 
             const uploadResult = await ai.files.upload({
                 file: item,

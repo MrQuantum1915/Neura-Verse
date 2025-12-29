@@ -35,7 +35,7 @@ const visibility = [
     { itemName: "Private", id: "private", icon: "/lock.svg" },
 ];
 
-function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic }) {
+function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, currInterface, setcurrInterface }) {
 
     const [modelDropdownOpen, setmodelDropdownOpen] = useState(false);
     const [editThreadName, seteditThreadName] = useState(false);
@@ -148,7 +148,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
     };
 
     return (
-        <div className={`relative flex flex-row flex-wrap justify-between w-full h-12 border-b-1 border-white/70 z-50`}>
+        <div className={`relative flex flex-row flex-wrap items-center justify-between w-full h-12 border-b-1 border-white/70 z-50`}>
             {
                 sidebarClose ? (
                     <Link href="/playgrounds/lumina">
@@ -280,6 +280,24 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
                 }
             </div>
 
+            {/* toggle interface */}
+            <div className="relative grid grid-cols-2 h-fit items-center justify-center border rounded-3xl border-white/30 p-1">
+            
+                {/* glass overlay :) */}
+                <div
+                    className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${currInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
+                />
+                <button
+                    onClick={() => { setcurrInterface(1) }}
+                    className={`${currInterface===1? "text-white/50":""}z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300`}>
+                    Chat
+                </button>
+                <button
+                    onClick={() => { setcurrInterface(2) }}
+                    className="z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300">
+                    NeuraGraph
+                </button>
+            </div>
 
 
 

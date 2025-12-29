@@ -1,4 +1,5 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
@@ -76,6 +77,7 @@ export default function RootLayout({ children }) {
           </div>
           <div className="relative z-10">
             {children}
+            <Analytics />
             {/* <GradualBlur
               target="page"
               position="bottom"

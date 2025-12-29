@@ -21,6 +21,7 @@ import ThreadIdpage from "./[[...threadId]]/page";
 import { redirect, useRouter } from "next/navigation";
 
 import { Roboto } from 'next/font/google';
+import NeuraGraphInterface from "@/components/lumina/NeuraGraphInterface";
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -50,6 +51,8 @@ function Lumina({ children }) {
     const [name, setname] = useState("Mystery Guest")
     const [profile_pic, setprofile_pic] = useState(null)
 
+    // chat/neuragraph area related
+    const [currInterface, setcurrInterface] = useState(1); // 1-chat, 2-neuragraph
 
     // this runs on every full render and checks if session is active or user logged in (client side)
     useEffect(() => {
@@ -300,27 +303,33 @@ function Lumina({ children }) {
 
             <main className="flex-1 min-w-0 h-full flex flex-col justify-between items-center ">
 
-                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} />
-
+                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} currInterface={currInterface} setcurrInterface={setcurrInterface}/>
+ 
 
                 {/* set height below topbar to fill remaining space */}
                 <div className={`flex w-full flex-1 overflow-hidden`}>
-
-                    <ChatInterface
-                        messages={messages}
-                        setMessages={setMessages}
-                        navigatingThread={navigatingThread}
-                        name={name}
-                        responseComplete={responseComplete}
-                        setresponseComplete={setresponseComplete}
-                        Model={Model}
-                        selectedFiles={selectedFiles}
-                        CurrThreadID={CurrThreadID}
-                        handleNewPrompt={handleNewPrompt}
-                        handleStreamResponse={handleStreamResponse}
-                        setalert={setalert}
-                        setalertMessage={setalertMessage}
-                    />
+                    {
+                        currInterface === 1 ? (
+                            <ChatInterface
+                                messages={messages}
+                                setMessages={setMessages}
+                                navigatingThread={navigatingThread}
+                                name={name}
+                                responseComplete={responseComplete}
+                                setresponseComplete={setresponseComplete}
+                                Model={Model}
+                                selectedFiles={selectedFiles}
+                                CurrThreadID={CurrThreadID}
+                                handleNewPrompt={handleNewPrompt}
+                                handleStreamResponse={handleStreamResponse}
+                                setalert={setalert}
+                                setalertMessage={setalertMessage}
+                            />
+                        ) :
+                            (
+                                <NeuraGraphInterface />
+                            )
+                    }
 
                     <WorkSpace setnewchat={setnewchat} files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
 

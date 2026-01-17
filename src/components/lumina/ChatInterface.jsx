@@ -157,7 +157,7 @@ const ChatInterface = ({
 
     return (
         <div className="flex flex-col flex-1 min-w-0 h-full items-center">
-            <div className=" w-full flex-1 min-h-0 pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
+            <div data-lenis-prevent className=" w-full flex-1 min-h-0 pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
                 {
                     (navigatingThread) && (
                         <div className="loader-4 fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 h-full w-full">

@@ -1,6 +1,7 @@
-// import { SpeedInsights } from "@vercel/speed-insights/next"
-// import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
+import SmoothScrolling from "@/components/SmoothScrolling";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
 import {
@@ -54,7 +55,8 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${roboto.variable} ${playfairDisplay.variable} ${instrumentSerif.variable}`}>
       <SpeedInsights />
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
-        <ConditionallyIncludeNavbar />
+        <SmoothScrolling>
+          <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
           <div className="fixed inset-0 z-0">
             <Galaxy
@@ -71,7 +73,8 @@ export default function RootLayout({ children }) {
             <Analytics />
           </div>
         </main>
-        <ConditionallyIncludeFooter />
+          <ConditionallyIncludeFooter />
+        </SmoothScrolling>
       </body>
     </html>
   );

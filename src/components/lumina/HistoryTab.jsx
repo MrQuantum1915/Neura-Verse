@@ -104,7 +104,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                 <ExpandHistory CurrThreadID={CurrThreadID} History={History} setCurrThreadName={setCurrThreadName} setHistory={setHistory} setHistoryExpand={setHistoryExpand} setnavigatingThread={setnavigatingThread} />
 
             }
-            <div className="relative flex flex-col w-[95%] h-full overflow-scroll ml-3 mt-4">
+            <div data-lenis-prevent className="relative flex flex-col w-[95%] h-full overflow-scroll ml-3 mt-4">
 
                 <div className="flex flex-row items-center justify-between w-full">
 
@@ -151,7 +151,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
 
                 <div className="h-[1px] bg-white/50 ml-2 mr-6 my-2"></div>
                 {/* previous chats container */}
-                <div className="overflow-y-scroll w-full flex flex-col" onScroll={() => setthreadMenu(false)}>
+                <div data-lenis-prevent className="overflow-y-scroll w-full flex flex-col" onScroll={() => setthreadMenu(false)}>
                     {History && History.map(items => (
                         <div key={items.thread_id} className="flex flex-row justify-between items-center my-0.5">
                             <button

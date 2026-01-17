@@ -328,7 +328,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     </div>
 
                     {/* files */}
-                    <div className='overflow-y-scroll overflow-x-scroll h-full w-full' onScroll={() => setFileMenu(false)}>
+                    <div data-lenis-prevent className='overflow-y-scroll overflow-x-scroll h-full w-full' onScroll={() => setFileMenu(false)}>
                         {files
                             .filter((file) => file.mimeType.split('/')[0] === currFileType.id.split('/')[0]) // filter out acc to curr file type selected
                             .map((item) => (

@@ -1,5 +1,5 @@
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/next"
+// import { SpeedInsights } from "@vercel/speed-insights/next"
+// import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
@@ -9,8 +9,7 @@ import {
   Michroma,
   Instrument_Serif
 } from 'next/font/google';
-import LightPillar from "@/components/LightPillar";
-import GradualBlur from "@/components/GradualBlur";
+import Galaxy from "@/components/Galaxy";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -58,36 +57,18 @@ export default function RootLayout({ children }) {
         <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
           <div className="fixed inset-0 z-0">
-            <LightPillar
-              topColor="#5227FF"
-              bottomColor="#FF9FFC"
-              intensity={0.9}
-              rotationSpeed={0.5}
-              glowAmount={0.002}
-              pillarWidth={3.0}
-              pillarHeight={0.4}
-              noiseIntensity={0.5}
-              pillarRotation={45}
-              interactive={true}
-              mixBlendMode="normal"
+            <Galaxy
+              mouseRepulsion={true}
+              mouseInteraction={true}
+              density={0.3}
+              glowIntensity={0.7}
+              saturation={2}
+              hueShift={500}
             />
-
-
-
           </div>
           <div className="relative z-10">
             {children}
             <Analytics />
-            {/* <GradualBlur
-              target="page"
-              position="bottom"
-              height="6rem"
-              strength={2}
-              divCount={5}
-              curve="bezier"
-              exponential={true}
-              opacity={1}
-            /> */}
           </div>
         </main>
         <ConditionallyIncludeFooter />

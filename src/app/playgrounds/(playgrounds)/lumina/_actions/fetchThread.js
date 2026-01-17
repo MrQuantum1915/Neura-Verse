@@ -1,5 +1,6 @@
 'use server'
 import { createClient_server } from "@/utils/supabase/supabaseServer"
+import { generateFlow } from "./neuraFlow/generateFlow";
 
 export async function fetchThread(thread_id) {
     const supabase = await createClient_server();
@@ -12,7 +13,7 @@ export async function fetchThread(thread_id) {
     if (userError) {
         const { data, error } = await supabase
             .from('lumina')
-            .select('role , content, ai_model, is_public')
+            .select('id, role , content, ai_model, is_public, thread_name, parent_id')
             .eq('thread_id', thread_id)
             .eq('is_public', true)
             .order('created_at', { ascending: true });  // oldest first
@@ -28,7 +29,7 @@ export async function fetchThread(thread_id) {
 
     const { data, error } = await supabase
         .from('lumina')
-        .select('role , content, ai_model, is_public, thread_name')
+        .select('id, role , content, ai_model, is_public, thread_name, parent_id')
         .eq('thread_id', thread_id)
         .eq('user_id', user.id)
         .order('created_at', { ascending: true });  // oldest first
@@ -40,5 +41,6 @@ export async function fetchThread(thread_id) {
     }
     // console.log(data);
     // console.log("sent");
-    return { data };
+    const neuraFlow = await generateFlow(data);
+    return { data: {content: data, neuraFlow } };
 }

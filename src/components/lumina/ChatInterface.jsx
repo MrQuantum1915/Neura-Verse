@@ -6,10 +6,12 @@ import remarkGfm from 'remark-gfm';
 import VerticalBarsLoader from "@/components/VerticalBarsLoader";
 import PromptBox from "@/components/lumina/PromptBox";
 import { deleteMessage } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteMessage";
+
+
 import CopyIcon from "@/components/icons/CopyIcon";
 import TickIcon from "@/components/icons/TickIcon";
 import { Playfair_Display } from 'next/font/google';
-
+import { Trash, Split } from "lucide-react";
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
     weight: ['400', '500', '600', '700', '800', '900'],
@@ -272,7 +274,7 @@ const ChatInterface = ({
                                                 <Image src={"/more.svg"} width={30} height={30} alt={"more menu"} className="opacity-50 hover:opacity-100" />
                                                 {
                                                     MoreMenu && (index === ToolbarTriggerIndex) && (
-                                                        <div ref={MoreMenuRef} className="absolute left-2 mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-100 flex flex-col">
+                                                        <div ref={MoreMenuRef} className="absolute mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-fit">
                                                             <div
                                                                 onClick={async () => {
                                                                     const { data, error } = await deleteMessage(CurrThreadID, index);
@@ -288,8 +290,21 @@ const ChatInterface = ({
                                                                 }}
                                                                 className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
                                                             >
-                                                                <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
-                                                                <div>Delete</div>
+                                                                <Trash color="red" size={18} className="flex-shrink-0" />
+                                                                <p>Delete</p>
+                                                            </div>
+                                                            <div
+                                                                onClick={() => {
+                                                                    setMessages((prev) => {
+                                                                        prev.splice(ToolbarTriggerIndex + 1)
+                                                                        return prev;
+                                                                    });
+                                                                    setMoreMenu(false);
+                                                                }}
+                                                                className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-cyan-300/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-300"
+                                                            >
+                                                                <Split color="cyan" size={18} className="flex-shrink-0" />
+                                                                <p>Branch</p>
                                                             </div>
                                                         </div>
                                                     )

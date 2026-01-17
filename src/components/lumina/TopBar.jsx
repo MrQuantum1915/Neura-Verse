@@ -20,22 +20,12 @@ const playfairDisplay = Playfair_Display({
     variable: '--font-playfair-display',
 });
 
-const models = [
-    { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.0 Flash-Lite", id: "gemini-2.0-flash-lite", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Pro", id: "gemini-2.5-pro", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash-Lite Preview 06-17", id: "gemini-2.5-flash-lite-preview-06-17", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20", icon: "/gemini.svg" },
-    // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
-];
-
 const visibility = [
     { itemName: "Public", id: "public", icon: "/globe.svg" },
     { itemName: "Private", id: "private", icon: "/lock.svg" },
 ];
 
-function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, currInterface, setcurrInterface }) {
+function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, currInterface, setcurrInterface }) {
 
     const [modelDropdownOpen, setmodelDropdownOpen] = useState(false);
     const [editThreadName, seteditThreadName] = useState(false);
@@ -285,7 +275,7 @@ function TopBar({ sidebarClose, Model, setModel, page, CurrThreadName, setCurrTh
             
                 {/* glass overlay :) */}
                 <div
-                    className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${currInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
+                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${currInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
                 />
                 <button
                     onClick={() => { setcurrInterface(1) }}

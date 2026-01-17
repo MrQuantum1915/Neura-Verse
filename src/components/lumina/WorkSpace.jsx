@@ -14,9 +14,11 @@ import { fetchListOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumin
 import { getSignedURLsOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles';
 import CircularLoader from '../CircularLoader';
 import { deleteWorkspaceFile } from '@/app/playgrounds/(playgrounds)/lumina/_actions/deleteWorkspaceFile';
-import { createNewThread } from '@/app/playgrounds/(playgrounds)/lumina/_actions/createNewThread';
 import { sendFilesToGemini } from '@/app/playgrounds/(playgrounds)/lumina/_actions/sendFilesToGemini';
 import { useRouter } from 'next/navigation';
+
+import { v7 } from 'uuid';
+import { insertNewMessage } from '@/app/playgrounds/(playgrounds)/lumina/_actions/insertNewMessage';
 
 const robotoSlab = Roboto_Slab({
     subsets: ['latin'],
@@ -106,15 +108,25 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
         try {
             if (CurrThreadID === null) {
-
-                const { data: newThreadData, error: newThreaderr } = await createNewThread("MultiModal Chat");
+                const newThreadID = v7();
+                const { data, error: newThreaderr } = await insertNewMessage(
+                    newThreadID,
+                    "Multi-Modal Chat",
+                    {
+                        id: v7(),
+                        role: "user",
+                        content: null,
+                        ai_model: null,
+                        parent_id: null,
+                    }
+                );
                 if (newThreaderr) {
                     setalertMessage(newThreaderr);
                     setalert(true);
                 }
                 else {
                     setnewchat(true);
-                    router.push(`/playgrounds/lumina/${newThreadData[0].thread_id}`)
+                    router.push(`/playgrounds/lumina/${newThreadID}`);
                 }
             }
 
@@ -380,7 +392,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                 fileMenu && selectedFileMenu && (
                     <div
                         ref={fileMenuRef}
-                        className="fixed mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-40"
+                        className="fixed mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-fit"
                         style={{ top: menuPosition.top, left: menuPosition.left }}>
                         <button
                             onClick={async () => {

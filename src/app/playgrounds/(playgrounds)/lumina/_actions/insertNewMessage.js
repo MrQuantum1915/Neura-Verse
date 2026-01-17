@@ -39,7 +39,7 @@ export async function insertNewMessage(thread_id, thread_name, message) { // rec
     //     const { data, error } = await supabase
     //         .from('lumina')
     //         .delete()
-    //         .eq('thread_id', thread_id)
+    //         .eq('thread_id', thread_ id)
     //         .eq('created_at', timeStamp)
     //         .eq('user_id', user.id)
     //         .select();
@@ -50,9 +50,11 @@ export async function insertNewMessage(thread_id, thread_name, message) { // rec
         .insert({
             thread_id: thread_id,
             thread_name: thread_name,
+            id: message.id,
             role: message.role,
             content: message.content,
             ai_model: message.ai_model,
+            parent_id: message.parent_id || null,
         })
         .eq('user_id', user.id)
         .select()
@@ -66,6 +68,6 @@ export async function insertNewMessage(thread_id, thread_name, message) { // rec
         console.log({thread_id,thread_name, message})
         return { error: 'Failed saving new Message' };
     }
-
+    // console.log("Inserted new message:", data);
     return { data };
 }

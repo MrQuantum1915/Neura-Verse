@@ -14,14 +14,15 @@ import ChatInterface from "@/components/lumina/ChatInterface";
 import { createClient_client } from "@/utils/supabase/supabaseClient"; // using browser client as this is a client side component
 import { fetchThread } from "./_actions/fetchThread";
 import { insertNewMessage } from "./_actions/insertNewMessage";
-import { createNewThread } from "./_actions/createNewThread";
+
+import { v7 } from "uuid";
 
 import ThreadIdpage from "./[[...threadId]]/page";
 
 import { redirect, useRouter } from "next/navigation";
 
 import { Roboto } from 'next/font/google';
-import NeuraGraphInterface from "@/components/lumina/NeuraGraphInterface";
+import NeuraFlowInterface from "@/components/lumina/NeuraFlowInterface";
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -31,7 +32,14 @@ const roboto = Roboto({
     variable: '--font-roboto',
 });
 
-const defaultModel = { itemName: "Gemini 2.0 Flash", id: "gemini-2.0-flash", icon: "/gemini.svg" }
+const models = [
+    { itemName: "Gemini 3 Flash", id: "gemini-3-flash-preview", icon: "/gemini.svg" },
+    // { itemName: "Gemini 3 Pro", id: "gemini-3-pro-preview", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash-Lite", id: "gemini-2.5-flash-lite", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20", icon: "/gemini.svg" },
+    // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
+];
 
 const toolbar = [
     // { itemName: "Like", icon: <LikeIcon fill="white" size={20} /> },
@@ -100,14 +108,14 @@ function Lumina({ children }) {
 
     // for frontend
     const [sidebarClose, setsidebarClose] = useState(false);
-
+    const [neuraFlow, setneuraFlow] = useState({ nodes: [], edges: [] });
     const [messages, setMessages] = useState([]);
     const [files, setfiles] = useState([]);
     const [selectedFiles, setselectedFiles] = useState([]);
 
     const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mounts, we do not need this to trigger the insertAIResponse() function.
 
-    const [Model, setModel] = useState(defaultModel);
+    const [Model, setModel] = useState(models[0]);
 
 
 
@@ -137,6 +145,7 @@ function Lumina({ children }) {
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
             setCurrThreadName("New Thread");
             setMessages([]);
+            setneuraFlow({ nodes: [], edges: [] });
         }
         else {
             if (!newchat) {
@@ -150,16 +159,16 @@ function Lumina({ children }) {
                             return;
                         }
                         else {
-
-                            setCurrThreadName(data[0].thread_name);
-                            if (data[0].is_public === true) {
+                            const { content, neuraFlow } = data;
+                            setMessages(content);
+                            setneuraFlow(neuraFlow);
+                            setCurrThreadName(content[0].thread_name);
+                            if (content[0].is_public === true) {
                                 setThreadPublic(true);
                             }
                             else {
                                 setThreadPublic(false);
                             }
-                            // console.log(data);
-                            setMessages(data);
                         }
                     } catch (err) {
                         setalertMessage(err.message);
@@ -184,9 +193,18 @@ function Lumina({ children }) {
     // handlers to add user and AI messages
     const handleNewPrompt = async (userPrompt) => {
         setresponseComplete(false);
+
+        const messageId = v7();
+        const parentId = messages.length > 0 ? messages[messages.length - 1].id : null;
+
         const newMessages = [
             ...messages,
-            { role: "user", content: userPrompt },
+            {
+                id: messageId,
+                role: "user",
+                content: userPrompt,
+                parent_id: parentId
+            },
         ];
         setMessages(newMessages);
 
@@ -204,7 +222,18 @@ function Lumina({ children }) {
             }
 
             else {
-                const { data, error } = await createNewThread(threadName);
+                const newThreadID = v7();
+                const { data, error } = await insertNewMessage(
+                    newThreadID,
+                    threadName,
+                    {
+                        id: messageId,
+                        role: "user",
+                        content: userPrompt,
+                        ai_model: null,
+                        parent_id: null,
+                    }
+                );
 
                 if (error) {
                     setalertMessage(error);
@@ -215,7 +244,7 @@ function Lumina({ children }) {
                 setnewchat(true);
                 // tempThreadId = data[0].thread_id;
                 setCurrThreadName(threadName);
-                router.push(`/playgrounds/lumina/${data[0].thread_id}`)
+                router.push(`/playgrounds/lumina/${newThreadID}`)
             }
         }
         else {
@@ -223,7 +252,13 @@ function Lumina({ children }) {
             const { data, error } = await insertNewMessage( // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
                 CurrThreadID,
                 threadName,
-                { role: "user", content: userPrompt, ai_model: null }
+                {
+                    id: messageId,
+                    role: "user",
+                    content: userPrompt,
+                    ai_model: null,
+                    parent_id: parentId,
+                }
             );
 
             if (error) {
@@ -242,7 +277,16 @@ function Lumina({ children }) {
                 updated[updated.length - 1] = { ...updated[updated.length - 1], content: streamResponse };
                 return updated;
             } else {
-                return [...prev, { role: "model", content: streamResponse, ai_model: Model }];
+                // first chunk of stream -> make new object
+                return [
+                    ...prev, {
+                        id: v7(),
+                        role: "model",
+                        content: streamResponse,
+                        ai_model: Model,
+                        parent_id: (prev.length > 0) ? (prev[prev.length - 1].id) : null
+                    }
+                ];
             }
         });
     };
@@ -252,9 +296,18 @@ function Lumina({ children }) {
     useEffect(() => {
         const insertAIResponse = async () => {
             try {
-                // here i used CurrThreadID insetaed of ref value because see this scenario : when user navigate to differetn thread while ai response in curr thread is pending, if we use ref value than it will insert the message in the new navaigated thread instead of previous, so here i am using stale value.
+                // here i used CurrThreadID insetaed of ref value because see this scenario : when user navigate to differetn thread while ai response in curr thread is pendingitems-center, if we use ref value than it will insert the message in the new navaigated thread instead of previous, so here i am using stale value.
 
-                const { data, error } = await insertNewMessage(CurrThreadID, CurrThreadName, { role: "model", content: messages[messages.length - 1].content, ai_model: messages[messages.length - 1].ai_model }) // sending three arguments, one is thread id second is name and third is object having role,content,ai_model
+                const { data, error } = await insertNewMessage(
+                    CurrThreadID,
+                    CurrThreadName,
+                    {
+                        id: messages[messages.length - 1].id,
+                        role: "model",
+                        content: messages[messages.length - 1].content,
+                        ai_model: messages[messages.length - 1].ai_model,
+                        parent_id: messages[messages.length - 1].parent_id,
+                    })
                 if (error) {
                     setalertMessage(error);
                     setalert(true);
@@ -265,7 +318,7 @@ function Lumina({ children }) {
             }
         }
 
-        // extra check for last role to be model, because if the LLM does not send the response than we set response Complete to true and we does not want to perform insert new message operation.
+        // extra check for last role to be model, because if the LLM does not send the response than we set response Complete to true and we do not want to perform insert new message operation.
         if (responseComplete && messages[messages.length - 1].role === "model") {
             insertAIResponse();
         }
@@ -303,8 +356,8 @@ function Lumina({ children }) {
 
             <main className="flex-1 min-w-0 h-full flex flex-col justify-between items-center ">
 
-                <TopBar sidebarClose={sidebarClose} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} currInterface={currInterface} setcurrInterface={setcurrInterface}/>
- 
+                <TopBar sidebarClose={sidebarClose} models={models} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} currInterface={currInterface} setcurrInterface={setcurrInterface} />
+
 
                 {/* set height below topbar to fill remaining space */}
                 <div className={`flex w-full flex-1 overflow-hidden`}>
@@ -327,7 +380,7 @@ function Lumina({ children }) {
                             />
                         ) :
                             (
-                                <NeuraGraphInterface />
+                                <NeuraFlowInterface messages={messages} neuraFlow={neuraFlow} setneuraFlow={setneuraFlow} />
                             )
                     }
 

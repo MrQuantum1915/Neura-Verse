@@ -1,12 +1,70 @@
-import { useState, useCallback } from 'react';
+"use client";
+import { useState, useEffect, useCallback } from 'react';
 import { ReactFlow, Controls, applyNodeChanges, applyEdgeChanges, addEdge, Background, BackgroundVariant } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import dagre from 'dagre';
+
+const nodeWidth = 300;
+const nodeHeight = 80;
+
+function getLayoutedElements(nodes, edges, direction = 'TB') {
+  if (!dagre || !dagre.graphlib) {
+    console.error('Dagre not loaded properly:', dagre);
+    return { nodes, edges };
+  }
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+  const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 10, nodesep: 10 });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+  
+  dagre.layout(dagreGraph);
+
+  const newNodes = nodes.map((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    const newNode = {
+      ...node,
+      targetPosition: isHorizontal ? 'left' : 'top',
+      sourcePosition: isHorizontal ? 'right' : 'bottom',
+      // We are shifting the dagre node position (anchor=center center) to the top left
+      // so it matches the React Flow node anchor point (top left).
+      position: {
+        x: nodeWithPosition.x - nodeWidth / 2,
+        y: nodeWithPosition.y - nodeHeight / 2,
+      },
+    };
+
+    return newNode;
+  });
+
+  return { nodes: newNodes, edges };
+};
 
 
-function NeuraFlowInterface({ messages, neuraFlow, setNeuraFlow }) {
-  console.log("NeuraFlowInterface neuraFlow:", neuraFlow);
+function NeuraFlowInterface({ messages, neuraFlow, setneuraFlow }) {
+
   const [nodes, setNodes] = useState(neuraFlow.nodes);
   const [edges, setEdges] = useState(neuraFlow.edges);
+
+  useEffect(() => {
+    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+      neuraFlow.nodes,
+      neuraFlow.edges,
+      'TB'
+    );
+    setNodes(layoutedNodes);
+    setEdges(layoutedEdges);
+    // setneuraFlow({ nodes: layoutedNodes, edges: layoutedEdges });
+  }, [neuraFlow, setneuraFlow]);
+
 
   const onNodesChange = useCallback(
     (changes) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),

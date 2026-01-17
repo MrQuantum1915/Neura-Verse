@@ -359,30 +359,34 @@ function Lumina({ children }) {
                 <TopBar sidebarClose={sidebarClose} models={models} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} currInterface={currInterface} setcurrInterface={setcurrInterface} />
 
 
-                {/* set height below topbar to fill remaining space */}
                 <div className={`flex w-full flex-1 overflow-hidden`}>
-                    {
-                        currInterface === 1 ? (
-                            <ChatInterface
-                                messages={messages}
-                                setMessages={setMessages}
-                                navigatingThread={navigatingThread}
-                                name={name}
-                                responseComplete={responseComplete}
-                                setresponseComplete={setresponseComplete}
-                                Model={Model}
-                                selectedFiles={selectedFiles}
-                                CurrThreadID={CurrThreadID}
-                                handleNewPrompt={handleNewPrompt}
-                                handleStreamResponse={handleStreamResponse}
-                                setalert={setalert}
-                                setalertMessage={setalertMessage}
-                            />
-                        ) :
-                            (
+
+                    <div className="relative flex-1 overflow-hidden">
+                        <div
+                            className={`flex w-full h-full transition-transform duration-500 ease-in-out ${currInterface === 1 ? 'translate-x-0' : '-translate-x-full'}`}
+                        >
+                            <div className="w-full h-full flex-shrink-0 flex flex-col">
+                                <ChatInterface
+                                    messages={messages}
+                                    setMessages={setMessages}
+                                    navigatingThread={navigatingThread}
+                                    name={name}
+                                    responseComplete={responseComplete}
+                                    setresponseComplete={setresponseComplete}
+                                    Model={Model}
+                                    selectedFiles={selectedFiles}
+                                    CurrThreadID={CurrThreadID}
+                                    handleNewPrompt={handleNewPrompt}
+                                    handleStreamResponse={handleStreamResponse}
+                                    setalert={setalert}
+                                    setalertMessage={setalertMessage}
+                                />
+                            </div>
+                            <div className="w-full h-full flex-shrink-0 flex flex-col">
                                 <NeuraFlowInterface messages={messages} neuraFlow={neuraFlow} setneuraFlow={setneuraFlow} />
-                            )
-                    }
+                            </div>
+                        </div>
+                    </div>
 
                     <WorkSpace setnewchat={setnewchat} files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
 

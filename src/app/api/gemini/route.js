@@ -3,6 +3,8 @@ import { GoogleGenAI } from "@google/genai";
 import { createPartFromUri } from "@google/genai";
 // import { NextResponse } from "next/server";
 
+import { createClient_server } from "@/utils/supabase/supabaseServer";
+
 // to allow external request to this endpoint
 // // CORS headers
 const corsHeaders = {
@@ -25,6 +27,16 @@ const ai = new GoogleGenAI({ apiKey: myApiKey });
 
 export async function POST(request) {
     try {
+
+        //auth check
+        const supabase = createClient_server();
+        const {data,error}=(await supabase).auth.getUser();
+        if(error || !data.user){
+            console.error('Authentication error:', error);
+            return new Response("Unauthorized", { status: 401, headers: corsHeaders });
+        }
+
+
         const body = await request.json();
         const model = body.model;
         const context = body.context;
@@ -36,7 +48,7 @@ export async function POST(request) {
                 model: model,
                 contents: context.map((item, idx) => ({
                     role: item.role,
-                    parts: [
+                    parts: [    1
                         { text: item.content },
                     ],
                 })),

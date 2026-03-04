@@ -25,7 +25,7 @@ const visibility = [
     { itemName: "Private", id: "private", icon: "/lock.svg" },
 ];
 
-function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, currInterface, setcurrInterface }) {
+function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, ActiveInterface, setActiveInterface }) {
 
     const [modelDropdownOpen, setmodelDropdownOpen] = useState(false);
     const [editThreadName, seteditThreadName] = useState(false);
@@ -275,15 +275,15 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
             
                 {/* glass overlay :) */}
                 <div
-                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${currInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
+                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${ActiveInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
                 />
                 <button
-                    onClick={() => { setcurrInterface(1) }}
-                    className={`${currInterface===1? "text-white/50":""}z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300`}>
+                    onClick={() => { setActiveInterface('chat') }}
+                    className={`${ActiveInterface=== 'chat'? "text-white/50":""}z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300`}>
                     Chat
                 </button>
                 <button
-                    onClick={() => { setcurrInterface(2) }}
+                    onClick={() => { setActiveInterface('neuraflow') }}
                     className="z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300">
                     NeuraGraph
                 </button>

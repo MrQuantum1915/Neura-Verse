@@ -7,7 +7,6 @@ import VerticalBarsLoader from "@/components/VerticalBarsLoader";
 import PromptBox from "@/components/lumina/PromptBox";
 import { deleteMessage } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteMessage";
 
-
 import CopyIcon from "@/components/icons/CopyIcon";
 import TickIcon from "@/components/icons/TickIcon";
 import { Playfair_Display } from 'next/font/google';
@@ -77,7 +76,9 @@ const CustomLi = ({ children }) => (
 
 const ChatInterface = ({
     messages,
-    setMessages,
+    setMessagesInStore,
+    deleteNode,
+    setActiveNode,
     navigatingThread,
     name,
     responseComplete,
@@ -96,7 +97,7 @@ const ChatInterface = ({
 
     useEffect(() => {
         if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); 9
         }
     }, [messages]);
 
@@ -276,29 +277,8 @@ const ChatInterface = ({
                                                     MoreMenu && (index === ToolbarTriggerIndex) && (
                                                         <div ref={MoreMenuRef} className="absolute mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-fit">
                                                             <div
-                                                                onClick={async () => {
-                                                                    const { data, error } = await deleteMessage(CurrThreadID, index);
-                                                                    if (error) {
-                                                                        setalertMessage(error);
-                                                                        setalert(true);
-                                                                        return;
-                                                                    }
-
-                                                                    setMessages((prev) => prev.filter((_, index) => index !== ToolbarTriggerIndex));
-
-                                                                    setMoreMenu(false);
-                                                                }}
-                                                                className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
-                                                            >
-                                                                <Trash color="red" size={18} className="flex-shrink-0" />
-                                                                <p>Delete</p>
-                                                            </div>
-                                                            <div
                                                                 onClick={() => {
-                                                                    setMessages((prev) => {
-                                                                        prev.splice(ToolbarTriggerIndex + 1)
-                                                                        return prev;
-                                                                    });
+                                                                    setActiveNode(msg.id);
                                                                     setMoreMenu(false);
                                                                 }}
                                                                 className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-cyan-300/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-300"
@@ -306,6 +286,27 @@ const ChatInterface = ({
                                                                 <Split color="cyan" size={18} className="flex-shrink-0" />
                                                                 <p>Branch</p>
                                                             </div>
+                                                            <div
+                                                                onClick={async () => {
+                                                                    
+                                                                    const { data, error } = await deleteMessage(CurrThreadID, msg.id);
+                                                                    if (error) {
+                                                                        setalertMessage(error);
+                                                                        setalert(true);
+                                                                        return;
+                                                                    }
+                                                                    setMoreMenu(false);
+                                                                    if(ToolbarTriggerIndex===messages.length-1){
+                                                                        setActiveNode(messages[messages.length-2].id);
+                                                                    }
+                                                                    deleteNode(msg.id);                                                                   
+                                                                }}
+                                                                className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
+                                                            >
+                                                                <Trash color="red" size={18} className="flex-shrink-0" />
+                                                                <p>Delete</p>
+                                                            </div>
+
                                                         </div>
                                                     )
                                                 }
@@ -323,7 +324,14 @@ const ChatInterface = ({
                     <div className="pointer-events-none absolute left-0 bottom-0 w-full h-50 bg-gradient-to-b from-transparent to-[#000000]/80" />
                 </div >
             </div >
-            <PromptBox navigatingThread={navigatingThread} onPrompt={handleNewPrompt} onStreamResponse={handleStreamResponse} setresponseComplete={setresponseComplete} Model={Model} context={messages} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
+            <PromptBox
+                navigatingThread={navigatingThread}
+                onPrompt={handleNewPrompt}
+                onStreamResponse={handleStreamResponse}
+                setresponseComplete={setresponseComplete}
+                Model={Model}
+                selectedFiles={selectedFiles}
+                CurrThreadID={CurrThreadID} />
         </div>
     );
 };

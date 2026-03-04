@@ -1,14 +1,18 @@
 "use client"
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 function ThreadIdpage({ setCurrThreadID }) {
 
-  // managing geting threadid from url
   const params = useParams();
-  // params.threadId can be undefined, a string, or an array (for catch-all routes)
   const threadId = params.threadId;
-  const threadIdValue = Array.isArray(threadId) ? threadId[0] : threadId;
+  const threadIdValue = Array.isArray(threadId) ? threadId[0] : threadId; // array if we have subroute but it will be preceded with /. However nodeID is set as parameter -> ?nodeID=1234
+
+  // threadId will have a nodeId also
+
+  const searchParams = useSearchParams();
+  const nodeId = searchParams.get("nodeID");
 
   useEffect(() => {
     if (typeof threadIdValue !== "undefined") {

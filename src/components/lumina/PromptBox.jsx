@@ -4,7 +4,15 @@ import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 
-function PromptBox({ onPrompt, navigatingThread, onStreamResponse, setresponseComplete, Model, context, selectedFiles, CurrThreadID }) {
+function PromptBox({
+    onPrompt,
+    navigatingThread,
+    onStreamResponse,
+    setresponseComplete,
+    Model,
+    selectedFiles,
+    CurrThreadID
+}) {
 
     const model = Model.id;
 
@@ -29,10 +37,8 @@ function PromptBox({ onPrompt, navigatingThread, onStreamResponse, setresponseCo
     async function sendToLLM() {
         const prompt = textareaRef.current.value;
         if (prompt.trim() !== "") {
-            onPrompt(prompt); // react state updates are async and also bundling , so it does not update immediately. hence we can not rely on the frontend update of the message/context array, Hence we need to make new updatedContext array as below. 
+            onPrompt(prompt);
             setawaitingResponse(true);
-
-            const updatedContext = [...context, { role: "user", content: prompt }]; // this is to be done to avoid abnormal behaviour of app, because react instructs to treat state objects or array as immutable, you should not directly change the original object itself. And another reason is mentioned above beside ```onPrompt(prompt);```
 
             try {
 
@@ -54,7 +60,7 @@ function PromptBox({ onPrompt, navigatingThread, onStreamResponse, setresponseCo
                 const response = await fetch("/api/gemini", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ model, context: updatedContext, mediaURLs: signedURLs }),
+                    body: JSON.stringify({ model, mediaURLs: signedURLs }),
                 });
 
                 if (!response.ok) {

@@ -1,4 +1,5 @@
 // this cannot be called by client as server action, because not using 'use server', this is just a funciton running on server that can be called by sever code.
+import 'server-only'; // only server can import this file, not client side
 
 export async function generateFlow(content) {
     let flow = {
@@ -9,8 +10,9 @@ export async function generateFlow(content) {
         return {
             id: e.id.toString(),
             position: { x: 0, y: 0 },
-            data: { label: e.content.substring(0, 20) + (e.content.length > 20 ? '...' : '') },
-            type: 'luminaNode'
+            data: { label: e.role=='model' ? 'AI' : 'You', value: e.content.substring(0, 20) + (e.content.length > 20 ? '...' : '') },
+            type: 'custom-node',
+            selected: e.is_head || false,
         }
     })
 
@@ -22,7 +24,7 @@ export async function generateFlow(content) {
                 source: e.parent_id.toString(),
                 target: e.id.toString(),
                 animated: true,
-                style: { stroke: '#4f46e5' },
+                type: 'custom-edge',
             }
         });
 

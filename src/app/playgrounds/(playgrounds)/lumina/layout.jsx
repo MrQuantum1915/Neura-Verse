@@ -1,7 +1,7 @@
 // named as [[...threadId]] because I want to catch all this routes /playground/lumina/ (no threadId), /playground/lumina/abc123 (with threadId)
 // to manage absence of any threadId parameter
 "use client"
-import React from "react";
+import React, { use } from "react";
 import Sidebar from "@/components/lumina/Sidebar"
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -23,6 +23,11 @@ import { redirect, useRouter } from "next/navigation";
 
 import { Roboto } from 'next/font/google';
 import NeuraFlowInterface from "@/components/lumina/NeuraFlowInterface";
+
+import { useThreadStore, getActiveBranch } from "@/store/lumina/useThreadStore";
+import {useShallow} from "zustand/shallow";
+
+import { useInterfaceStore } from "@/store/lumina/useInterfaceStore";
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -60,7 +65,10 @@ function Lumina({ children }) {
     const [profile_pic, setprofile_pic] = useState(null)
 
     // chat/neuragraph area related
-    const [currInterface, setcurrInterface] = useState(1); // 1-chat, 2-neuragraph
+    // const [ActiveInterface, setActiveInterface] = useState(1); // 1-chat, 2-neuragraph
+    const ActiveInterface = useInterfaceStore((state) => state.activeInterface);
+    const setActiveInterface = useInterfaceStore((state) => state.setActiveInterface);
+
 
     // this runs on every full render and checks if session is active or user logged in (client side)
     useEffect(() => {
@@ -109,7 +117,13 @@ function Lumina({ children }) {
     // for frontend
     const [sidebarClose, setsidebarClose] = useState(false);
     const [neuraFlow, setneuraFlow] = useState({ nodes: [], edges: [] });
-    const [messages, setMessages] = useState([]);
+
+    const messages = useThreadStore(useShallow(getActiveBranch));// useshallow to prevent re-renders as getActiveBranch returns new array everytime -> new reference. We only need it to change when the content actually changes
+    const setMessagesInStore = useThreadStore((state) => state.setMessages);
+    const setActiveNode = useThreadStore((state) => state.setActiveNodeId);
+    const deleteNode = useThreadStore((state) => state.deleteMessage);
+
+    // const [messages, setMessages] = useState(() => useThreadStore.getState().getActiveBranch());
     const [files, setfiles] = useState([]);
     const [selectedFiles, setselectedFiles] = useState([]);
 
@@ -126,7 +140,10 @@ function Lumina({ children }) {
     const [ThreadPublic, setThreadPublic] = useState(false);
     const [newchat, setnewchat] = useState(false);
 
-    // This block is implemented because here we are using CurrThreadName and ID in v   arious operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
+    //related to current branch
+    const [nodeID, setNodeID] = useState(null);
+
+    // This block is implemented because here we are using CurrThreadName and ID in various operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
     // create refs for thread ID/name
     // const currThreadIDRef = useRef(CurrThreadID);
     // const currThreadNameRef = useRef(CurrThreadName);
@@ -144,7 +161,7 @@ function Lumina({ children }) {
         // setresponseComplete(null)
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
             setCurrThreadName("New Thread");
-            setMessages([]);
+            setMessagesInStore(null, []);
             setneuraFlow({ nodes: [], edges: [] });
         }
         else {
@@ -160,7 +177,12 @@ function Lumina({ children }) {
                         }
                         else {
                             const { content, neuraFlow } = data;
-                            setMessages(content);
+                            setMessagesInStore(CurrThreadID, content);
+
+                            const defaultNodeId = content[content.length - 1]?.id;
+
+                            setActiveNode(defaultNodeId);
+
                             setneuraFlow(neuraFlow);
                             setCurrThreadName(content[0].thread_name);
                             if (content[0].is_public === true) {
@@ -206,7 +228,7 @@ function Lumina({ children }) {
                 parent_id: parentId
             },
         ];
-        setMessages(newMessages);
+        setMessagesInStore(CurrThreadID, newMessages);
 
 
 
@@ -352,23 +374,48 @@ function Lumina({ children }) {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
 
-            <Sidebar page="Lumina" setsidebarClose={setsidebarClose} profile_pic={profile_pic} CurrThreadID={CurrThreadID} CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} setnavigatingThread={setnavigatingThread} responseComplete={responseComplete} navigatingThread={navigatingThread} />
+            <Sidebar
+                page="Lumina"
+                setsidebarClose={setsidebarClose}
+                profile_pic={profile_pic}
+                CurrThreadID={CurrThreadID}
+                CurrThreadName={CurrThreadName}
+                setCurrThreadName={setCurrThreadName}
+                setnavigatingThread={setnavigatingThread}
+                responseComplete={responseComplete}
+                navigatingThread={navigatingThread}
+            />
+
 
             <main className="flex-1 min-w-0 h-full flex flex-col justify-between items-center ">
 
-                <TopBar sidebarClose={sidebarClose} models={models} Model={Model} setModel={setModel} page="Lumina" CurrThreadName={CurrThreadName} setCurrThreadName={setCurrThreadName} CurrThreadID={CurrThreadID} ThreadPublic={ThreadPublic} setThreadPublic={setThreadPublic} currInterface={currInterface} setcurrInterface={setcurrInterface} />
+                <TopBar
+                    sidebarClose={sidebarClose}
+                    models={models}
+                    Model={Model}
+                    setModel={setModel}
+                    page="Lumina" CurrThreadName={CurrThreadName}
+                    setCurrThreadName={setCurrThreadName}
+                    CurrThreadID={CurrThreadID}
+                    ThreadPublic={ThreadPublic}
+                    setThreadPublic={setThreadPublic}
+                    ActiveInterface={ActiveInterface}
+                    setActiveInterface={setActiveInterface}
+                />
 
 
                 <div className={`flex w-full flex-1 overflow-hidden`}>
 
                     <div className="relative flex-1 overflow-hidden">
                         <div
-                            className={`flex w-full h-full transition-transform duration-500 ease-in-out ${currInterface === 1 ? 'translate-x-0' : '-translate-x-full'}`}
+                            className={`flex w-full h-full transition-transform duration-500 ease-in-out ${ActiveInterface === 'chat' ? 'translate-x-0' : '-translate-x-full'}`}
                         >
                             <div className="w-full h-full flex-shrink-0 flex flex-col">
                                 <ChatInterface
                                     messages={messages}
-                                    setMessages={setMessages}
+                                    setMessagesInStore={setMessagesInStore}
+                                    setActiveNode={setActiveNode}
+                                    deleteNode={deleteNode}
                                     navigatingThread={navigatingThread}
                                     name={name}
                                     responseComplete={responseComplete}
@@ -383,12 +430,23 @@ function Lumina({ children }) {
                                 />
                             </div>
                             <div className="w-full h-full flex-shrink-0 flex flex-col">
-                                <NeuraFlowInterface messages={messages} neuraFlow={neuraFlow} setneuraFlow={setneuraFlow} />
+                                <NeuraFlowInterface
+                                    messages={messages}
+                                    neuraFlow={neuraFlow}
+                                    setneuraFlow={setneuraFlow}
+                                />
                             </div>
                         </div>
                     </div>
 
-                    <WorkSpace setnewchat={setnewchat} files={files} setFiles={setfiles} setselectedFiles={setselectedFiles} selectedFiles={selectedFiles} CurrThreadID={CurrThreadID} />
+                    <WorkSpace
+                        setnewchat={setnewchat}
+                        files={files}
+                        setFiles={setfiles}
+                        setselectedFiles={setselectedFiles}
+                        selectedFiles={selectedFiles}
+                        CurrThreadID={CurrThreadID}
+                    />
 
                 </div>
 

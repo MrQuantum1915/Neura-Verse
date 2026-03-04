@@ -1,5 +1,5 @@
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/next"
+// import { SpeedInsights } from "@vercel/speed-insights/next"
+// import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import SmoothScrolling from "@/components/SmoothScrolling";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
@@ -53,7 +53,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${roboto.variable} ${playfairDisplay.variable} ${instrumentSerif.variable}`}>
-      <SpeedInsights />
+      {/* <SpeedInsights /> */}
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <SmoothScrolling>
           <ConditionallyIncludeNavbar />
@@ -70,7 +70,7 @@ export default function RootLayout({ children }) {
           </div>
           <div className="relative z-10">
             {children}
-            <Analytics />
+            {/* <Analytics /> */}
           </div>
         </main>
           <ConditionallyIncludeFooter />

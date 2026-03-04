@@ -1,7 +1,7 @@
 'use server'
 import { createClient_server } from "@/utils/supabase/supabaseServer"
 
-export async function deleteMessage(thread_id, index) {
+export async function deleteMessage(thread_id, nodeId) {
     const supabase = await createClient_server();
 
     const {
@@ -18,28 +18,19 @@ export async function deleteMessage(thread_id, index) {
         return { error: 'User not authenticated' };
     }
 
-    const { data, error } = await supabase
-        .from('lumina')
-        .select('created_at')
-        .eq('thread_id', thread_id)
-        .eq('user_id', user.id)
-        .order('created_at') // just-optional-to ensure consistent ordering
-
-    const timeStamp = data[index].created_at;
-
-    const { deletedata, deleteerror } = await supabase
+    const { data: deletedata, error: deleteerror } = await supabase
         .from('lumina')
         .delete()
-        .eq('user_id', user.id)
         .eq('thread_id', thread_id)
-        .eq('created_at', timeStamp)
-        .select()
+        .eq('id', nodeId)
+        .eq('user_id', user.id)
+        .select();
 
     // console.log('User ID: ', user.id);
     // console.log('Profile update response:', data, error);
 
-    if (error || deleteerror) {
-        console.error('Error Deleting Message', error);
+    if (  deleteerror) {
+        console.error('Error Deleting Message', deleteerror);
         return { error: 'Failed to Delete Message' };
     }
 

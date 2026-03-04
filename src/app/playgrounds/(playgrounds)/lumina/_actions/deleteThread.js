@@ -23,7 +23,7 @@ export async function deleteThread(thread_id) {
         .delete()
         .eq('thread_id', thread_id)
         .eq('user_id', user.id)
-        .select(); // optional to return the deleted rows
+        .select();
 
 
     // console.log('User ID: ', user.id);

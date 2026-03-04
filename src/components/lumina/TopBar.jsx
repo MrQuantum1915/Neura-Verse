@@ -275,7 +275,7 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
             
                 {/* glass overlay :) */}
                 <div
-                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${ActiveInterface === 2 ? "translate-x-full" : "translate-x-0"}`}
+                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${ActiveInterface === 'neuraflow' ? "translate-x-full" : "translate-x-0"}`}
                 />
                 <button
                     onClick={() => { setActiveInterface('chat') }}

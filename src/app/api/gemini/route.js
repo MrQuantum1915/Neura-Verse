@@ -48,7 +48,7 @@ export async function POST(request) {
                 model: model,
                 contents: context.map((item, idx) => ({
                     role: item.role,
-                    parts: [    1
+                    parts: [
                         { text: item.content },
                     ],
                 })),

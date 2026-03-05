@@ -9,8 +9,6 @@ function ThreadIdpage({ setCurrThreadID, setActiveNode }) {
   const threadId = params.threadId;
   const threadIdValue = Array.isArray(threadId) ? threadId[0] : threadId; // array if we have subroute but it will be preceded with /. But nodeID is set as parameter -> ?node=1234
 
-  // threadId will have a node also
-
   const searchParams = useSearchParams();
   const nodeId = searchParams.get("node");
 

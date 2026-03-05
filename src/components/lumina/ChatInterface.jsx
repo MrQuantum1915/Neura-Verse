@@ -301,10 +301,18 @@ const ChatInterface = ({
                                                                     }
 
                                                                     setMoreMenu(false);
-                                                                    router.push(`/playgrounds/lumina/${CurrThreadID}?node=${msg.id}`);
                                                                     
-                                                                    if(ToolbarTriggerIndex===messages.length-1){
-                                                                        setActiveNode(messages[messages.length-2].id);
+                                                                    if (ToolbarTriggerIndex === messages.length - 1) {
+                                                                        if (messages.length > 1) {
+                                                                            const prevNodeId = messages[messages.length - 2].id;
+                                                                            setActiveNode(prevNodeId);
+                                                                            router.push(`/playgrounds/lumina/${CurrThreadID}?node=${prevNodeId}`);
+                                                                        } else {
+                                                                            setActiveNode(null);
+                                                                            router.push(`/playgrounds/lumina/${CurrThreadID}`);
+                                                                        }
+                                                                    } else {
+                                                                        //todo
                                                                     }
                                                                     deleteNode(msg.id);                                                                   
                                                                 }}

@@ -29,6 +29,10 @@ export async function deleteMessage(thread_id, nodeId) {
     // console.log('User ID: ', user.id);
     // console.log('Profile update response:', data, error);
 
+    if(deleteerror.code==='23503'){
+        console.error('Foreign key constraint error:', deleteerror);
+        return { error: 'Cannot delete node having child nodes' };
+    }
     if (  deleteerror) {
         console.error('Error Deleting Message', deleteerror);
         return { error: 'Failed to Delete Message' };

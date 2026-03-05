@@ -184,11 +184,15 @@ function Lumina({ children }) {
                             const { content, neuraFlow } = data;
                             setMessagesInStore(CurrThreadID, content);
 
-                            const defaultNodeId = content[content.length - 1]?.id;
-
-                            setActiveNode(defaultNodeId);
-                            router.push(`/playgrounds/lumina/${CurrThreadID}?node=${defaultNodeId}`);
-
+                            if(getThreadStoreState().activeNodeId===null){
+                                //the node having is_head = true
+                                const headNode = content.find(msg => msg.is_head === true);
+                                console.log("headNode: ", headNode);
+                                console.log("content: ", content);
+                                if(headNode){
+                                    router.push(`/playgrounds/lumina/${CurrThreadID}?node=${headNode.id}`);
+                                }
+                            }
 
                             setNeuraFlow(neuraFlow);
                             setCurrThreadName(content[0].thread_name);

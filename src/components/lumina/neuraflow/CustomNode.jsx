@@ -1,22 +1,34 @@
 'use client'
-import { Position, Handle } from '@xyflow/react';
+import { Position, Handle, useReactFlow } from '@xyflow/react';
 import { Menu, ExternalLink } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useThreadStore } from '@/store/lumina/useThreadStore';
 import { useInterfaceStore } from '@/store/lumina/useInterfaceStore';
+import { useRouter } from 'next/navigation';
 
 function CustomNode(props) {
+
+    const router = useRouter();
+
     const { selected, data } = props;
 
     const [isSelected, setIsSelected] = useState(selected);
     const [openMenu, setopenMenu] = useState(false);
     const menuRef = useRef(null);
     const setActiveNodeId = useThreadStore((state) => state.setActiveNodeId);
+    const CurrThreadID = useThreadStore((state) => state.threadId);
 
     const setActiveInterface = useInterfaceStore((state) => state.setActiveInterface);
+    const { updateNode } = useReactFlow();
+
+    // bring this node to front when menu is open - prevent from going behind other nodes
+    useEffect(() => {
+        updateNode(props.id, { zIndex: openMenu ? 1000 : 0 });
+    }, [openMenu, props.id, updateNode]);
 
     const setActiveNode = () => {
         setActiveNodeId(props.id);
+        router.push(`/playgrounds/lumina/${CurrThreadID}?node=${props.id}`);
     };
 
     // close menu when click outside

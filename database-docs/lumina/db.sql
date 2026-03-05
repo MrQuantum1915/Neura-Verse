@@ -12,11 +12,11 @@ BEGIN
     RETURN QUERY
     WITH RECURSIVE branch AS(
     SELECT 
-        role,
-        content, 
-        parent_id,
+        l.role,
+        l.content, 
+        l.parent_id,
         1 as depth --leaf=> depth = 1
-    FROM lumina
+    FROM lumina l
     WHERE 
         user_id=req_user_id 
         AND 
@@ -35,6 +35,8 @@ BEGIN
     FROM lumina l
     INNER JOIN branch b ON l.id=b.parent_id
     ) 
-    SELECT role,content FROM branch ORDER BY depth DESC;
+    SELECT b.role, b.content 
+    FROM branch b 
+    ORDER BY b.depth DESC;
 END;
 $$;

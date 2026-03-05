@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import VerticalBarsLoader from "@/components/VerticalBarsLoader";
 import PromptBox from "@/components/lumina/PromptBox";
 import { deleteMessage } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteMessage";
+import { useRouter } from "next/navigation";
 
 import CopyIcon from "@/components/icons/CopyIcon";
 import TickIcon from "@/components/icons/TickIcon";
@@ -91,6 +92,8 @@ const ChatInterface = ({
     setalert,
     setalertMessage
 }) => {
+
+    const router = useRouter();
 
     // scroll to bottom on re-render
     const messagesEndRef = useRef(null);
@@ -279,6 +282,7 @@ const ChatInterface = ({
                                                             <div
                                                                 onClick={() => {
                                                                     setActiveNode(msg.id);
+                                                                    router.push(`/playgrounds/lumina/${CurrThreadID}?node=${msg.id}`);
                                                                     setMoreMenu(false);
                                                                 }}
                                                                 className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-cyan-300/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-300"
@@ -295,7 +299,10 @@ const ChatInterface = ({
                                                                         setalert(true);
                                                                         return;
                                                                     }
+
                                                                     setMoreMenu(false);
+                                                                    router.push(`/playgrounds/lumina/${CurrThreadID}?node=${msg.id}`);
+                                                                    
                                                                     if(ToolbarTriggerIndex===messages.length-1){
                                                                         setActiveNode(messages[messages.length-2].id);
                                                                     }
@@ -327,6 +334,7 @@ const ChatInterface = ({
             <PromptBox
                 navigatingThread={navigatingThread}
                 onPrompt={handleNewPrompt}
+                messages={messages}
                 onStreamResponse={handleStreamResponse}
                 setresponseComplete={setresponseComplete}
                 Model={Model}

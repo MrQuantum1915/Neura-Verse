@@ -28,19 +28,30 @@ const ai = new GoogleGenAI({ apiKey: myApiKey });
 export async function POST(request) {
     try {
 
+        const body = await request.json();
+        const model = body.model;
+        const nodeId = body.node_id;
+        const thread_id = body.thread_id;
+        const media = body.mediaURLs; // mediaURLs is an array of objects with fileURI and mimeType
+
         //auth check
-        const supabase = createClient_server();
-        const {data,error}=(await supabase).auth.getUser();
-        if(error || !data.user){
+        const supabase = await createClient_server();
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) {
             console.error('Authentication error:', error);
             return new Response("Unauthorized", { status: 401, headers: corsHeaders });
         }
 
+        //context retrieval from DB
+        const { data: context, error: rpc_err } = await supabase
+            .rpc('get_curr_branch_context', { node_id: nodeId, req_thread_id: thread_id, req_user_id: data.user.id });
 
-        const body = await request.json();
-        const model = body.model;
-        const context = body.context;
-        const media = body.mediaURLs; // mediaURLs is an array of objects with fileURI and mimeType
+        if (rpc_err) {
+            console.error("RPC Error:", rpc_err);
+            return new Response("Context Retrieval Error", { status: 500, headers: corsHeaders });
+        }
+
+        // console.log("Context retrieved:", context);
 
         let response = "";
         if (media.length === 0) {
@@ -83,6 +94,7 @@ export async function POST(request) {
                 try {
                     for await (const chunk of response) {
                         if (chunk.text) {
+                            // console.log(chunk.text);
                             controller.enqueue(new TextEncoder().encode(chunk.text));
                         }
                     }
@@ -104,4 +116,8 @@ export async function POST(request) {
         console.error("Error:", error);
         return new Response("Internal Server Error", { status: 500, headers: corsHeaders });
     }
+    // finally{
+    //     // store the response in DB - no matter if stream succeed or not
+
+    // }
 }

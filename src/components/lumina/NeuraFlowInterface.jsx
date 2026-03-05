@@ -6,8 +6,9 @@ import dagre from 'dagre';
 
 import CustomNode from './neuraflow/CustomNode';
 import { CustomEdge } from './neuraflow/CustomEdge';
+import { useThreadStore } from '@/store/lumina/useThreadStore';
 
-const nodeWidth = 300;
+const nodeWidth = 160; // w-40 is 160px
 const nodeHeight = 80;
 const nodeTypes = {
   'custom-node': CustomNode,
@@ -25,7 +26,7 @@ function getLayoutedElements(nodes, edges, direction = 'TB') {
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
   const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction, ranksep: 10, nodesep: 10 });
+  dagreGraph.setGraph({ rankdir: direction, ranksep: 30, nodesep: 30 });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -57,7 +58,10 @@ function getLayoutedElements(nodes, edges, direction = 'TB') {
 
 
 
-function NeuraFlowInterface({ messages, neuraFlow, setneuraFlow }) {
+function NeuraFlowInterface({ messages }) {
+  
+  const neuraFlow = useThreadStore((state) => state.neuraFlow);
+  // const setNeuraFlow = useThreadStore((state) => state.setNeuraFlow);
 
   const [nodes, setNodes] = useState(neuraFlow.nodes);
   const [edges, setEdges] = useState(neuraFlow.edges);
@@ -73,7 +77,7 @@ function NeuraFlowInterface({ messages, neuraFlow, setneuraFlow }) {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges.map(edge => ({ ...edge, style: { ...edge.style, stroke: 'orange' } })));
     // setneuraFlow({ nodes: layoutedNodes, edges: layoutedEdges });
-  }, [neuraFlow, setneuraFlow]);
+  }, [neuraFlow]);
 
 
   const onNodesChange = useCallback(

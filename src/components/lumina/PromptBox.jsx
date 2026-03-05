@@ -7,6 +7,7 @@ import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/l
 function PromptBox({
     onPrompt,
     navigatingThread,
+    messages,
     onStreamResponse,
     setresponseComplete,
     Model,
@@ -37,11 +38,11 @@ function PromptBox({
     async function sendToLLM() {
         const prompt = textareaRef.current.value;
         if (prompt.trim() !== "") {
-            onPrompt(prompt);
             setawaitingResponse(true);
-
             try {
 
+                const newNodeId = await onPrompt(prompt);
+                
                 let signedURLs = [];
                 if (selectedFiles && selectedFiles.length > 0) {
                     const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, selectedFiles);
@@ -51,16 +52,24 @@ function PromptBox({
                         setalert(true);
                         return;
                     }
-                    let signedURLs = data.map(file => file.signedUrl);
+                    signedURLs = data.map(file => file.signedUrl);
                     console.log("Signed URLs:", signedURLs);
                 }
+                
+                // const newNodeId = await newNodeIdPromise;
+
                 let responseText = "";
 
-                // we need to awiat the fetch because otherwise the finally block will run immediately after the code run without awaiting the response
+                // need to await obv
                 const response = await fetch("/api/gemini", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ model, mediaURLs: signedURLs }),
+                    body: JSON.stringify({
+                        model,
+                        mediaURLs: signedURLs,
+                        node_id: newNodeId,    // Use the newly created node's ID instead of the old one
+                        thread_id: CurrThreadID
+                    }),
                 });
 
                 if (!response.ok) {
@@ -80,7 +89,7 @@ function PromptBox({
                     if (value) {
                         const chunk = decoder.decode(value);
                         responseText += chunk;
-                        onStreamResponse(responseText);
+                        onStreamResponse(chunk);
                     }
                 }
 

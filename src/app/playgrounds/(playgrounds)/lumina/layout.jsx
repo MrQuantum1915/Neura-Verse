@@ -25,9 +25,10 @@ import { Roboto } from 'next/font/google';
 import NeuraFlowInterface from "@/components/lumina/NeuraFlowInterface";
 
 import { useThreadStore, getActiveBranch } from "@/store/lumina/useThreadStore";
-import {useShallow} from "zustand/shallow";
+import { useShallow } from "zustand/shallow";
 
 import { useInterfaceStore } from "@/store/lumina/useInterfaceStore";
+import { add } from "mathjs";
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -116,12 +117,16 @@ function Lumina({ children }) {
 
     // for frontend
     const [sidebarClose, setsidebarClose] = useState(false);
-    const [neuraFlow, setneuraFlow] = useState({ nodes: [], edges: [] });
 
     const messages = useThreadStore(useShallow(getActiveBranch));// useshallow to prevent re-renders as getActiveBranch returns new array everytime -> new reference. We only need it to change when the content actually changes
     const setMessagesInStore = useThreadStore((state) => state.setMessages);
     const setActiveNode = useThreadStore((state) => state.setActiveNodeId);
     const deleteNode = useThreadStore((state) => state.deleteMessage);
+    const addFirstChunk = useThreadStore((state) => state.addFirstChunk);
+    const appendStreamChunk = useThreadStore((state) => state.appendStreamChunk);
+    const addMessage = useThreadStore((state) => state.addMessage);
+    const setNeuraFlow = useThreadStore((state) => state.setNeuraFlow);
+    const getThreadStoreState = useThreadStore.getState;
 
     // const [messages, setMessages] = useState(() => useThreadStore.getState().getActiveBranch());
     const [files, setfiles] = useState([]);
@@ -162,7 +167,7 @@ function Lumina({ children }) {
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
             setCurrThreadName("New Thread");
             setMessagesInStore(null, []);
-            setneuraFlow({ nodes: [], edges: [] });
+            setNeuraFlow({ nodes: [], edges: [] });
         }
         else {
             if (!newchat) {
@@ -182,8 +187,10 @@ function Lumina({ children }) {
                             const defaultNodeId = content[content.length - 1]?.id;
 
                             setActiveNode(defaultNodeId);
+                            router.push(`/playgrounds/lumina/${CurrThreadID}?node=${defaultNodeId}`);
 
-                            setneuraFlow(neuraFlow);
+
+                            setNeuraFlow(neuraFlow);
                             setCurrThreadName(content[0].thread_name);
                             if (content[0].is_public === true) {
                                 setThreadPublic(true);
@@ -212,26 +219,26 @@ function Lumina({ children }) {
     }, [CurrThreadID])
 
 
-    // handlers to add user and AI messages
+    // add new message
     const handleNewPrompt = async (userPrompt) => {
         setresponseComplete(false);
 
+        // add in store
         const messageId = v7();
         const parentId = messages.length > 0 ? messages[messages.length - 1].id : null;
+        const temp = {
+            id: messageId,
+            role: "user",
+            content: userPrompt,
+            ai_model: null,
+            is_public: ThreadPublic,
+            thread_name: CurrThreadName,
+            parent_id: parentId,
+            is_head: false
+        };
+        addMessage(temp);
 
-        const newMessages = [
-            ...messages,
-            {
-                id: messageId,
-                role: "user",
-                content: userPrompt,
-                parent_id: parentId
-            },
-        ];
-        setMessagesInStore(CurrThreadID, newMessages);
-
-
-
+        // add in DB
         // if this is first message, update thread name
         // let tempThreadId;
         if (messages.length === 0 && CurrThreadID === null) { // 2 because after setMessages() this still will be 2 not 3 because state update are async. And 2 because there are already 2 dummy messages while creating new thread.
@@ -253,7 +260,10 @@ function Lumina({ children }) {
                         role: "user",
                         content: userPrompt,
                         ai_model: null,
-                        parent_id: null,
+                        is_public: ThreadPublic,
+                        thread_name: CurrThreadName,
+                        is_head: false,
+                        parent_id: null
                     }
                 );
 
@@ -279,7 +289,10 @@ function Lumina({ children }) {
                     role: "user",
                     content: userPrompt,
                     ai_model: null,
+                    is_public: ThreadPublic,
+                    thread_name: CurrThreadName,
                     parent_id: parentId,
+                    is_head: false
                 }
             );
 
@@ -288,29 +301,39 @@ function Lumina({ children }) {
                 setalert(true);
             }
         }
+        return messageId;
     };
 
     // appending stream responses
-    const handleStreamResponse = (streamResponse) => {
-        setMessages(prev => {
-            // if last message is ai, update it; else, add new ai message
-            if (prev.length > 0 && prev[prev.length - 1].role === "model") {
-                const updated = [...prev];
-                updated[updated.length - 1] = { ...updated[updated.length - 1], content: streamResponse };
-                return updated;
-            } else {
-                // first chunk of stream -> make new object
-                return [
-                    ...prev, {
-                        id: v7(),
-                        role: "model",
-                        content: streamResponse,
-                        ai_model: Model,
-                        parent_id: (prev.length > 0) ? (prev[prev.length - 1].id) : null
-                    }
-                ];
-            }
-        });
+    const handleStreamResponse = (chunk) => {
+        /*
+        we need to actvely get the nodeid from store, 
+        because the loop that is calling this function, 
+        fetches the old version of this version (bcz same loop) 
+        and hence also have that same old messages array. 
+        (stale closure problem)
+        */
+        const storeState = getThreadStoreState();
+        const activeNode = storeState.activeNodeId ? storeState.messages[storeState.activeNodeId] : null;
+        
+        // if last message is ai, update it; else, add new ai message
+        if (activeNode && activeNode.role === "model") {
+            appendStreamChunk(activeNode.id, chunk);
+        }
+        else {
+            // 'id, role , content, ai_model, is_public, thread_name, parent_id, is_head'
+            const obj = {
+                id: v7(),
+                role: "model",
+                content: chunk,
+                ai_model: Model,
+                is_public: ThreadPublic,
+                thread_name: CurrThreadName,
+                parent_id: activeNode ? activeNode.id : null,
+                is_head: false
+            };
+            addFirstChunk(obj, chunk);
+        }
     };
 
 
@@ -318,7 +341,12 @@ function Lumina({ children }) {
     useEffect(() => {
         const insertAIResponse = async () => {
             try {
-                // here i used CurrThreadID insetaed of ref value because see this scenario : when user navigate to differetn thread while ai response in curr thread is pendingitems-center, if we use ref value than it will insert the message in the new navaigated thread instead of previous, so here i am using stale value.
+                /*
+                here i used CurrThreadID insetaed of ref value because see this scenario : 
+                when user navigate to differetn thread while ai response in curr thread is pendingitems-center, 
+                if we use ref value than it will insert the message in the new navaigated thread instead of previous, 
+                so here i am using stale value.
+                */
 
                 const { data, error } = await insertNewMessage(
                     CurrThreadID,
@@ -369,7 +397,7 @@ function Lumina({ children }) {
 
     return (
         <div className={`${roboto.className} flex flex-row fixed inset-0 w-full overflow-hidden bg-black`}>
-            <ThreadIdpage setCurrThreadID={setCurrThreadID} />
+            <ThreadIdpage setCurrThreadID={setCurrThreadID} setActiveNode={setActiveNode} />
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
@@ -432,8 +460,6 @@ function Lumina({ children }) {
                             <div className="w-full h-full flex-shrink-0 flex flex-col">
                                 <NeuraFlowInterface
                                     messages={messages}
-                                    neuraFlow={neuraFlow}
-                                    setneuraFlow={setneuraFlow}
                                 />
                             </div>
                         </div>

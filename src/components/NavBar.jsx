@@ -6,6 +6,7 @@ import NavItem from "./NavItem";
 import { createClient_client } from "@/utils/supabase/supabaseClient";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { CircleUser } from "lucide-react";
 
 import { Michroma } from "next/font/google"
 const michroma = Michroma({
@@ -53,7 +54,7 @@ function NavBar() {
           }
         }
         setprofile_pic(getCookie('profile_pic'));
-        console.log("pfp",profile_pic)
+        console.log("pfp", profile_pic)
       }
     };
 
@@ -86,13 +87,17 @@ function NavBar() {
           userLoggedIn ? (
             <Link href={"/profile"}>
               <div key={"profile"}>
-                <Image
-                  src={profile_pic || "/pfp-placeholder-2.svg"}
-                  width={55}
-                  height={55}
-                  alt="Profile"
-                  style={{ aspectRatio: "1/1" }}
-                  className=" object-cover rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                {(!profile_pic || profile_pic === "/pfp-placeholder-2.svg") ? (
+                  <CircleUser size={55} className="text-white opacity-80 rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                ) : (
+                  <Image
+                    src={profile_pic}
+                    width={55}
+                    height={55}
+                    alt="Profile"
+                    style={{ aspectRatio: "1/1" }}
+                    className=" object-cover rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                )}
               </div>
             </Link>
           ) : (

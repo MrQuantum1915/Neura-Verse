@@ -28,6 +28,7 @@ import { useThreadStore, getActiveBranch } from "@/store/lumina/useThreadStore";
 import { useShallow } from "zustand/shallow";
 
 import { useInterfaceStore } from "@/store/lumina/useInterfaceStore";
+import { useModelStore } from "@/store/lumina/useModelStore";
 import { add } from "mathjs";
 
 const roboto = Roboto({
@@ -134,10 +135,9 @@ function Lumina({ children }) {
 
     const [responseComplete, setresponseComplete] = useState(null); // set to null because when first time page mounts, we do not need this to trigger the insertAIResponse() function.
 
-    const [Model, setModel] = useState(models[0]);
-
-
-
+    const storedModel = useModelStore((state) => state.selectedModel);
+    const setModel = useModelStore((state) => state.setSelectedModel);
+    const Model = storedModel || models[0];
 
     const [CurrThreadID, setCurrThreadID] = useState(null);
     const [CurrThreadName, setCurrThreadName] = useState("New Thread");
@@ -145,8 +145,6 @@ function Lumina({ children }) {
     const [ThreadPublic, setThreadPublic] = useState(false);
     const [newchat, setnewchat] = useState(false);
 
-    //related to current branch
-    const [nodeID, setNodeID] = useState(null);
 
     // This block is implemented because here we are using CurrThreadName and ID in various operation like inserting messages in database. And as state upadates are async, they may not get latest value of the CURRThreadName and ID. So use this ref there.
     // create refs for thread ID/name

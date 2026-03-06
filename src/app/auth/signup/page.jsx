@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image"
+import { Mail, Lock, EyeOff, Eye } from "lucide-react"
 import { Roboto } from 'next/font/google';
 import { oAuth } from "../_actions/oAuth";
 import { signUpNewUser } from "../_actions/email_signup";
@@ -137,26 +138,14 @@ function page() {
                                 Email
                             </div>
                             <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-                                <Image
-                                    src={"/email-1-svgrepo-com.svg"}
-                                    width={30}
-                                    height={30}
-                                    alt="Email"
-                                    className="opacity-50"
-                                />
+                                <Mail size={25} className="opacity-50 text-white" />
                                 <input name="email" type="email" placeholder="Email" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
                             </div>
 
 
                             {/*show/hide and validation */}
                             <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row items-center hover:bg-black/50 transition-all duration-300 ease-in-out relative w-full">
-                                <Image
-                                    src={"/lock.svg"}
-                                    width={30}
-                                    height={30}
-                                    alt="Password"
-                                    className="opacity-50"
-                                />
+                                <Lock size={25} className="opacity-50 text-white" />
                                 <input
                                     name="password"
                                     type={showPassword ? "text" : "password"}
@@ -175,9 +164,9 @@ function page() {
                                     aria-label={showPassword ? "Hide password" : "Show password"}
                                 >
                                     {showPassword ? (
-                                        <Image src={"/eye-password-hide.svg"} width={25} height={25} alt="Show Password" />
+                                        <EyeOff size={25} className="text-white" />
                                     ) : (
-                                        <Image src={"/eye-password-show.svg"} width={25} height={25} alt="Hide Password" />
+                                        <Eye size={25} className="text-white" />
                                     )}
                                 </button>
                             </div>

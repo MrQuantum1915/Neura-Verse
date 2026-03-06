@@ -4,6 +4,7 @@
 'use client'
 import React from 'react'
 import Image from 'next/image'
+import { CircleUser, LogOut, AlertTriangle } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react';
 
 import { createClient_client } from '@/utils/supabase/supabaseClient';
@@ -151,12 +152,16 @@ function Profile() {
                         </div>
                         <div className="flex flex-row flex-wrap justify-between items-center">
                             <div className="relative w-[200px] h-[200px] flex-shrink-0">
-                                <Image
-                                    src={Profile_Picture}
-                                    fill
-                                    alt="Profile Picture"
-                                    className="rounded-full border-2 border-white object-cover aspect-square"
-                                />
+                                {Profile_Picture === "/pfp-placeholder-2.svg" ? (
+                                    <CircleUser size={200} className="text-white opacity-80" />
+                                ) : (
+                                    <Image
+                                        src={Profile_Picture}
+                                        fill
+                                        alt="Profile Picture"
+                                        className="rounded-full border-2 border-white object-cover aspect-square"
+                                    />
+                                )}
                             </div>
                             <div className='flex flex-row flex-wrap items-center gap-4'>
 
@@ -479,7 +484,7 @@ function Profile() {
 
                         <div className='flex flex-row flex-wrap items-center justify-between'>
                             <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
-                                <Image src={"/signOut.svg"} width={30} height={30} alt="Warning" className="" />
+                                <LogOut size={30} className="text-white" />
                                 <div className="opacity-75 text-xl">Sign out of this session</div>
                             </div>
                             <button
@@ -520,7 +525,7 @@ function Profile() {
 
                         <div className='flex flex-row flex-wrap items-center justify-between'>
                             <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
-                                <Image src={"/warning.svg"} width={30} height={30} alt="Warning" className="" />
+                                <AlertTriangle size={30} className="text-white" />
                                 <div className="opacity-75 text-xl">Delete Your Account</div>
                             </div>
                             <button

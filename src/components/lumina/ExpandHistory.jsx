@@ -4,6 +4,7 @@ import OpenInNewTab from "../icons/OpenInNewTab";
 import { deleteThread } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteThread";
 import MyAlert from "../MyAlert";
 import Image from "next/image";
+import { X, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -18,7 +19,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-3/4 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
+            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-1/2 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
 
                 <div className="flex flex-row text-3xl m-2 w-full px-4 justify-between py-2">
                     <h1 className="text-orange-400">Library</h1>
@@ -28,17 +29,17 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                         }}
                         className="hover:rotate-90 rounded-full opacity-50 hover:opacity-100 hover:bg-white/10  border border-white/0 hover:border-white/30  p-1 cursor-pointer transition-all duration-300 ease-out "
                     >
-                        <Image src={"/cross.svg"} width={30} height={30} alt={"close"}></Image>
+                        <X size={30} className="text-white" />
                     </button>
                 </div>
                 <div className="h-[1px] bg-white/20 w-full" ></div>
-                <div className="w-full h-full text-2xl overflow-y-scroll text-wrap flex flex-col mx-4 my-1">
+                <div className="w-full h-full text-xl overflow-y-scroll text-wrap flex flex-col mx-4 my-1">
                     {
                         (History.map((item) => {
                             return (
                                 <div key={item.thread_id} className="flex flex-col">
 
-                                    <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/5 border border-white/0 hover:border-white/30  rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-3 w-full">
+                                    <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/5 border border-white/0 hover:border-white/30  rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-2 w-full">
                                         <button
                                             onClick={() => {
                                                 if (CurrThreadID !== item.thread_id) {
@@ -64,10 +65,10 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                             <Link href={`${process.env.NEXT_PUBLIC_BASE_URL}/playgrounds/lumina/${item.thread_id}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center text-white hover:text-orange-400"
                                                 style={{ minWidth: '2rem', minHeight: '2rem' }}
                                             >
-                                                <OpenInNewTab fill="white" size={24} className={"p-0.5"} />
+                                                <OpenInNewTab fill="currentColor" size={24} className="p-0.5 transition-colors" />
                                             </Link>
                                             <button
                                                 onClick={async () => {
@@ -82,10 +83,10 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                                         return prev.filter((array) => item.thread_id != array.thread_id)
                                                     })
                                                 }}
-                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center"
+                                                className="rounded-lg opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0 w-8 h-8 flex items-center justify-center text-white hover:text-red-400"
                                                 style={{ minWidth: '2rem', minHeight: '2rem' }}
                                             >
-                                                <Image src={"/delete.svg"} width={24} height={24} alt={"more"} className="p-1" />
+                                                <Trash2 size={24} className="p-0.5 transition-colors" />
                                             </button>
                                         </div>
                                     </div>

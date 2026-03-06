@@ -1,5 +1,6 @@
 "use client" // doesnt matter beacuse the parent component is already client component.
 import Image from "next/image"
+import { Maximize2, Plus, MoreVertical, Trash } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useRef } from "react"
 import { fetchHistory } from "@/app/playgrounds/(playgrounds)/lumina/_actions/fetchHistory"
@@ -117,13 +118,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                         }
                     >
                         History
-                        <Image
-                            className="p-0.5 hover:scale-130 transition-all duration-200 ease-in-out"
-                            src={"/expand.svg"}
-                            width={20}
-                            height={20}
-                            alt="threadMenu in full"
-                        />
+                        <Maximize2 size={24} className="p-0.5  text-white" />
                     </button>
 
 
@@ -139,12 +134,9 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                         }}
                         className="rounded-full mr-4"
                     >
-                        <Image
-                            src={"/plus.svg"}
-                            width={40}
-                            height={40}
-                            alt={"new thread"}
-                            className={`p-2 opacity-50 hover:opacity-100 rounded-full bg-white/10 border border-white/0 hover:border-white/30  cursor-pointer transition-all duration-300 ease-in-out`}
+                        <Plus
+                            size={40}
+                            className="p-1 text-white opacity-50 hover:opacity-100 rounded-full bg-white/10 border border-white/0 hover:border-white/30 cursor-pointer transition-all duration-300 ease-in-out"
                         />
                     </button>
                 </div>
@@ -191,7 +183,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
 
                                 className="rounded-lg mx-4 opacity-50 hover:opacity-100 hover:bg-white/10  border border-white/0 hover:border-white/30 cursor-pointer transition-all duration-300 ease-in-out flex-shrink-0"
                             >
-                                <Image src={"/more.svg"} width={30} height={30} alt={"thread menu"} className="p-0.5 rotate-90" />
+                                <MoreVertical size={24} className="p-0.5 rotate-90 text-white" />
                             </button>
 
                         </div>
@@ -200,7 +192,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
             </div >
             {
                 threadMenu && selectedThreadMenu && (
-                    <div ref={threadMenuRef} className="fixed mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-fit"
+                    <div ref={threadMenuRef} className="fixed mt-1 bg-neutral-900 border border-white/20 rounded-sm shadow-md animate-fadeIn z-[101] flex flex-col p-1 w-fit justify-start"
                         style={{ top: menuPosition.top, left: menuPosition.left }}
                     >
                         <button
@@ -219,16 +211,16 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
                             }}
                             className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
                         >
-                            <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
+                            <Trash size={18} color="red" className="flex-shrink-0 transition-colors" />
                             <div>Delete</div>
                         </button>
                         <Link href={`${process.env.NEXT_PUBLIC_BASE_URL}/playgrounds/lumina/${selectedThreadMenu}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-1 rounded-lg w-full h-fit flex flex-row  items-center gap-2 hover:bg-cyan-400/20 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-400"
+                            className="p-1 rounded-lg w-full h-fit flex flex-row items-center gap-2 hover:bg-orange-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-orange-500"
                             style={{ minWidth: '2rem', minHeight: '2rem' }}
                         >
-                            <OpenInNewTab fill="cyan" size={20} />
+                            <OpenInNewTab size={18} color="orange" className="flex-shrink-0 transition-colors"  />
                             <h1>New Tab</h1>
                         </Link>
                     </div>

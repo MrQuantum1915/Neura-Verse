@@ -18,7 +18,7 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
     <div
       ref={ref}
       style={style}
-      className={`flex flex-col z-[1000] text-white border-1 border-white/50 bg-black rounded-lg ${width} h-fit whitespace-wrap pointer-events-auto transition-all duration-300 ease-in-out`}
+      className={`flex flex-col z-[1000] text-white border border-white/20 bg-neutral-900 rounded-lg shadow-md animate-fadeIn ${width} h-fit py-1.5 pointer-events-auto transition-all duration-300 ease-in-out`}
       role="menu"
     >
       {itemsArray.map((item) => (
@@ -30,8 +30,12 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
           key={item.id}
           className={`flex flex-row p-2 items-center gap-2 ${(item.id === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}
         >
-          <Image src={item.icon} width={20} height={20} alt="icon" />
-          <div>
+          {typeof item.icon === 'string' ? (
+            <Image src={item.icon} width={20} height={20} alt="icon" />
+          ) : (
+            <span className="flex-shrink-0 flex items-center justify-center w-[20px] h-[20px]">{item.icon}</span>
+          )}
+          <div className="text-left whitespace-nowrap">
             {item.itemName}
           </div>
 

@@ -55,7 +55,7 @@ function CustomNode(props) {
     return (
 
         <div className={`
-                relative group rounded-xl bg-black p-2 w-40 transition-all duration-200 ease-in-out 
+                relative group rounded-xl bg-neutral-900 p-2 w-40 transition-all duration-200 ease-in-out 
                 border 
                 ${isSelected
                 ? 'border-orange-500 ring-1 ring-orange-500/70 shadow-lg shadow-orange-500/40'

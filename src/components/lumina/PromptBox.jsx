@@ -1,8 +1,15 @@
 "use client";
 import Image from "next/image";
+import { Paperclip, CircleStop, SendHorizontal } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
+import { JetBrains_Mono } from 'next/font/google';
+
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700'],
+});
 
 function PromptBox({
     onPrompt,
@@ -42,7 +49,7 @@ function PromptBox({
             try {
 
                 const newNodeId = await onPrompt(prompt);
-                
+
                 let signedURLs = [];
                 if (selectedFiles && selectedFiles.length > 0) {
                     const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, selectedFiles);
@@ -55,7 +62,7 @@ function PromptBox({
                     signedURLs = data.map(file => file.signedUrl);
                     console.log("Signed URLs:", signedURLs);
                 }
-                
+
                 // const newNodeId = await newNodeIdPromise;
 
                 let responseText = "";
@@ -117,18 +124,18 @@ function PromptBox({
     // }, []);
 
     return (
-        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/30 z-85 hover:border-cyan-400 transition-all duration-300 ease-in-out`}>
+        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] focus-within:ring-1 focus-within:ring-white/50 fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/20 hover:border-white/50 transition-all duration-300 ease-in-out`}>
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
             {/* user uploads their damn media here , just whatever*/}
             <label className="relative m-1 opacity-50">
                 {/* <input onChange={handleMediaUpload} type="file" className="hidden" multiple /> */}
-                <Image src={"/files.svg"} width={40} height={40} alt="Upload Media" />
+                <Paperclip size={20} className="text-white hover:text-white transition-opacity" />
                 {/* {
                     (files.length != 0) &&
                     (
-                        <div className="text-sm text-cyan-400 absolute z-50 top-8 left-15 rounded-sm bg-cyan-400/20 px-1  ">{selectedFiles.length}
+                        <div className="text-sm text-orange-400 absolute z-50 top-8 left-15 rounded-sm bg-orange-500/20 px-1  ">{selectedFiles.length}
                         </div>
                     )
                 } */}
@@ -141,7 +148,7 @@ function PromptBox({
                 id="prompt-input"
                 name="prompt"
                 role="take-user-prompt"
-                className="text-[1.25em] overflow-hidden p-2 m-2 w-[90%]  outline-none rounded-xl border-transparent resize-none max-h-40  transition-all duration-700 ease-in-out"
+                className={`text-lg overflow-hidden p-2 m-2 w-[90%] text-white bg-transparent outline-none rounded-xl border-transparent resize-none max-h-40 transition-all duration-700 ease-in-out ${jetbrainsMono.className}`}
                 rows={1}
                 onInput={handleInput}
                 placeholder="What's On Your Mind...?"
@@ -158,18 +165,27 @@ function PromptBox({
 
 
             <button>
-                <Image
-                    src={`${awaitingResponse ? "/stop.svg" : "/send.svg"}`}
-                    width={40}
-                    height={40}
-                    alt="Submit"
-                    className={`cursor-pointer opacity-90 rounded-full p-1.5 mx-5 transition-all duration-300 ease-in-out hover:scale-105 hover:bg-white/5 border border-white/0 hover:border-white/30  active:opacity-100 ${awaitingResponse ? "animate-pulse p-3 bg-black/10 hover:rotate-90" : ""}`}
-                    aria-label="Submit Prompt"
-                    onClick={(e) => {
-                        awaitingResponse ? (handleInput()) : (sendToLLM(), textareaRef.current.value = "", handleInput());
-                        e.preventDefault();
-                    }}
-                />
+                {awaitingResponse ? (
+                    <CircleStop
+                        size={24}
+                        className="cursor-pointer text-red-400 opacity-90 mx-5 transition-all duration-300 ease-in-out hover:scale-105 animate-pulse"
+                        onClick={(e) => {
+                            handleInput();
+                            e.preventDefault();
+                        }}
+                    />
+                ) : (
+                    <SendHorizontal
+                        size={24}
+                        className="cursor-pointer text-white opacity-90 mx-3 transition-all duration-300 ease-in-out hover:scale-105"
+                        onClick={(e) => {
+                            sendToLLM();
+                            textareaRef.current.value = "";
+                            handleInput();
+                            e.preventDefault();
+                        }}
+                    />
+                )}
             </button>
         </div >
     );

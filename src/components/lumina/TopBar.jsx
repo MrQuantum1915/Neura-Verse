@@ -7,10 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { updateThreadName } from "@/app/playgrounds/(playgrounds)/lumina/_actions/updateThreadName";
 import MyAlert from "../MyAlert";
 import { editThreadVisibility } from "@/app/playgrounds/(playgrounds)/lumina/_actions/editThreadVisibility";
-import DropdownIcon from "../icons/DropdownIcon";
-import LinkIcon from "../icons/LinkIcon";
-import LockIcon from "../icons/LockIcon";
-import GlobeIcon from "../icons/GlobeIcon";
+import { Globe, Lock, Hash, Check, Pencil, ChevronDown, Link as LinkIcon } from 'lucide-react';
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
@@ -21,8 +18,8 @@ const playfairDisplay = Playfair_Display({
 });
 
 const visibility = [
-    { itemName: "Public", id: "public", icon: "/globe.svg" },
-    { itemName: "Private", id: "private", icon: "/lock.svg" },
+    { itemName: "Public", id: "public", icon: <Globe size={20} className="text-white" /> },
+    { itemName: "Private", id: "private", icon: <Lock size={20} className="text-white" /> },
 ];
 
 function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, ActiveInterface, setActiveInterface }) {
@@ -138,188 +135,185 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
     };
 
     return (
-        <div className={`relative flex flex-row flex-wrap items-center justify-between w-full h-12 border-b-1 border-white/70 z-50`}>
-            {
-                sidebarClose ? (
-                    <Link href="/playgrounds/lumina">
-                        <h1 className={`text-4xl m-1 mx-2 cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-all duration-500 ease-in-out ${playfairDisplay.className}`}>{page}</h1>
-                    </Link>
-                ) : (<div></div>) // dummy element to make thread name at center in both sidebar modelDropdownopen and close
-            }
-            {
-                alert && <MyAlert message={alertMessage} alertHandler={setalert} />
-            }
+        <div className={`relative flex flex-col md:flex-row items-center justify-between w-full border-b border-white/20 bg-black/40 backdrop-blur-md px-4 py-3 md:py-0 md:h-[64px] z-50 gap-4 md:gap-0 shadow-sm select-none`}>
 
-            <div className="flex flex-row gap-8">
-                <div className="self-center flex flex-row items-center gap-2">
-                    <Image src={"/hash.svg"} width={20} height={20} alt={"topic"} className="opacity-50 mx-2" />
-                    <div className="overflow-x-hidden whitespace-nowrap text-center text-xl text-orange-400 w-fit max-w-100 overflow-y-hidden overflow-x-hidden text-ellipsis ">
-                        {
-                            !editThreadName ? (CurrThreadName) : (
+            {alert && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[60]">
+                    <MyAlert message={alertMessage} alertHandler={setalert} />
+                </div>
+            )}
+
+
+            <div className="flex flex-row items-center justify-between md:justify-start w-full md:w-auto md:flex-1 gap-4 lg:gap-6 min-w-0">
+                {sidebarClose ? (
+                    <Link href="/playgrounds/lumina" className="flex-shrink-0">
+                        <h1 className={`text-2xl lg:text-3xl cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-transform duration-300 hover:scale-[1.02] ease-in-out font-bold tracking-tight ${playfairDisplay.className}`}>
+                            {page}
+                        </h1>
+                    </Link>
+                ) : (
+                    <div className="w-[1px] hidden md:block"></div>
+                )}
+
+
+                <div className="flex flex-row items-center gap-2 lg:gap-3 bg-white/5 border border-white/10 text-white/90 rounded-full px-3 lg:px-4 py-1.5 backdrop-blur-sm shadow-inner min-w-0">
+
+                    <div className="flex flex-row items-center gap-1.5 lg:gap-2 min-w-0">
+                        <Hash size={16} className="text-white/40 flex-shrink-0" />
+                        <div className="truncate text-sm lg:text-base text-orange-400/90 font-medium max-w-[120px] lg:max-w-[200px]">
+                            {!editThreadName ? (
+                                CurrThreadName || "Unnamed Thread"
+                            ) : (
                                 <input
                                     onKeyDown={async (e) => {
                                         if (e.key === 'Enter') {
-                                            if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation
+                                            if (editThreadName) {
                                                 try {
                                                     const newThreadName = threadNameRef.current.value;
                                                     const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
                                                     if (error) {
-                                                        setalertMessage(`Error renaming thread title :  ${error}`);
+                                                        setalertMessage(`Error renaming thread: ${error}`);
                                                         setalert(true);
                                                         return;
                                                     }
                                                     setCurrThreadName(newThreadName);
+                                                } finally {
+                                                    seteditThreadName(false);
                                                 }
-                                                finally {
-                                                    seteditThreadName((prev) => {
-                                                        return !prev;
-                                                    });
-                                                }
-                                            }
-                                            else {
-                                                seteditThreadName((prev) => {
-                                                    return !prev;
-                                                })
+                                            } else {
+                                                seteditThreadName(true);
                                             }
                                         }
                                     }}
                                     ref={threadNameRef}
-                                    className="border-b-2 border-cyan-400 outline-none text-2xl w-fit"
-                                    placeholder='Enter Thread Name'
+                                    className="bg-transparent border-b border-orange-400/50 focus:border-orange-400 outline-none text-orange-400 w-full"
+                                    placeholder='Thread Name'
                                     type='text'
                                     defaultValue={CurrThreadName}
+                                    autoFocus
                                 />
-                            )
-                        }
+                            )}
+                        </div>
+                        <button
+                            onClick={async () => {
+                                if (editThreadName) {
+                                    try {
+                                        const newThreadName = threadNameRef.current.value;
+                                        const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
+                                        if (error) {
+                                            setalertMessage(`Error renaming thread: ${error}`);
+                                            setalert(true);
+                                            return;
+                                        }
+                                        setCurrThreadName(newThreadName);
+                                    } finally {
+                                        seteditThreadName(false);
+                                    }
+                                } else {
+                                    seteditThreadName(true);
+                                }
+                            }}
+                            className="flex-shrink-0 text-white/50 hover:text-white transition-colors p-1 rounded hover:bg-white/10"
+                        >
+                            {CurrThreadID !== null && (
+                                editThreadName ? <Check size={14} /> : <Pencil size={14} />
+                            )}
+                        </button>
                     </div>
+
+
+                    {CurrThreadID !== null && (
+                        <>
+                            <div className="w-[1px] h-4 bg-white/20"></div>
+                            <button
+                                className="relative flex flex-row items-center gap-1 lg:gap-1.5 text-xs lg:text-sm font-medium text-white/70 hover:text-white transition-colors"
+                                onClick={() => setVisibilityDropdownOpen(prev => !prev)}
+                                ref={VisibilityButtonRef}
+                            >
+                                {ThreadPublic ? <Globe size={14} className="text-green-400" /> : <Lock size={14} className="text-orange-400/80" />}
+                                <span className="hidden sm:inline">{ThreadPublic ? "Public" : "Private"}</span>
+                                <ChevronDown size={14} className={`opacity-60 transition-transform ${VisibilityDropdownOpen ? "rotate-180" : ""}`} />
+                                {VisibilityDropdownOpen && (
+                                    <DropDown width="w-[130px]" top={30} left={0} color="orange-400" itemsArray={visibility} selectItem={handleVisibilityEdit} ref={VisibilityDropdownMenuRef} currentSelectedItemID={ThreadPublic ? "public" : "private"} />
+                                )}
+                            </button>
+                        </>
+                    )}
+
+
+                    {CurrThreadID !== null && ThreadPublic && (
+                        <>
+                            <div className="w-[1px] h-4 bg-white/20"></div>
+                            <button
+                                type="button"
+                                onClick={handleCopy}
+                                aria-label="Copy thread link"
+                                className={`flex flex-row items-center gap-1 lg:gap-1.5 text-xs lg:text-sm font-medium transition-colors ${copied ? "text-green-400" : "text-white/70 hover:text-white"}`}
+                            >
+                                <LinkIcon size={14} />
+                                <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
+                            </button>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            <div className="md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 flex items-center justify-center w-full md:w-auto mt-2 md:mt-0">
+                <div className="relative flex p-1 bg-[#1A1A1A] border border-white/10 rounded-full shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] h-[40px] w-[260px] md:w-[280px]">
+
+                    <div
+                        className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-white transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-sm ${ActiveInterface === 'neuraflow'
+                            ? "translate-x-full"
+                            : "translate-x-0"
+                            }`}
+                    />
 
                     <button
-
-                        onClick={async () => {
-
-                            if (editThreadName) { // if previous state was editThreadName = true then this click is for saving operation 
-                                try {
-                                    const newThreadName = threadNameRef.current.value;
-                                    const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
-                                    if (error) {
-                                        setalertMessage(`Error renaming thread title :  ${error}`);
-                                        setalert(true);
-                                        return;
-                                    }
-                                    setCurrThreadName(newThreadName);
-                                }
-                                finally {
-                                    seteditThreadName((prev) => {
-                                        return !prev;
-                                    });
-                                }
-                            }
-                            else {
-                                seteditThreadName((prev) => {
-                                    return !prev;
-                                })
-                            }
-                        }}
-                        className="flex-shrink-0"
+                        onClick={() => setActiveInterface('chat')}
+                        className={`relative z-10 flex-1 flex items-center justify-center text-sm font-semibold tracking-wide transition-colors duration-200 rounded-full ${ActiveInterface === 'chat'
+                            ? "text-black drop-shadow-sm"
+                            : "text-white/60 hover:text-white/90 hover:bg-white/5"
+                            }`}
                     >
-                        {
-                            (CurrThreadID !== null) &&
-                            (<Image src={`${editThreadName ? ("/tick.svg") : ("/edit.svg")}`} width={35} height={35} alt="edit thread name" className="p-2 opacity-50 hover:opacity-100 hover:bg-white/10 border border-white/0 hover:border-white/30  rounded-lg transition-all duration-300 ease-in-out cursor-pointer" />)
-                        }
+                        Chat
+                    </button>
+
+
+                    <button
+                        onClick={() => setActiveInterface('neuraflow')}
+                        className={`relative z-10 flex-1 flex items-center justify-center text-sm font-semibold tracking-wide transition-colors duration-200 rounded-full ${ActiveInterface === 'neuraflow'
+                            ? "text-black drop-shadow-sm"
+                            : "text-white/60 hover:text-white/90 hover:bg-white/5"
+                            }`}
+                    >
+                        NeuraGraph
                     </button>
                 </div>
-                {
-                    (CurrThreadID !== null) && (
-
-                        <button
-                            className="z-50 relative self-center p-1 bg-cyan-400/90 rounded text-black h-fit w-fit cursor-pointer"
-                            onClick={() => { setVisibilityDropdownOpen(prev => !prev) }}
-                            ref={VisibilityButtonRef}
-                        >
-                            <div className="flex flex-row gap-1 font-bold">
-                                {
-                                    ThreadPublic ? (
-                                        <GlobeIcon size={22} alt="Public" fill="black" />
-                                    ) : (
-                                        <LockIcon size={22} alt="Private" fill="black" />
-                                    )
-                                }
-                                <div>{ThreadPublic ? ("Public") : ("Private")}</div>
-                                <DropdownIcon fill="black" size={24} alt="Choose who can access this Thread" open={VisibilityDropdownOpen} className={`${(VisibilityDropdownOpen) ? ("rotate-180") : ("")} transition-all duration-200 ease-in-out`} />
-                            </div>
-                            {
-                                VisibilityDropdownOpen &&
-                                <DropDown width="w-[100%]" top={35} left={0} color={"cyan-400"} itemsArray={visibility} selectItem={handleVisibilityEdit} ref={VisibilityDropdownMenuRef} currentSelectedItemID={ThreadPublic ? ("public") : ("private")} />
-                            }
-                        </button>
-
-                    )
-                }
-                {
-                    (CurrThreadID !== null) && ThreadPublic && (
-                        <button
-                            type="button"
-                            onClick={handleCopy}
-                            aria-label="Copy thread link to clipboard"
-                            className="self-center opacity-50 hover:opacity-80 hover:text-cyan-400 flex flex-row gap-1 items-center h-fit w-fit cursor-pointer border-1 border-white/50 rounded-lg p-1 transition-all duration-300 ease-in-out"
-                        >
-                            <LinkIcon size={24} fill={`${copied ? ("cyan") : ("white")}`} />
-                            <span className={`${copied ? ("text-cyan-400") : ("text-white")}`}>{copied ? "Copied!" : "Copy Link"}</span>
-                        </button>
-                    )
-                }
-            </div>
-
-            {/* toggle interface */}
-            <div className="relative grid grid-cols-2 h-fit items-center justify-center border rounded-3xl border-white/30 p-1">
-            
-                {/* glass overlay :) */}
-                <div
-                    className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-3xl bg-white/10 border border-white/50 transition-transform duration-300 ease-in-out ${ActiveInterface === 'neuraflow' ? "translate-x-full" : "translate-x-0"}`}
-                />
-                <button
-                    onClick={() => { setActiveInterface('chat') }}
-                    className={`${ActiveInterface=== 'chat'? "text-white/50":""}z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300`}>
-                    Chat
-                </button>
-                <button
-                    onClick={() => { setActiveInterface('neuraflow') }}
-                    className="z-10 cursor-pointer px-4 py-1 rounded-3xl text-center transition-colors duration-300">
-                    NeuraGraph
-                </button>
             </div>
 
 
-
-            <div className="flex flex-row mx-5 items-center justify-center  gap-4">
-
-                <div className="border border-white/20 rounded-xl px-4 text-cyan-400">
-                    {Model.itemName}
+            <div className="flex flex-row items-center justify-center md:justify-end gap-3 w-full md:w-auto md:flex-1 min-w-0">
+                <div className="flex flex-row items-center bg-white/5 border border-white/10 rounded-full p-1 pl-3 lg:pl-4 pr-1 backdrop-blur-sm shadow-inner transition-colors hover:bg-white/10 cursor-default">
+                    <span className="text-orange-400/90 text-xs lg:text-sm font-medium mr-2 lg:mr-3 truncate max-w-[120px] lg:max-w-[180px]">
+                        {Model.itemName}
+                    </span>
+                    <div className="w-[1px] h-4 bg-white/20 mr-1 lg:mr-2"></div>
+                    <button
+                        onClick={() => setmodelDropdownOpen(!modelDropdownOpen)}
+                        ref={modelButtonRef}
+                        className="relative flex flex-row items-center gap-1.5 px-3 py-1 lg:py-1.5 bg-white/10 hover:bg-white/20 rounded-full text-white text-xs lg:text-sm font-medium transition-colors"
+                    >
+                        <span>Models</span>
+                        <ChevronDown size={14} className={`opacity-70 transition-transform duration-200 ${modelDropdownOpen ? "rotate-180" : ""}`} />
+                        {modelDropdownOpen && (
+                            <DropDown width="min-w-[200px] lg:min-w-[240px] w-max" top={35} right={0} color="orange-400" itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
+                        )}
+                    </button>
                 </div>
-
-                <div
-                    onClick={() => { setmodelDropdownOpen(prevmodelDropdownOpen => !prevmodelDropdownOpen) }}
-                    className='relative flex flex-row items-center justify-center flex-grow-0 items-center cursor-pointer rounded w-fit pl-2 transition-all duration-300 ease-in-out text-black font-semibold bg-cyan-400/90'
-                    ref={modelButtonRef}
-                >
-
-                    <div>
-                        Models
-                    </div>
-                    <DropdownIcon fill="black" size={28} width={20} height={20} alt="Choose Model" open={modelDropdownOpen} className={`${(modelDropdownOpen) ? ("rotate-180") : ("")} transition-all duration-200 ease-in-out`} />
-
-                    {
-                        modelDropdownOpen &&
-                        <DropDown width={"w-[250%]"} top={35} right={0} color={"cyan-400"} itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
-                    }
-                </div>
-
-
             </div>
 
-            <div className="z-5 pointer-events-none absolute top-full w-full h-5 bg-gradient-to-b from-[#000000]/80 to-transparent" />
-
-        </div >
+            <div className="pointer-events-none absolute top-full left-0 w-full h-4 bg-gradient-to-b from-black/20 to-transparent" />
+        </div>
     )
 }
 

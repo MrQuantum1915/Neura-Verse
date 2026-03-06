@@ -1,14 +1,15 @@
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ReactFlow, Controls, applyNodeChanges, applyEdgeChanges, addEdge, Background, BackgroundVariant } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import dagre from 'dagre';
 
 import CustomNode from './neuraflow/CustomNode';
 import { CustomEdge } from './neuraflow/CustomEdge';
-import { useThreadStore } from '@/store/lumina/useThreadStore';
+import { useThreadStore, getActiveBranch } from '@/store/lumina/useThreadStore';
+import { useShallow } from 'zustand/react/shallow';
 
-const nodeWidth = 160; // w-40 is 160px
+const nodeWidth = 160;
 const nodeHeight = 80;
 const nodeTypes = {
   'custom-node': CustomNode,
@@ -61,23 +62,40 @@ function getLayoutedElements(nodes, edges, direction = 'TB') {
 function NeuraFlowInterface({ messages }) {
   
   const neuraFlow = useThreadStore((state) => state.neuraFlow);
+  const activeBranch = useThreadStore(useShallow(getActiveBranch));
   // const setNeuraFlow = useThreadStore((state) => state.setNeuraFlow);
 
   const [nodes, setNodes] = useState(neuraFlow.nodes);
   const [edges, setEdges] = useState(neuraFlow.edges);
 
+  const layoutedData = useMemo(() => {
+    return getLayoutedElements(neuraFlow.nodes, neuraFlow.edges, 'TB');
+  }, [neuraFlow]);
 
   useEffect(() => {
-
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-      neuraFlow.nodes,
-      neuraFlow.edges,
-      'TB'
+    const activeIds = activeBranch.map(msg => msg.id.toString());
+    const { nodes: layoutedNodes, edges: layoutedEdges } = layoutedData;
+    
+    setNodes(
+      layoutedNodes.map(node => ({
+        ...node,
+        style: { ...node.style },
+        className: activeIds.includes(node.id) 
+            ? '!opacity-100 transition-opacity duration-300' 
+            : '!opacity-30 hover:!opacity-100 [&.selected]:!opacity-100 transition-opacity duration-300'
+      }))
     );
-    setNodes(layoutedNodes);
-    setEdges(layoutedEdges.map(edge => ({ ...edge, style: { ...edge.style, stroke: 'orange' } })));
+    setEdges(
+      layoutedEdges.map(edge => ({
+        ...edge,
+        style: { ...edge.style, stroke: 'orange' },
+        className: activeIds.includes(edge.source) && activeIds.includes(edge.target) 
+            ? '!opacity-100 transition-opacity duration-300' 
+            : '!opacity-30 hover:!opacity-100 [&.selected]:!opacity-100 transition-opacity duration-300'
+      }))
+    );
     // setneuraFlow({ nodes: layoutedNodes, edges: layoutedEdges });
-  }, [neuraFlow]);
+  }, [layoutedData, activeBranch]);
 
 
   const onNodesChange = useCallback(

@@ -13,8 +13,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #171717;
+    --foreground: #d4d4d4;
   }
 }
 
@@ -46,6 +46,22 @@
 
   .animation-delay-400 {
     animation-delay: 0.4s;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out forwards;
   }
 }
 
@@ -85,8 +101,8 @@ html {
 
 
 ::selection {
-  background-color: rgba(0, 238, 255, 0.082);
-  color: rgba(0, 255, 255, 0.774);
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 }
 
 

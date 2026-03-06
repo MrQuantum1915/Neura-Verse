@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image"
+import { Mail, Lock } from "lucide-react"
 import Link from "next/link";
 import { Roboto } from 'next/font/google';
 import { oAuth } from "../_actions/oAuth";
@@ -112,23 +113,11 @@ function page() {
                 Email
               </div>
               <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-                <Image
-                  src={"/email-1-svgrepo-com.svg"}
-                  width={30}
-                  height={30}
-                  alt="Email"
-                  className="opacity-50"
-                />
+                <Mail size={25} className="opacity-50 text-white" />
                 <input name="email" type="email" placeholder="Email" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
               </div>
               <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-                <Image
-                  src={"/lock.svg"}
-                  width={30}
-                  height={30}
-                  alt="Email"
-                  className="opacity-50"
-                />
+                <Lock size={25} className="opacity-50 text-white" />
                 <input name="password" type="password" placeholder="Password" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
               </div>
 

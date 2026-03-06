@@ -1,10 +1,10 @@
 "use client"
 import React from 'react'
+import { ImageIcon, FileText, AudioLines, Video, Layers, X as XIcon, Upload, CheckCircle, CheckSquare, Square, MoreVertical, Trash, Menu } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Roboto_Slab } from 'next/font/google';
 import DropDown from '../DropDown';
-import HorizontalBars from '../icons/HorizontalBars';
 import Cross from '../icons/Cross';
 import Link from 'next/link';
 import OpenInNewTab from '../icons/OpenInNewTab';
@@ -28,11 +28,11 @@ const robotoSlab = Roboto_Slab({
 });
 
 const fileTypes = [
-    { itemName: "Images", mimeType: "image/*", id: "image/*", icon: "/image.svg" },
-    { itemName: "PDFs", mimeType: "application/pdf", id: "application/pdf", icon: "/pdf.svg" },
-    { itemName: "Texts", mimeType: "text/plain", id: "text/plain", icon: "/text.svg" },
-    { itemName: "Audios", mimeType: "audio/*", id: "audio/*", icon: "/audio.svg" },
-    { itemName: "Videos", mimeType: "video/*", id: "video/*", icon: "/video.svg" }
+    { itemName: "Images", mimeType: "image/*", id: "image/*", icon: <ImageIcon size={25} /> },
+    { itemName: "PDFs", mimeType: "application/pdf", id: "application/pdf", icon: <FileText size={25} /> },
+    { itemName: "Texts", mimeType: "text/plain", id: "text/plain", icon: <FileText size={25} /> },
+    { itemName: "Audios", mimeType: "audio/*", id: "audio/*", icon: <AudioLines size={25} /> },
+    { itemName: "Videos", mimeType: "video/*", id: "video/*", icon: <Video size={25} /> }
 ];
 
 
@@ -40,7 +40,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
     const router = useRouter();
     const [WorkspaceOpen, setWorkspaceOpen] = useState(false);
-    const [currFileType, setcurrFileType] = useState({ itemName: "Images", type: "image/*", id: "image/*", icon: "/image.svg" })
+    const [currFileType, setcurrFileType] = useState({ itemName: "Images", type: "image/*", id: "image/*", icon: <ImageIcon size={25} /> })
     // {console.log("workspace remounted")}
 
     const [fileTypesMenu, setfileTypesMenu] = useState(false);
@@ -49,6 +49,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
     const [alert, setalert] = useState(false);
     const [alertMessage, setalertMessage] = useState("Alert");
+
 
     useEffect(() => {
         if (!fileTypesMenu) {
@@ -193,12 +194,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
                     className={`mt-4 bg-[#212121] hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-lg p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out ${WorkspaceOpen ? ("") : ("mr-4")}`}>
 
-                    <Image
-                        src={"/stacks.svg"}
-                        width={30}
-                        height={30}
-                        alt="Workspace icon"
-                    />
+                    <Layers size={30} className="text-white" />
                 </button>
             }
 
@@ -214,31 +210,21 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                             onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
                             className="absolute left-0 opacity-50 hover:opacity-100 bg-[#212121] hover:bg-white/5 border border-white/0 hover:border-white/30 hover:rotate-90 rounded-full p-1 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out">
 
-                            <Image
-                                src={"/cross.svg"}
-                                width={30}
-                                height={30}
-                                alt="Workspace icon"
-                            />
+                            <XIcon size={30} className="text-white" />
                         </button>
-                        <Image
-                            src={"/stacks.svg"}
-                            width={30}
-                            height={30}
-                            alt="Workspace icon"
-                        />
+                        <Layers size={30} className="text-white" />
                         <h1 className='p-2 text-2xl font-bold text-center text-white'>Workspace</h1>
 
                     </div>
                     <h2 className='my-1 text-center opacity-50'>Individual file size limit - 50MB</h2>
 
-                    <label className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-cyan-400 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center  active:translate-y-0.5 transition-all duration-300 ease-in-out`}>
+                    <label className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-white hover:bg-neutral-200 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center active:translate-y-0.5 transition-all duration-300 ease-in-out`}>
                         <input
                             onChange={handleFileUpload}
                             type='file'
                             className="hidden"
                             multiple />
-                        <Image src={"/cloud_upload.svg"} width={30} height={30} alt='upload files' className='flex-shrink-0' />
+                        <Upload size={24} color='black' className="flex-shrink-0 p-0.5" />
                         <div>Upload Files</div>
                     </label>
                 </div>
@@ -263,7 +249,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                         </div>
                                     ) : (
                                         <div className='flex flex-row items-center gap-1  text-green-400'>
-                                            <Image src={"/circular_check.svg"} width={20} height={20} alt='check' className='flex-shrink-0' />
+                                            <CheckCircle size={20} className="flex-shrink-0 text-green-400" />
                                             <div>Ready</div>
                                         </div>
                                     )
@@ -285,7 +271,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     <div className='flex flex-row w-full h-fit justify-between items-center border-b-1 border-white/30 px-4 py-1'>
 
                         <div className={`flex flex-row gap-2 py-1 items-center w-full h-fit text-2xl`}>
-                            <Image src={`${currFileType.icon}`} width={25} height={25} alt={'icon'}></Image>
+                            <span className="flex-shrink-0 flex items-center justify-center w-[25px] h-[25px] text-white">{currFileType.icon}</span>
                             {currFileType.itemName}
                         </div>
                         <button
@@ -303,7 +289,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                     setSend(false);
                                 }
                             }}
-                            className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-cyan-400 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center transition-all duration-300 ease-in-out`}>
+                            className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-white hover:bg-neutral-200 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center transition-all duration-300 ease-in-out`}>
                             <div>{`${sendingToGemini ? ("Sending...") : ("Sent")}`}</div>
                         </button>
 
@@ -315,11 +301,11 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
                             }}
                             className='relative cursor-pointer'>
-                            {fileTypesMenu ? (<Cross size={30} fill={"#bdbdbd"} strokeWidth={0.25} />) : (<HorizontalBars size={30} fill={"#bdbdbd"} strokeWidth={1} />)}
+                            {fileTypesMenu ? (<Cross size={30} fill={"#bdbdbd"} strokeWidth={0.25} />) : (<Menu size={30} fill={"#bdbdbd"} strokeWidth={1} />)}
 
                             {
                                 fileTypesMenu && (
-                                    <DropDown right={0} itemsArray={fileTypes} selectItem={handleSelectItem} currentSelectedItemID={currFileType.id} color={"cyan-400"} width={"w-[400%]"} ref={dropdownRef} />
+                                    <DropDown right={0} itemsArray={fileTypes} selectItem={handleSelectItem} currentSelectedItemID={currFileType.id} color={"white"} width={"w-[400%]"} ref={dropdownRef} />
                                 )
                             }
 
@@ -333,7 +319,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                             .filter((file) => file.mimeType.split('/')[0] === currFileType.id.split('/')[0]) // filter out acc to curr file type selected
                             .map((item) => (
                                 <div key={item.name}
-                                    className={`w-full items-center justify-between rounded-xl p-2 flex flex-row gap-2 items-center my-1 ${selectedFiles.some(f => f.name === item.name && f.mimeType === item.mimeType) ? ("text-cyan-400") : ("text-white/75")}`}
+                                    className={`w-full items-center justify-between rounded-xl p-2 flex flex-row gap-2 items-center my-1 ${selectedFiles.some(f => f.name === item.name && f.mimeType === item.mimeType) ? ("text-orange-400 font-medium") : ("text-white/75")}`}
                                 >
                                     <button
                                         className="cursor-pointer px-2 flex-shrink-0"
@@ -356,13 +342,10 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                         }}
                                     >
 
-                                        <Image
-                                            src={`${selectedFiles.some(name => name === item.name) ? ("/checkbox-checked.svg") : ("/checkbox-unchecked.svg")}`}
-                                            width={25}
-                                            height={25}
-                                            alt={'checkbox'}
-                                            className='flex-shrink-0'
-                                        />
+                                        {selectedFiles.some(name => name === item.name)
+                                            ? <CheckSquare size={25} className="flex-shrink-0 text-orange-500" />
+                                            : <Square size={25} className="flex-shrink-0 text-white/50" />
+                                        }
                                     </button>
                                     <div className='overflow-x-hidden text-ellipsis w-full whitespace-nowrap'>{item.name}</div>
                                     <div
@@ -380,7 +363,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
                                         className='flex-shrink-0 relative cursor-pointer transition-all duration-300 ease-in-out hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-full'
                                     >
-                                        <Image src={"/more.svg"} width={30} height={30} alt='more options' className='opacity-50 hover:opacity-100' />
+                                        <MoreVertical size={24} className="opacity-50 hover:opacity-100 text-white p-0.5" />
                                     </div>
                                 </div>
                             ))}
@@ -392,7 +375,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                 fileMenu && selectedFileMenu && (
                     <div
                         ref={fileMenuRef}
-                        className="fixed mt-1 bg-black border border-white/30 rounded-lg shadow-sm shadow-white/30 z-[101] flex flex-col p-1 w-fit"
+                        className="fixed mt-1 bg-black border border-white/20 rounded-sm shadow-md animate-fadeIn z-[101] flex flex-col p-1 w-fit"
                         style={{ top: menuPosition.top, left: menuPosition.left }}>
                         <button
                             onClick={async () => {
@@ -415,7 +398,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                             }}
                             className="p-1 rounded-lg w-full h-fit flex flex-row gap-2 px-2 items-center hover:bg-red-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-red-500"
                         >
-                            <Image src={"/delete.svg"} width={15} height={15} alt={"delete thread"} className="flex-shrink-0" />
+                            <Trash size={18} color="red" className="flex-shrink-0 transition-colors" />
                             <div>Delete</div>
                         </button>
                         <button
@@ -431,10 +414,10 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                 setFileMenu(false);
                                 window.open(data[0].signedUrl, '_blank');
                             }}
-                            className="p-1 rounded-lg w-full h-fit flex flex-row  items-center gap-2 hover:bg-cyan-400/20 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-cyan-400"
+                            className="p-1 rounded-lg w-full h-fit flex flex-row items-center gap-2 hover:bg-orange-800/30 cursor-pointer transition-all duration-300 ease-in-out text-white hover:text-orange-500"
                             style={{ minWidth: '2rem', minHeight: '2rem' }}
                         >
-                            <OpenInNewTab fill="cyan" size={20} />
+                            <OpenInNewTab size={18} color="orange" className="flex-shrink-0 transition-colors"  />
                             <h1>View</h1>
                         </button>
                     </div>

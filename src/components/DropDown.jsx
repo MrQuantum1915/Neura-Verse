@@ -31,7 +31,7 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
           className={`flex flex-row p-2 items-center gap-2 ${(item.id === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}
         >
           {typeof item.icon === 'string' ? (
-            <Image src={item.icon} width={20} height={20} alt="icon" />
+            <Image src={item.icon} width={20} height={20} className="object-contain" alt="icon" />
           ) : (
             <span className="flex-shrink-0 flex items-center justify-center w-[20px] h-[20px]">{item.icon}</span>
           )}

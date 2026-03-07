@@ -2,8 +2,9 @@
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useThreadStore } from '@/store/lumina/useThreadStore';
 
-function ThreadIdpage({ setCurrThreadID, setActiveNode }) {
+function ThreadIdpage({ setActiveNode }) {
 
   const params = useParams();
   const threadId = params.threadId;
@@ -14,9 +15,9 @@ function ThreadIdpage({ setCurrThreadID, setActiveNode }) {
 
   useEffect(() => {
     if (typeof threadIdValue !== "undefined") {
-      setCurrThreadID(threadIdValue);
+      useThreadStore.getState().setThreadId(threadIdValue);
     } else {
-      setCurrThreadID(null);
+      useThreadStore.getState().setThreadId(null);
     }
   }, [threadIdValue]);
 

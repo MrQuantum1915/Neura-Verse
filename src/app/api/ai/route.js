@@ -1,35 +1,22 @@
-
-import { GoogleGenAI } from "@google/genai";
-import { createPartFromUri } from "@google/genai";
-// import { NextResponse } from "next/server";
-
 import { createClient_server } from "@/utils/supabase/supabaseServer";
+import { getProvider } from "@/utils/ai-providers";
 
-// to allow external request to this endpoint
-// // CORS headers
+// CORS headers
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
-
-const myApiKey = process.env.Gemini_API_Key;
-const ai = new GoogleGenAI({ apiKey: myApiKey });
-
-// // Handle OPTIONS preflight
-// export async function OPTIONS() {
-//     return new Response(null, {
-//         status: 204,
-//         headers: corsHeaders
-//     });
-// }
-
 export async function POST(request) {
     try {
-
         const body = await request.json();
         const model = body.model;
+
+        // console.log(`\n\n[ AI-Provider ] \n-> Full Request Body: ${JSON.stringify(body, null, 2)} \n-> Extracted Model: ${model}\n`);
+
+        console.log(`\n\n[ AI-Provider ] Starting inference with model: ${model}\n`);
+
         const nodeId = body.node_id;
         const thread_id = body.thread_id;
         const media = body.mediaURLs; // mediaURLs is an array of objects with fileURI and mimeType
@@ -51,50 +38,14 @@ export async function POST(request) {
             return new Response("Context Retrieval Error", { status: 500, headers: corsHeaders });
         }
 
-        // console.log("Context retrieved:", context);
-
-        let response = "";
-        if (media.length === 0) {
-            response = await ai.models.generateContentStream({
-                model: model,
-                contents: context.map((item, idx) => ({
-                    role: item.role,
-                    parts: [
-                        { text: item.content },
-                    ],
-                })),
-            });
-        } else {
-            response = await ai.models.generateContentStream({
-                model: model,
-                contents: context.map((item, idx) => {
-                    if (item.role === "user" && idx === context.length - 1) {
-                        return {
-                            role: item.role,
-                            parts: [
-                                { text: item.content },
-                                ...media.map(url => ({ text: url })),
-                            ],
-                        };
-                    } else {
-                        return {
-                            role: item.role,
-                            parts: [{ text: item.content }],
-                        };
-                    }
-                }),
-                config: {
-                    tools: [{ urlContext: {} }],
-                },
-            });
-        }
+        const provider = getProvider(model);
+        const responseGenerator = await provider.generateStream(model, context, media);
 
         const stream = new ReadableStream({
             async start(controller) {
                 try {
-                    for await (const chunk of response) {
+                    for await (const chunk of responseGenerator) {
                         if (chunk.text) {
-                            // console.log(chunk.text);
                             controller.enqueue(new TextEncoder().encode(chunk.text));
                         }
                     }
@@ -116,8 +67,4 @@ export async function POST(request) {
         console.error("Error:", error);
         return new Response("Internal Server Error", { status: 500, headers: corsHeaders });
     }
-    // finally{
-    //     // store the response in DB - no matter if stream succeed or not
-
-    // }
 }

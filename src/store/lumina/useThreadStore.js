@@ -6,6 +6,7 @@ export const useThreadStore = create((set, get) => ({
     threadId: null,
     neuraFlow: { nodes: [], edges: [] },
 
+    setThreadId: (id) => set({ threadId: id }),
     setNeuraFlow: (flow) => set({ neuraFlow: flow }),
 
     addNeuraFlowNode: (msg) => set((state) => {
@@ -55,6 +56,23 @@ export const useThreadStore = create((set, get) => ({
 
     setActiveNodeId: (id) => set({ activeNodeId: id }),
 
+    setAsHeadNode: (id) => set((state) => {
+        const updatedMessages = {};
+        for (const [key, msg] of Object.entries(state.messages)) {
+            updatedMessages[key] = { ...msg, is_head: key === id };
+        }
+
+        const updatedNodes = state.neuraFlow.nodes.map(node => ({
+            ...node,
+            selected: node.id === id
+        }));
+
+        return {
+            messages: updatedMessages,
+            neuraFlow: { ...state.neuraFlow, nodes: updatedNodes }
+        };
+    }),
+
     setMessages: (threadid, msgs) => {
         //msgs will be array, convert to object with id as key -> .reduce()
         const msgsobj = msgs.reduce((acc, msg) => {
@@ -77,7 +95,7 @@ export const useThreadStore = create((set, get) => ({
         const newMsgs = { ...state.messages };
         delete newMsgs[id];
         get().deleteNeuraFlowNode(id);
-        return { 
+        return {
             messages: newMsgs,
         };
     }),
@@ -98,8 +116,8 @@ export const useThreadStore = create((set, get) => ({
 
         get().addNeuraFlowNode(newMsg);
 
-        return { 
-            messages: { ...state.messages, [id]: newMsg }, 
+        return {
+            messages: { ...state.messages, [id]: newMsg },
             activeNodeId: id,
         };
     }),
@@ -111,10 +129,10 @@ export const useThreadStore = create((set, get) => ({
 
         const updatedMsg = { ...state.messages };
         updatedMsg[id] = { ...updatedMsg[id], content: updatedMsg[id].content + chunk };
-        
+
         get().updateNeuraFlowNodeContent(id, updatedMsg[id].content);
 
-        return { 
+        return {
             messages: updatedMsg,
         };
     })
@@ -137,4 +155,24 @@ export const getActiveBranch = (state) => {
 
     branch.reverse();
     return branch;
+}
+
+export const getHeadNodeId = (state) => {
+    const messages = Object.values(state.messages);
+    if (messages.length === 0) return null;
+
+    let explicitHeadId = null;
+    let newestId = messages[0].id;
+
+    for (let i = 0; i < messages.length; i++) {
+        const msg = messages[i];
+        if (msg.is_head) {
+            explicitHeadId = msg.id;
+        }
+        if (msg.id > newestId) {
+            newestId = msg.id;
+        }
+    }
+
+    return explicitHeadId || newestId;
 }

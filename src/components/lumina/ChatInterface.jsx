@@ -78,7 +78,54 @@ const CustomLi = ({ children }) => (
     <li className="py-1 leading-[1.7]">{children}</li>
 );
 
+const TypewriterMarkdown = ({ content, isStreaming }) => {
+    const [displayedContent, setDisplayedContent] = useState(content);
+
+    useEffect(() => {
+        if (!isStreaming) {
+            setDisplayedContent(content);
+            return;
+        }
+    }, [isStreaming, content]);
+
+    useEffect(() => {
+        if (!isStreaming) return;
+        if (content.length < displayedContent.length || content === "") {
+            setDisplayedContent(content);
+            return;
+        }
+
+        if (displayedContent.length < content.length) {
+            const timeout = setTimeout(() => {
+                setDisplayedContent(content.substring(0, displayedContent.length + 1));
+            }, 10);
+            return () => clearTimeout(timeout);
+        }
+    }, [content, displayedContent, isStreaming]);
+
+    return (
+        <ReactMarkdown components={
+            {
+                h1: CustomH1,
+                h2: CustomH2,
+                h3: CustomH3,
+                h4: CustomH4,
+                h5: CustomH5,
+                h6: CustomH6,
+                p: CustomParagraph,
+                ul: CustomUl,
+                ol: CustomOl,
+                li: CustomLi,
+                a: CustomLink,
+            }
+        } remarkPlugins={[remarkGfm]}>
+            {displayedContent}
+        </ReactMarkdown>
+    );
+};
+
 const ChatInterface = ({
+
     messages,
     setMessagesInStore,
     deleteNode,
@@ -98,14 +145,32 @@ const ChatInterface = ({
 
     const router = useRouter();
 
-    // scroll to bottom on re-render
     const messagesEndRef = useRef(null);
+    const scrollContainerRef = useRef(null);
+
+    const isUserScrolledUp = useRef(false);
+
+    const handleScroll = (e) => {
+        const container = e.target;
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+        isUserScrolledUp.current = !isNearBottom;
+    };
 
     useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" }); 9
+        if (scrollContainerRef.current) {
+            const container = scrollContainerRef.current;
+
+            if (!isUserScrolledUp.current || messages.length <= 2) {
+
+                const isStreaming = !responseComplete && responseComplete !== null;
+
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: isStreaming ? "auto" : "smooth"
+                });
+            }
         }
-    }, [messages]);
+    }, [messages, responseComplete]);
 
 
     const loadingMessages = [
@@ -164,7 +229,7 @@ const ChatInterface = ({
 
     return (
         <div className="flex flex-col flex-1 min-w-0 h-full items-center">
-            <div data-lenis-prevent className=" w-full flex-1 min-h-0 pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
+            <div ref={scrollContainerRef} onScroll={handleScroll} data-lenis-prevent className=" w-full flex-1 min-h-0 pb-50 flex flex-col items-center overflow-x-scroll overflow-y-auto">
                 {
                     (navigatingThread) && (
                         <div className="loader-4 fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-50 h-full w-full">
@@ -173,7 +238,7 @@ const ChatInterface = ({
                         </div>
                     )
                 }
-                <div>
+                <div className="w-full flex justify-center">
                     {messages.length === 0 ? (
                         <div className={`sm:text-5xl text-2xl mt-74 flex flex-col items-center justify-center ${playfairDisplay.className} `}>
                             <div className="flex">
@@ -188,69 +253,43 @@ const ChatInterface = ({
                         <div className="w-full max-w-6xl py-4 px-4 md:px-12">
 
                             {messages.map((msg, index) => (
-                                <div key={index} className={`mb-4 break-words flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                                    {
-                                        ((msg.role === "model")) && (
-                                            <div className="my-4 self-start flex-shrink-0 h-full rounded-full">
-                                                <div className={`
-                                                    ${(((index === messages.length - 1) && (!responseComplete && (responseComplete !== null)))
-                                                        ? "animate-pulse" : ""
-                                                    )}                
-                                                `}>
-                                                    <AudioWaveform size={28} className="text-orange-400" />
-                                                </div>
-                                            </div>)
-                                    }
-
-                                    {
-                                        msg.role === "model" && (
-                                            <div className="fixed left-[50%] top-[2%] flex-shrink-0 h-full">
-
-                                                {
-                                                    (!responseComplete && (responseComplete !== null)) && (
-                                                        <div className="flex items-center">
-                                                            <div className="loader">
-                                                                <div className="inner one"></div>
-                                                                <div className="inner two"></div>
-                                                                <div className="inner three"></div>
-                                                            </div>
-                                                            <div className="px-4">
-                                                                {currentLoadingMessage}
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-                                        )
-                                    }
-
-                                    <div className={`flex flex-col px-7 py-3 rounded-2xl text-white/85 rounded-tl-xs ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                                <div key={index} className={`mb-4 w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                    <div className={`flex flex-col px-4 md:px-7 py-2 md:py-3 max-w-[95%] md:max-w-[85%] rounded-2xl text-white/85 rounded-tl-xs ${msg.role === "user" ? "items-end" : "items-start"}`}>
 
                                         {
                                             msg.role === "model" && (
-                                                <div className="flex flex-row w-fit h-fit rounded-full px-3 py-1 mb-2 bg-white/5 border border-white/10 text-white/50 text-sm font-medium">
-                                                    {msg.ai_model.itemName}
+                                                <div className="flex flex-row items-center gap-2 mb-2 w-fit">
+                                                    <div className={`
+                                                        ${(((index === messages.length - 1) && (!responseComplete && (responseComplete !== null)))
+                                                            ? "animate-pulse" : ""
+                                                        )}                
+                                                    `}>
+                                                        <AudioWaveform size={22} className="text-orange-400" />
+                                                    </div>
+                                                    <div className="flex flex-row w-fit h-fit rounded-full px-3 py-1 bg-white/5 border border-white/10 text-white/50 text-xs md:text-sm font-medium">
+                                                        {msg.ai_model.itemName}
+                                                    </div>
                                                 </div>
                                             )
                                         }
-                                        <div className={`text-[0.95rem] ${jetbrainsMono.className} ${msg.role === "user" ? "px-6 py-4 rounded-2xl max-w-[85%] bg-white/5 border border-white/10 text-white/90 rounded-tr-sm shadow-sm" : `px-6 py-[5px] rounded-2xl max-w-[85%] bg-white/5 border border-white/5 text-white/90 rounded-tl-sm shadow-sm `}`}>
-                                            <ReactMarkdown components={
-                                                {
-                                                    h1: CustomH1,
-                                                    h2: CustomH2,
-                                                    h3: CustomH3,
-                                                    h4: CustomH4,
-                                                    h5: CustomH5,
-                                                    h6: CustomH6,
-                                                    p: CustomParagraph,
-                                                    ul: CustomUl,
-                                                    ol: CustomOl,
-                                                    li: CustomLi,
-                                                    a: CustomLink,
-                                                }
-                                            } remarkPlugins={[remarkGfm]}>
-                                                {msg.content}
-                                            </ReactMarkdown>
+                                        <div className={`text-[0.95rem] ${jetbrainsMono.className} break-words ${msg.role === "user" ? "px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-white/5 border border-white/10 text-white/90 rounded-tr-sm shadow-sm" : `px-4 md:px-6 py-2 md:py-[5px] rounded-2xl bg-white/5 border border-white/5 text-white/90 rounded-tl-sm shadow-sm `}`}>
+                                            {(!responseComplete && responseComplete !== null && index === messages.length - 1 && !msg.content) ? (
+                                                <div className="flex items-center py-2 px-1">
+                                                    <div className="loader">
+                                                        <div className="inner one"></div>
+                                                        <div className="inner two"></div>
+                                                        <div className="inner three"></div>
+                                                    </div>
+                                                    <div className="px-4 text-orange-400 text-sm font-medium animate-pulse">
+                                                        {currentLoadingMessage}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <TypewriterMarkdown
+                                                    content={msg.content}
+                                                    isStreaming={!responseComplete && responseComplete !== null && index === messages.length - 1 && msg.role === 'model'}
+                                                />
+                                            )}
                                         </div>
 
                                         {/* toolbar */}
@@ -262,17 +301,17 @@ const ChatInterface = ({
                                                     handleCopy(msg.content);
                                                     setToolbarTriggerIndex(index);
                                                 }}
-                                                className="mx-2 cursor-pointer opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out">
-                                                {(CopyContent && (ToolbarTriggerIndex === index)) ? (<Check className="text-white" size={20} />) : (<Copy className="text-white" size={20} />)}
+                                                className="flex items-center justify-center w-8 h-8 mx-2 cursor-pointer opacity-50 hover:opacity-100 hover:bg-white/10 rounded-full transition-all duration-300 ease-in-out">
+                                                {(CopyContent && (ToolbarTriggerIndex === index)) ? (<Check className="text-white" size={18} />) : (<Copy className="text-white" size={18} />)}
                                             </button>
                                             <button
                                                 onClick={() => {
                                                     setMoreMenu((prev) => (!prev))
                                                     setToolbarTriggerIndex(index);
                                                 }}
-                                                className="relative mx-2 cursor-pointer hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-full transition-all duration-200 ease-in-out"
+                                                className="relative flex items-center justify-center w-8 h-8 mx-2 cursor-pointer hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-full transition-all duration-200 ease-in-out"
                                             >
-                                                <MoreVertical size={25} className={`p-1 text-white opacity-50 hover:opacity-100 ${msg.role === "user" ? "mr-[-8px]" : ""}`} />
+                                                <MoreVertical size={20} className="text-white opacity-50 hover:opacity-100" />
                                                 {
                                                     MoreMenu && (index === ToolbarTriggerIndex) && (
                                                         <div ref={MoreMenuRef} className="absolute mt-1 bg-neutral-900 border border-white/20 rounded-sm shadow-md animate-fadeIn z-[101] flex flex-col p-1 w-fit">
@@ -330,6 +369,30 @@ const ChatInterface = ({
                             ))}
 
                             <div ref={messagesEndRef} />
+
+                            {(!responseComplete && responseComplete !== null && (messages.length === 0 || messages[messages.length - 1].role === 'user')) && (
+                                <div className="mb-4 w-full flex justify-start">
+                                    <div className="flex flex-col px-4 md:px-7 py-2 md:py-3 max-w-[95%] md:max-w-[85%] rounded-2xl text-white/85 rounded-tl-xs items-start">
+                                        <div className="flex flex-row items-center gap-2 mb-2 w-fit">
+                                            <div className="animate-pulse">
+                                                <AudioWaveform size={22} className="text-orange-400" />
+                                            </div>
+                                        </div>
+                                        <div className={`text-[0.95rem] ${jetbrainsMono.className} px-4 md:px-6 py-2 md:py-[5px] rounded-2xl bg-white/5 border border-white/5 text-white/90 rounded-tl-sm shadow-sm`}>
+                                            <div className="flex items-center py-2 px-1">
+                                                <div className="loader">
+                                                    <div className="inner one"></div>
+                                                    <div className="inner two"></div>
+                                                    <div className="inner three"></div>
+                                                </div>
+                                                <div className="px-4 text-orange-400 text-sm font-medium animate-pulse">
+                                                    {currentLoadingMessage}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )
                     }

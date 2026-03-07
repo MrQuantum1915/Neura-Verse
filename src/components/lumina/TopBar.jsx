@@ -7,7 +7,8 @@ import { useState, useEffect, useRef } from "react";
 import { updateThreadName } from "@/app/playgrounds/(playgrounds)/lumina/_actions/updateThreadName";
 import MyAlert from "../MyAlert";
 import { editThreadVisibility } from "@/app/playgrounds/(playgrounds)/lumina/_actions/editThreadVisibility";
-import { Globe, Lock, Hash, Check, Pencil, ChevronDown, Link as LinkIcon } from 'lucide-react';
+import { Globe, Lock, Hash, Check, Pencil, ChevronDown, Link as LinkIcon, Menu, MessageSquare, Workflow } from 'lucide-react';
+
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
@@ -22,7 +23,7 @@ const visibility = [
     { itemName: "Private", id: "private", icon: <Lock size={20} className="text-white" /> },
 ];
 
-function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, ActiveInterface, setActiveInterface }) {
+function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, CurrThreadName, setCurrThreadName, CurrThreadID, ThreadPublic, setThreadPublic, ActiveInterface, setActiveInterface }) {
 
     const [modelDropdownOpen, setmodelDropdownOpen] = useState(false);
     const [editThreadName, seteditThreadName] = useState(false);
@@ -145,8 +146,17 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
 
 
             <div className="flex flex-row items-center justify-between md:justify-start w-full md:w-auto md:flex-1 gap-4 lg:gap-6 min-w-0">
+                {sidebarClose && (
+                    <button
+                        className="md:hidden p-2 -ml-2 text-white/70 hover:text-white z-[110] transition-colors"
+                        onClick={() => setsidebarClose(false)}
+                    >
+                        <Menu size={24} />
+                    </button>
+                )}
+
                 {sidebarClose ? (
-                    <Link href="/playgrounds/lumina" className="flex-shrink-0">
+                    <Link href="/playgrounds/lumina" className="flex-shrink-0 hidden md:block">
                         <h1 className={`text-2xl lg:text-3xl cursor-pointer bg-gradient-to-r from-red-400 via-orange-500 to-yellow-400 bg-clip-text text-transparent transition-transform duration-300 hover:scale-[1.02] ease-in-out font-bold tracking-tight ${playfairDisplay.className}`}>
                             {page}
                         </h1>
@@ -258,11 +268,11 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
                 </div>
             </div>
 
-            <div className="md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 flex items-center justify-center w-full md:w-auto mt-2 md:mt-0">
-                <div className="relative flex p-1 bg-[#1A1A1A] border border-white/10 rounded-full shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] h-[40px] w-[260px] md:w-[280px]">
+            <div className="md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 flex items-center justify-center w-full md:w-auto mt-2 md:mt-0 order-3 md:order-none">
+                <div className="relative flex bg-[#1A1A1A] border border-white/10 rounded-full shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] h-[40px] w-full md:w-[280px]">
 
                     <div
-                        className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-white transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-sm ${ActiveInterface === 'neuraflow'
+                        className={`absolute top-0 bottom-0 left-0 w-1/2 rounded-full bg-white transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shadow-sm ${ActiveInterface === 'neuraflow'
                             ? "translate-x-full"
                             : "translate-x-0"
                             }`}
@@ -275,7 +285,9 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
                             : "text-white/60 hover:text-white/90 hover:bg-white/5"
                             }`}
                     >
-                        Chat
+                        <MessageSquare size={16} className="mr-1.5" />
+                        <span className="hidden md:inline">Chat</span>
+                        <span className="md:hidden">Chat</span>
                     </button>
 
 
@@ -286,14 +298,25 @@ function TopBar({ sidebarClose, models, Model, setModel, page, CurrThreadName, s
                             : "text-white/60 hover:text-white/90 hover:bg-white/5"
                             }`}
                     >
-                        NeuraGraph
+                        <Workflow size={16} className="mr-1.5" />
+                        <span className="hidden md:inline">Neura Flow</span>
+                        <span className="md:hidden">Flow</span>
                     </button>
                 </div>
             </div>
 
 
-            <div className="flex flex-row items-center justify-center md:justify-end gap-3 w-full md:w-auto md:flex-1 min-w-0">
+            <div className="flex flex-row items-center justify-center md:justify-end gap-3 w-full md:w-auto md:flex-1 min-w-0 order-2 md:order-none mt-2 md:mt-0 hidden md:flex">
                 <div className="flex flex-row items-center bg-white/5 border border-white/10 rounded-full p-1 pl-3 lg:pl-4 pr-1 backdrop-blur-sm shadow-inner transition-colors hover:bg-white/10 cursor-default">
+                    {Model.icon && (
+                        <div className="flex items-center justify-center w-5 h-5 mr-2 flex-shrink-0">
+                            {typeof Model.icon === 'string' ? (
+                                <Image src={Model.icon} alt={Model.itemName} width={20} height={20} className="object-contain" />
+                            ) : (
+                                <span className="flex items-center justify-center w-full h-full">{Model.icon}</span>
+                            )}
+                        </div>
+                    )}
                     <span className="text-orange-400/90 text-xs lg:text-sm font-medium mr-2 lg:mr-3 truncate max-w-[120px] lg:max-w-[180px]">
                         {Model.itemName}
                     </span>

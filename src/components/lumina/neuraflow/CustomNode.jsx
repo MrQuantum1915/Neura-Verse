@@ -1,9 +1,10 @@
 'use client'
 import { Position, Handle, useReactFlow } from '@xyflow/react';
-import { Menu, ExternalLink } from 'lucide-react';
+import { Menu, ExternalLink, Flag } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useThreadStore } from '@/store/lumina/useThreadStore';
+import { useThreadStore, getHeadNodeId } from '@/store/lumina/useThreadStore';
 import { useInterfaceStore } from '@/store/lumina/useInterfaceStore';
+import { setThreadHead } from '@/app/playgrounds/(playgrounds)/lumina/_actions/setThreadHead';
 import { useRouter } from 'next/navigation';
 
 function CustomNode(props) {
@@ -16,7 +17,11 @@ function CustomNode(props) {
     const [openMenu, setopenMenu] = useState(false);
     const menuRef = useRef(null);
     const setActiveNodeId = useThreadStore((state) => state.setActiveNodeId);
+    const setAsHeadNode = useThreadStore((state) => state.setAsHeadNode);
     const CurrThreadID = useThreadStore((state) => state.threadId);
+
+    const headNodeId = useThreadStore(getHeadNodeId);
+    const isHead = headNodeId === props.id;
 
     const setActiveInterface = useInterfaceStore((state) => state.setActiveInterface);
     const { updateNode } = useReactFlow();
@@ -67,6 +72,14 @@ function CustomNode(props) {
                 setIsSelected(!isSelected);
             }
             }>
+
+            {isHead && (
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-neutral-950/80 backdrop-blur-sm border border-orange-500/40 text-orange-400 text-[8px] font-semibold tracking-widest uppercase px-2.5 py-[2px] rounded-lg shadow-[0_0_8px_rgba(249,115,22,0.2)] flex items-center gap-1 z-10 pointer-events-none">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_4px_rgba(249,115,22,0.6)]" />
+                    HEAD
+                </div>
+            )}
+
             <div className="text-xs text-neutral-400 font-medium">{props.data.label}</div>
             <div className='text-xs text-neutral-200'>{props.data.value}</div>
             <Handle type="target" position={Position.Top} />
@@ -80,19 +93,19 @@ function CustomNode(props) {
                     }`}
             >
                 <div
-                    className={`p-1.5 rounded-lg transition-colors duration-200 cursor-pointer ${openMenu ? 'bg-white/10 text-white' : 'text-neutral-400 hover:bg-white/5 hover:text-neutral-200'}`}
+                    className={`p-1 rounded-sm border transition-colors duration-150 cursor-pointer ${openMenu ? 'bg-white/15 border-white/20 text-white' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10 hover:border-white/15 hover:text-neutral-200'}`}
                     onClick={(e) => {
                         e.stopPropagation();
                         setopenMenu(!openMenu);
                     }}
                 >
-                    <Menu className="w-3.5 h-3.5" />
+                    <Menu size={12} />
                 </div>
 
                 <div
-                    className={`absolute top-0 left-full ml-2 w-max bg-neutral-950/90 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl shadow-black/50 p-0.5 flex flex-col gap-0.5 transition-all duration-100 origin-top-left ${openMenu
-                        ? 'opacity-100 scale-100 translate-x-0 pointer-events-auto'
-                        : 'opacity-0 scale-90 -translate-x-2 pointer-events-none'}`}
+                    className={`absolute top-0 left-full ml-2 w-max bg-neutral-950 border border-white/10 rounded-lg shadow-2xl shadow-black/60 p-0.5 flex flex-col gap-0.5 transition-all duration-75 origin-top-left ${openMenu
+                        ? 'opacity-100 scale-100 pointer-events-auto'
+                        : 'opacity-0 scale-95 pointer-events-none'}`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <button
@@ -106,6 +119,22 @@ function CustomNode(props) {
                     >
                         <ExternalLink size={10} className="opacity-50 group-hover/item:opacity-100 transition-opacity" />
                         <span>Jump Here</span>
+                    </button>
+
+                    <button
+                        className="w-full text-left px-2 py-1 text-[10px] font-medium text-neutral-400 hover:text-black bg-white/0 hover:bg-white rounded transition-all duration-100 flex items-center gap-1.5 group/item cursor-pointer"
+                        onClick={async () => {
+                            setAsHeadNode(props.id);
+                            setopenMenu(false);
+
+                            const { error } = await setThreadHead(CurrThreadID, props.id);
+                            if (error) {
+                                console.error("Failed to set thread head: ", error);
+                            }
+                        }}
+                    >
+                        <Flag size={10} className="opacity-50 group-hover/item:opacity-100 transition-opacity" />
+                        <span>Set as Head</span>
                     </button>
                 </div>
             </div>

@@ -26,6 +26,7 @@
     "react-dom": "^19.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "sarvamai": "^1.1.5",
     "three": "^0.167.1",
     "uuid": "^13.0.0",
     "zustand": "^5.0.11"

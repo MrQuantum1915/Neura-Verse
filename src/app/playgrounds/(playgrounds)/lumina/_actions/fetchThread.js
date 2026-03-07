@@ -4,27 +4,24 @@ import { generateFlow } from "./neuraFlow/generateFlow";
 
 export async function fetchThread(thread_id) {
     const supabase = await createClient_server();
-    console.log("received fetch request")
+    // console.log("received fetch request")
     const {
         data: { user },
         error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError) {
+    if (userError || !user) {
         const { data, error } = await supabase
             .from('lumina')
-            .select('id, role , content, ai_model, is_public, thread_name, parent_id')
+            .select('id, role , content, ai_model, is_public, thread_name, parent_id, is_head')
             .eq('thread_id', thread_id)
             .eq('is_public', true)
             .order('created_at', { ascending: true });  // oldest first
         if (error || !data || data.length === 0) {
             return { error: 'No messages found or thread is Private. If this is your thread then please Login to view.' };
         }
-        return { data };
-    }
-
-    if (!user) {
-        return { error: 'User not authenticated' };
+        const neuraFlow = await generateFlow(data);
+        return { data: { content: data, neuraFlow } };
     }
 
     const { data, error } = await supabase
@@ -42,5 +39,5 @@ export async function fetchThread(thread_id) {
     // console.log(data);
     // console.log("sent");
     const neuraFlow = await generateFlow(data);
-    return { data: {content: data, neuraFlow } };
+    return { data: { content: data, neuraFlow } };
 }

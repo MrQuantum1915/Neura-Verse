@@ -19,7 +19,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-1/2 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
+            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-[95%] md:w-1/2 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
 
                 <div className="flex flex-row text-3xl m-2 w-full px-4 justify-between py-2">
                     <h1 className="text-orange-400">Library</h1>

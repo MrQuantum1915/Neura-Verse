@@ -19,7 +19,7 @@ import { v7 } from "uuid";
 
 import ThreadIdpage from "./[[...threadId]]/page";
 
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, useParams } from "next/navigation";
 
 import { Roboto } from 'next/font/google';
 import NeuraFlowInterface from "@/components/lumina/NeuraFlowInterface";
@@ -29,7 +29,6 @@ import { useShallow } from "zustand/shallow";
 
 import { useInterfaceStore } from "@/store/lumina/useInterfaceStore";
 import { useModelStore } from "@/store/lumina/useModelStore";
-import { add } from "mathjs";
 
 const roboto = Roboto({
     subsets: ['latin'],
@@ -40,11 +39,17 @@ const roboto = Roboto({
 });
 
 const models = [
+    { itemName: "Sarvam", id: "sarvam-m", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 30B", id: "sarvam-30b", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 30B 16K", id: "sarvam-30b-16k", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 105B", id: "sarvam-105b", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 105B 32K", id: "sarvam-105b-32k", icon: "/sarvam.svg" },
     { itemName: "Gemini 3 Flash", id: "gemini-3-flash-preview", icon: "/gemini.svg" },
-    // { itemName: "Gemini 3 Pro", id: "gemini-3-pro-preview", icon: "/gemini.svg" },
+    // { itemName: "Gemini 2.5 Pro", id: "gemini-2.5-pro", icon: "/gemini.svg" },
+    { itemName: "Gemma 3 27B", id: "gemma-3-27b-it", icon: "/gemini.svg" },
+    { itemName: "Gemma 3n E4B", id: "gemma-3n-e4b-it", icon: "/gemini.svg" },
     { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", icon: "/gemini.svg" },
     { itemName: "Gemini 2.5 Flash-Lite", id: "gemini-2.5-flash-lite", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash Preview 05-20", id: "gemini-2.5-flash-preview-05-20", icon: "/gemini.svg" },
     // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
 ];
 
@@ -57,6 +62,8 @@ const toolbar = [
 function Lumina({ children }) {
 
     const router = useRouter();
+    const params = useParams();
+    const urlThreadId = params?.threadId ? (Array.isArray(params.threadId) ? params.threadId[0] : params.threadId) : null;
 
     // for alerts
     const [alert, setalert] = useState(false);
@@ -119,6 +126,7 @@ function Lumina({ children }) {
     // for frontend
     const [sidebarClose, setsidebarClose] = useState(false);
 
+    const CurrThreadID = useThreadStore((state) => state.threadId);
     const messages = useThreadStore(useShallow(getActiveBranch));// useshallow to prevent re-renders as getActiveBranch returns new array everytime -> new reference. We only need it to change when the content actually changes
     const setMessagesInStore = useThreadStore((state) => state.setMessages);
     const setActiveNode = useThreadStore((state) => state.setActiveNodeId);
@@ -139,7 +147,7 @@ function Lumina({ children }) {
     const setModel = useModelStore((state) => state.setSelectedModel);
     const Model = storedModel || models[0];
 
-    const [CurrThreadID, setCurrThreadID] = useState(null);
+    // const [CurrThreadID, setCurrThreadID] = useState(null);
     const [CurrThreadName, setCurrThreadName] = useState("New Thread");
     const [navigatingThread, setnavigatingThread] = useState(false);
     const [ThreadPublic, setThreadPublic] = useState(false);
@@ -163,9 +171,11 @@ function Lumina({ children }) {
     useEffect(() => {
         // setresponseComplete(null)
         if (CurrThreadID === null) { // when new thread button is clicked it sets thread ID to null, hence now reset the messages array in frontend
-            setCurrThreadName("New Thread");
-            setMessagesInStore(null, []);
-            setNeuraFlow({ nodes: [], edges: [] });
+            if (urlThreadId === null) {
+                setCurrThreadName("New Thread");
+                setMessagesInStore(null, []);
+                setNeuraFlow({ nodes: [], edges: [] });
+            }
         }
         else {
             if (!newchat) {
@@ -182,12 +192,17 @@ function Lumina({ children }) {
                             const { content, neuraFlow } = data;
                             setMessagesInStore(CurrThreadID, content);
 
-                            if(getThreadStoreState().activeNodeId===null){
+                            if (getThreadStoreState().activeNodeId === null) {
                                 //the node having is_head = true
-                                const headNode = content.find(msg => msg.is_head === true);
-                                console.log("headNode: ", headNode);
-                                console.log("content: ", content);
-                                if(headNode){
+                                let headNode = content.find(msg => msg.is_head === true);
+
+
+                                if (!headNode && content.length > 0) {
+                                    headNode = content[content.length - 1];
+                                }
+
+                                if (headNode) {
+                                    setActiveNode(headNode.id);
                                     router.push(`/playgrounds/lumina/${CurrThreadID}?node=${headNode.id}`);
                                 }
                             }
@@ -274,11 +289,12 @@ function Lumina({ children }) {
                     setalert(true);
                     return;
                 }
-                // setCurrThreadID(data[0].thread_id); // we are using dyanmic routes now so we will only update url, the current thread id will update due to useeffect of threadId, and also we donot wnat to fetch the thread from database, so we stop fetch in the useeffect of CurrThreadId by using newchat state :) I am genius huh?
+                useThreadStore.getState().setThreadId(newThreadID);
                 setnewchat(true);
                 // tempThreadId = data[0].thread_id;
                 setCurrThreadName(threadName);
-                router.push(`/playgrounds/lumina/${newThreadID}`)
+                setActiveNode(messageId);
+                router.push(`/playgrounds/lumina/${newThreadID}?node=${messageId}`);
             }
         }
         else {
@@ -301,6 +317,9 @@ function Lumina({ children }) {
             if (error) {
                 setalertMessage(error);
                 setalert(true);
+            } else {
+                setActiveNode(messageId);
+                router.push(`/playgrounds/lumina/${CurrThreadID}?node=${messageId}`);
             }
         }
         return messageId;
@@ -317,7 +336,7 @@ function Lumina({ children }) {
         */
         const storeState = getThreadStoreState();
         const activeNode = storeState.activeNodeId ? storeState.messages[storeState.activeNodeId] : null;
-        
+
         // if last message is ai, update it; else, add new ai message
         if (activeNode && activeNode.role === "model") {
             appendStreamChunk(activeNode.id, chunk);
@@ -398,14 +417,15 @@ function Lumina({ children }) {
 
 
     return (
-        <div className={`${roboto.className} flex flex-row fixed inset-0 w-full overflow-hidden bg-black`}>
-            <ThreadIdpage setCurrThreadID={setCurrThreadID} setActiveNode={setActiveNode} />
+        <div className={`${roboto.className} flex flex-row fixed inset-0 w-full h-[100dvh] overflow-hidden bg-black`}>
+            <ThreadIdpage setActiveNode={setActiveNode} />
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
 
             <Sidebar
                 page="Lumina"
+                sidebarClose={sidebarClose}
                 setsidebarClose={setsidebarClose}
                 profile_pic={profile_pic}
                 CurrThreadID={CurrThreadID}
@@ -417,10 +437,11 @@ function Lumina({ children }) {
             />
 
 
-            <main className="flex-1 min-w-0 h-full flex flex-col justify-between items-center ">
+            <main className="relative flex-1 min-w-0 h-full flex flex-col justify-between items-center ">
 
                 <TopBar
                     sidebarClose={sidebarClose}
+                    setsidebarClose={setsidebarClose}
                     models={models}
                     Model={Model}
                     setModel={setModel}

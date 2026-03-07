@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 import { JetBrains_Mono } from 'next/font/google';
+import { useThreadStore } from '@/store/lumina/useThreadStore';
 
 const jetbrainsMono = JetBrains_Mono({
     subsets: ['latin'],
@@ -50,9 +51,11 @@ function PromptBox({
 
                 const newNodeId = await onPrompt(prompt);
 
+                const activeThreadId = useThreadStore.getState().threadId;
+
                 let signedURLs = [];
                 if (selectedFiles && selectedFiles.length > 0) {
-                    const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, selectedFiles);
+                    const { data, error } = await getSignedURLsOfWorkspaceFiles(activeThreadId, selectedFiles);
                     if (error) {
 
                         setalertMessage("Failed to fetch signed URLs for files.");
@@ -68,14 +71,14 @@ function PromptBox({
                 let responseText = "";
 
                 // need to await obv
-                const response = await fetch("/api/gemini", {
+                const response = await fetch("/api/ai", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         model,
                         mediaURLs: signedURLs,
                         node_id: newNodeId,    // Use the newly created node's ID instead of the old one
-                        thread_id: CurrThreadID
+                        thread_id: activeThreadId
                     }),
                 });
 
@@ -124,12 +127,12 @@ function PromptBox({
     // }, []);
 
     return (
-        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] focus-within:ring-1 focus-within:ring-white/50 fixed bottom-5 w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 border-1 border-white/20 hover:border-white/50 transition-all duration-300 ease-in-out`}>
+        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] focus-within:ring-1 focus-within:ring-white/50 fixed bottom-5 w-[90vw] md:w-[60vw] lg:w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 md:px-4 border-1 border-white/20 hover:border-white/50 transition-all duration-300 ease-in-out`}>
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
             {/* user uploads their damn media here , just whatever*/}
-            <label className="relative m-1 opacity-50">
+            <label className="relative m-1 opacity-50 flex-shrink-0">
                 {/* <input onChange={handleMediaUpload} type="file" className="hidden" multiple /> */}
                 <Paperclip size={20} className="text-white hover:text-white transition-opacity" />
                 {/* {
@@ -148,7 +151,7 @@ function PromptBox({
                 id="prompt-input"
                 name="prompt"
                 role="take-user-prompt"
-                className={`text-lg overflow-hidden p-2 m-2 w-[90%] text-white bg-transparent outline-none rounded-xl border-transparent resize-none max-h-40 transition-all duration-700 ease-in-out ${jetbrainsMono.className}`}
+                className={`text-base md:text-lg overflow-hidden p-2 my-2 flex-1 min-w-0 text-white bg-transparent outline-none rounded-xl border-transparent resize-none max-h-40 transition-all duration-700 ease-in-out ${jetbrainsMono.className}`}
                 rows={1}
                 onInput={handleInput}
                 placeholder="What's On Your Mind...?"
@@ -177,7 +180,7 @@ function PromptBox({
                 ) : (
                     <SendHorizontal
                         size={24}
-                        className="cursor-pointer text-white opacity-90 mx-3 transition-all duration-300 ease-in-out hover:scale-105"
+                        className="cursor-pointer text-white opacity-90 ml-1 mr-3 md:mx-3 transition-all duration-300 ease-in-out flex-shrink-0 hover:scale-105"
                         onClick={(e) => {
                             sendToLLM();
                             textareaRef.current.value = "";

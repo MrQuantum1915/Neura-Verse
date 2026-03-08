@@ -4,12 +4,11 @@ import { persist } from "zustand/middleware";
 export const useModelStore = create(
   persist(
     (set) => ({
-        selectedModel: null,
-        setSelectedModel: (model) => set({ selectedModel: model })
+      selectedModel: null,
+      setSelectedModel: (model) => set({ selectedModel: model })
     }),
     {
-        name: "model-storage",
-        skipHydration: true,
+      name: "model-storage",
     }
   )
 );

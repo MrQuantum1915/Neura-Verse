@@ -80,7 +80,7 @@ export const useThreadStore = create((set, get) => ({
             return acc;
         }, {});
 
-        set({ messages: msgsobj, threadId: threadid });
+        set({ messages: msgsobj });
     },
 
     addMessage: (msg) => set((state) => {

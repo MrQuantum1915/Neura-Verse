@@ -192,7 +192,7 @@ function HistoryTab({ profile_pic, CurrThreadID, CurrThreadName, setCurrThreadNa
             </div >
             {
                 threadMenu && selectedThreadMenu && (
-                    <div ref={threadMenuRef} className="fixed mt-1 bg-neutral-900 border border-white/20 rounded-sm shadow-md animate-fadeIn z-[101] flex flex-col p-1 w-fit justify-start"
+                    <div ref={threadMenuRef} className="fixed mt-1 bg-neutral-900 border border-white/20 rounded-sm shadow-md animate-fadeIn z-[101] flex flex-col p-1 w-fit whitespace-nowrap justify-start"
                         style={{ top: menuPosition.top, left: menuPosition.left }}
                     >
                         <button

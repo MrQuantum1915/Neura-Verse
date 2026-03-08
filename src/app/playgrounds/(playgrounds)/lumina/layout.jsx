@@ -183,6 +183,9 @@ function Lumina({ children }) {
                 const getThread = async () => {
                     try {
                         const { data, error } = await fetchThread(CurrThreadID);
+
+                        if (getThreadStoreState().threadId !== CurrThreadID) return;
+
                         if (error) {
                             setalertMessage(error);
                             setalert(true);
@@ -222,7 +225,9 @@ function Lumina({ children }) {
                     }
 
                     finally {
-                        setnavigatingThread(false);
+                        if (getThreadStoreState().threadId === CurrThreadID) {
+                            setnavigatingThread(false);
+                        }
                     }
                 }
 
@@ -392,6 +397,8 @@ function Lumina({ children }) {
         // extra check for last role to be model, because if the LLM does not send the response than we set response Complete to true and we do not want to perform insert new message operation.
         if (responseComplete && messages[messages.length - 1].role === "model") {
             insertAIResponse();
+
+            router.push(`/playgrounds/lumina/${CurrThreadID}?node=${messages[messages.length - 1].id}`);
         }
 
     }, [responseComplete])

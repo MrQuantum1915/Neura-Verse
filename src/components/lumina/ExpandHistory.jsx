@@ -1,5 +1,6 @@
 'use client'
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import OpenInNewTab from "../icons/OpenInNewTab";
 import { deleteThread } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteThread";
 import MyAlert from "../MyAlert";
@@ -7,22 +8,38 @@ import Image from "next/image";
 import { X, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Playfair_Display } from 'next/font/google';
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-playfair-display',
+});
 
 function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, setHistoryExpand, setnavigatingThread }) {
 
     const router = useRouter();
     const [alert, setalert] = useState(false);
     const [alertMessage, setalertMessage] = useState("Alert");
+    const [mounted, setMounted] = useState(false);
 
-    return (
-        <div className="fixed inset-0 z-100 bg-transparent backdrop-blur-sm w-full h-full flex items-center justify-center">
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[100] bg-transparent backdrop-blur-sm w-full h-full flex items-center justify-center font-sans">
             {
                 alert && <MyAlert message={alertMessage} alertHandler={setalert} />
             }
-            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-[95%] md:w-1/2 h-3/4 bg-[#171717] border-1  border-white/10 items-center justify-center  transition-all duration-300 ease-out">
+            <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-[95%] md:w-1/2 h-3/4 bg-[#171717] border  border-white/10 items-center transition-all duration-300 ease-out">
 
                 <div className="flex flex-row text-3xl m-2 w-full px-4 justify-between py-2">
-                    <h1 className="text-orange-400">Library</h1>
+                    <h1 className={`text-orange-400 ${playfairDisplay.className}`}>Library</h1>
                     <button
                         onClick={() => {
                             setHistoryExpand(false);
@@ -33,13 +50,13 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                     </button>
                 </div>
                 <div className="h-[1px] bg-white/20 w-full" ></div>
-                <div className="w-full h-full text-xl overflow-y-scroll text-wrap flex flex-col mx-4 my-1">
+                <div className="w-full h-full text-xl overflow-y-auto flex flex-col px-4 my-1">
                     {
                         (History.map((item) => {
                             return (
                                 <div key={item.thread_id} className="flex flex-col">
 
-                                    <div className="flex flex-row justify-between text-white opacity-50 hover:opacity-100 hover:bg-white/5 border border-white/0 hover:border-white/30  rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-2 w-full">
+                                    <div className="flex flex-row justify-between items-center text-white opacity-50 hover:opacity-100 hover:bg-white/5 border border-white/0 hover:border-white/30 rounded-lg cursor-pointer transition-all duration-300 ease-in-out py-2 w-full min-w-0 gap-2">
                                         <button
                                             onClick={() => {
                                                 if (CurrThreadID !== item.thread_id) {
@@ -53,9 +70,9 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                                     setHistoryExpand(false);
                                                 }
                                             }}
-                                            className="w-full cursor-pointer mx-4 text-start"
+                                            className="flex-1 min-w-0 cursor-pointer mx-4 text-start"
                                         >
-                                            <h1>
+                                            <h1 className="break-words line-clamp-2">
                                                 {item.thread_name}
                                             </h1>
                                         </button>
@@ -97,7 +114,8 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                     }
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
 

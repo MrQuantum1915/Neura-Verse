@@ -4,12 +4,11 @@ import { persist } from "zustand/middleware";
 export const useInterfaceStore = create(
   persist(
     (set) => ({
-        activeInterface: 'chat',
-        setActiveInterface: (id) => set({ activeInterface: id }),
+      activeInterface: 'chat',
+      setActiveInterface: (id) => set({ activeInterface: id }),
     }),
     {
-        name: "interface-storage",
-        skipHydration: true,
+      name: "interface-storage",
     }
   )
 );

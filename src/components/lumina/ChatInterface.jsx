@@ -4,6 +4,7 @@ import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import VerticalBarsLoader from "@/components/VerticalBarsLoader";
+import TextLoader from "@/components/lumina/TextLoader";
 import PromptBox from "@/components/lumina/PromptBox";
 import { deleteMessage } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteMessage";
 import { useRouter } from "next/navigation";
@@ -78,6 +79,54 @@ const CustomLi = ({ children }) => (
     <li className="py-1 leading-[1.7]">{children}</li>
 );
 
+const ThinkBlock = ({ content, isStreaming, isThinking }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    useEffect(() => {
+        if (isThinking) {
+            setIsExpanded(true);
+        } else if (!isStreaming && content) {
+             setIsExpanded(false); 
+        }
+    }, [isThinking, isStreaming, content]);
+
+    return (
+        <div className="mb-4 rounded-xl overflow-hidden border border-white/10 bg-black/20">
+            <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="flex w-full items-center justify-between px-4 py-3 text-sm text-white/70 hover:text-white transition-colors bg-white/5"
+            >
+                <div className="flex items-center gap-2">
+                    {isThinking ? (
+                        <div className="flex space-x-1 items-center justify-center">
+                            <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                            <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                            <span className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-bounce"></span>
+                        </div>
+                    ) : (
+                        <span className="text-orange-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 17h6"/><path d="M16 9h2"/><path d="M16 5h6"/><path d="M21 8v1"/><path d="M21 16v1"/><path d="M22 4l-1 1"/><path d="M22 20l-1-1"/></svg>
+                        </span>
+                    )}
+                    <span className="font-semibold">{isThinking ? 'Thinking...' : 'Thought Process'}</span>
+                </div>
+                <div className="flex items-center justify-center">
+                    {isExpanded ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    )}
+                </div>
+            </button>
+            {isExpanded && (
+                <div className="px-4 py-3 text-sm text-white/60 border-t border-white/10 whitespace-pre-wrap font-mono leading-relaxed bg-black/40">
+                    {content}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const TypewriterMarkdown = ({ content, isStreaming }) => {
     const [displayedContent, setDisplayedContent] = useState(content);
 
@@ -97,30 +146,52 @@ const TypewriterMarkdown = ({ content, isStreaming }) => {
 
         if (displayedContent.length < content.length) {
             const timeout = setTimeout(() => {
-                setDisplayedContent(content.substring(0, displayedContent.length + 1));
+                setDisplayedContent(content.substring(0, displayedContent.length + 4));
             }, 10);
             return () => clearTimeout(timeout);
         }
     }, [content, displayedContent, isStreaming]);
 
+    let mainContent = displayedContent;
+    let thinkContent = null;
+    let isThinking = false;
+
+    const thinkMatch = displayedContent.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
+    if (thinkMatch) {
+        thinkContent = thinkMatch[1].trim();
+        mainContent = displayedContent.replace(/<think>[\s\S]*?(?:<\/think>|$)/, '').trim();
+        if (isStreaming && !displayedContent.includes('</think>')) {
+            isThinking = true;
+        }
+    }
+
     return (
-        <ReactMarkdown components={
-            {
-                h1: CustomH1,
-                h2: CustomH2,
-                h3: CustomH3,
-                h4: CustomH4,
-                h5: CustomH5,
-                h6: CustomH6,
-                p: CustomParagraph,
-                ul: CustomUl,
-                ol: CustomOl,
-                li: CustomLi,
-                a: CustomLink,
-            }
-        } remarkPlugins={[remarkGfm]}>
-            {displayedContent}
-        </ReactMarkdown>
+        <div className="flex flex-col w-full">
+            {(thinkContent !== null && thinkContent !== "") && (
+                <ThinkBlock content={thinkContent} isStreaming={isStreaming} isThinking={isThinking} />
+            )}
+            {mainContent && (
+                <div className="w-full">
+                    <ReactMarkdown components={
+                        {
+                            h1: CustomH1,
+                            h2: CustomH2,
+                            h3: CustomH3,
+                            h4: CustomH4,
+                            h5: CustomH5,
+                            h6: CustomH6,
+                            p: CustomParagraph,
+                            ul: CustomUl,
+                            ol: CustomOl,
+                            li: CustomLi,
+                            a: CustomLink,
+                        }
+                    } remarkPlugins={[remarkGfm]}>
+                        {mainContent}
+                    </ReactMarkdown>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -177,8 +248,6 @@ const ChatInterface = ({
         "Analysing...",
         "Thinking...",
         "Generating...",
-        "Cooking...",
-        "Crafting...",
     ];
     const [currentLoadingMessage, setCurrentLoadingMessage] = useState(loadingMessages[0]);
     useEffect(() => {
@@ -274,16 +343,7 @@ const ChatInterface = ({
                                         }
                                         <div className={`text-[0.95rem] ${jetbrainsMono.className} break-words ${msg.role === "user" ? "px-4 md:px-6 py-3 md:py-4 rounded-2xl bg-white/5 border border-white/10 text-white/90 rounded-tr-sm shadow-sm" : `px-4 md:px-6 py-2 md:py-[5px] rounded-2xl bg-white/5 border border-white/5 text-white/90 rounded-tl-sm shadow-sm `}`}>
                                             {(!responseComplete && responseComplete !== null && index === messages.length - 1 && !msg.content) ? (
-                                                <div className="flex items-center py-2 px-1">
-                                                    <div className="loader">
-                                                        <div className="inner one"></div>
-                                                        <div className="inner two"></div>
-                                                        <div className="inner three"></div>
-                                                    </div>
-                                                    <div className="px-4 text-orange-400 text-sm font-medium animate-pulse">
-                                                        {currentLoadingMessage}
-                                                    </div>
-                                                </div>
+                                                <TextLoader currentLoadingMessage={currentLoadingMessage} />
                                             ) : (
                                                 <TypewriterMarkdown
                                                     content={msg.content}
@@ -379,16 +439,7 @@ const ChatInterface = ({
                                             </div>
                                         </div>
                                         <div className={`text-[0.95rem] ${jetbrainsMono.className} px-4 md:px-6 py-2 md:py-[5px] rounded-2xl bg-white/5 border border-white/5 text-white/90 rounded-tl-sm shadow-sm`}>
-                                            <div className="flex items-center py-2 px-1">
-                                                <div className="loader">
-                                                    <div className="inner one"></div>
-                                                    <div className="inner two"></div>
-                                                    <div className="inner three"></div>
-                                                </div>
-                                                <div className="px-4 text-orange-400 text-sm font-medium animate-pulse">
-                                                    {currentLoadingMessage}
-                                                </div>
-                                            </div>
+                                            <TextLoader currentLoadingMessage={currentLoadingMessage} />
                                         </div>
                                     </div>
                                 </div>

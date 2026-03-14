@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Paperclip, CircleStop, SendHorizontal } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import MyAlert from "../MyAlert";
+import { v7 } from "uuid";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 import { JetBrains_Mono } from 'next/font/google';
 import { useThreadStore } from '@/store/lumina/useThreadStore';
@@ -20,7 +21,9 @@ function PromptBox({
     setresponseComplete,
     Model,
     selectedFiles,
-    CurrThreadID
+    CurrThreadID,
+    CurrThreadName,
+    ThreadPublic
 }) {
 
     const model = Model.id;
@@ -69,6 +72,7 @@ function PromptBox({
                 // const newNodeId = await newNodeIdPromise;
 
                 let responseText = "";
+                const aiMessageId = v7();
 
                 // need to await obv
                 const response = await fetch("/api/ai", {
@@ -77,8 +81,13 @@ function PromptBox({
                     body: JSON.stringify({
                         model,
                         mediaURLs: signedURLs,
-                        node_id: newNodeId,    // Use the newly created node's ID instead of the old one
-                        thread_id: activeThreadId
+                        node_id: newNodeId,
+                        thread_id: activeThreadId,
+                        ai_model_object: Model,
+                        thread_name: CurrThreadName,
+                        parent_id: newNodeId,
+                        is_public: ThreadPublic,
+                        ai_message_id: aiMessageId,
                     }),
                 });
 
@@ -99,7 +108,7 @@ function PromptBox({
                     if (value) {
                         const chunk = decoder.decode(value);
                         responseText += chunk;
-                        onStreamResponse(chunk);
+                        onStreamResponse(chunk, aiMessageId);
                     }
                 }
 
@@ -139,7 +148,7 @@ function PromptBox({
                     (files.length != 0) &&
                     (
                         <div className="text-sm text-orange-400 absolute z-50 top-8 left-15 rounded-sm bg-orange-500/20 px-1  ">{selectedFiles.length}
-                        </div>
+            </div>
                     )
                 } */}
             </label>

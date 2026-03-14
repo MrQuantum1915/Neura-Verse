@@ -208,6 +208,8 @@ const ChatInterface = ({
     Model,
     selectedFiles,
     CurrThreadID,
+    CurrThreadName,
+    ThreadPublic,
     handleNewPrompt,
     handleStreamResponse,
     setalert,
@@ -319,11 +321,11 @@ const ChatInterface = ({
                             <h1 className="bg-gradient-to-r py-4 from-neutral-300 to-neutral-500 bg-clip-text text-transparent">What can I help you with Today?</h1>
                         </div>
                     ) : (
-                        <div className="w-full max-w-6xl py-4 px-4 md:px-12">
+                        <div className="w-full max-w-6xl py-4 px-2 md:px-12">
 
                             {messages.map((msg, index) => (
                                 <div key={index} className={`mb-4 w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                                    <div className={`flex flex-col px-4 md:px-7 py-2 md:py-3 max-w-[95%] md:max-w-[85%] rounded-2xl text-white/85 rounded-tl-xs ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                                    <div className={`flex flex-col px-2 md:px-7 py-2 md:py-3 ${msg.role === "user" ? "max-w-[90%] md:max-w-[85%]" : "max-w-[98%] md:max-w-[85%]"} rounded-2xl text-white/85 rounded-tl-xs ${msg.role === "user" ? "items-end" : "items-start"}`}>
 
                                         {
                                             msg.role === "model" && (
@@ -432,7 +434,7 @@ const ChatInterface = ({
 
                             {(!responseComplete && responseComplete !== null && (messages.length === 0 || messages[messages.length - 1].role === 'user')) && (
                                 <div className="mb-4 w-full flex justify-start">
-                                    <div className="flex flex-col px-4 md:px-7 py-2 md:py-3 max-w-[95%] md:max-w-[85%] rounded-2xl text-white/85 rounded-tl-xs items-start">
+                                    <div className="flex flex-col px-2 md:px-7 py-2 md:py-3 max-w-[98%] md:max-w-[85%] rounded-2xl text-white/85 rounded-tl-xs items-start">
                                         <div className="flex flex-row items-center gap-2 mb-2 w-fit">
                                             <div className="animate-pulse">
                                                 <AudioWaveform size={22} className="text-orange-400" />
@@ -458,7 +460,9 @@ const ChatInterface = ({
                 setresponseComplete={setresponseComplete}
                 Model={Model}
                 selectedFiles={selectedFiles}
-                CurrThreadID={CurrThreadID} />
+                CurrThreadID={CurrThreadID}
+                CurrThreadName={CurrThreadName}
+                ThreadPublic={ThreadPublic} />
         </div>
     );
 };

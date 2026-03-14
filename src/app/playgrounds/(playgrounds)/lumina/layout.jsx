@@ -124,7 +124,7 @@ function Lumina({ children }) {
 
 
     // for frontend
-    const [sidebarClose, setsidebarClose] = useState(false);
+    const [sidebarClose, setsidebarClose] = useState(true);
 
     const CurrThreadID = useThreadStore((state) => state.threadId);
     const messages = useThreadStore(useShallow(getActiveBranch));// useshallow to prevent re-renders as getActiveBranch returns new array everytime -> new reference. We only need it to change when the content actually changes
@@ -331,7 +331,7 @@ function Lumina({ children }) {
     };
 
     // appending stream responses
-    const handleStreamResponse = (chunk) => {
+    const handleStreamResponse = (chunk, aiMessageId) => {
         /*
         we need to actvely get the nodeid from store, 
         because the loop that is calling this function, 
@@ -349,7 +349,7 @@ function Lumina({ children }) {
         else {
             // 'id, role , content, ai_model, is_public, thread_name, parent_id, is_head'
             const obj = {
-                id: v7(),
+                id: aiMessageId,
                 role: "model",
                 content: chunk,
                 ai_model: Model,
@@ -363,44 +363,10 @@ function Lumina({ children }) {
     };
 
 
-    // to insert the ai response to database after got response in currThread.
     useEffect(() => {
-        const insertAIResponse = async () => {
-            try {
-                /*
-                here i used CurrThreadID insetaed of ref value because see this scenario : 
-                when user navigate to differetn thread while ai response in curr thread is pendingitems-center, 
-                if we use ref value than it will insert the message in the new navaigated thread instead of previous, 
-                so here i am using stale value.
-                */
-
-                const { data, error } = await insertNewMessage(
-                    CurrThreadID,
-                    CurrThreadName,
-                    {
-                        id: messages[messages.length - 1].id,
-                        role: "model",
-                        content: messages[messages.length - 1].content,
-                        ai_model: messages[messages.length - 1].ai_model,
-                        parent_id: messages[messages.length - 1].parent_id,
-                    })
-                if (error) {
-                    setalertMessage(error);
-                    setalert(true);
-                }
-            } catch (err) {
-                setalertMessage(err.message);
-                setalert(true);
-            }
-        }
-
-        // extra check for last role to be model, because if the LLM does not send the response than we set response Complete to true and we do not want to perform insert new message operation.
-        if (responseComplete && messages[messages.length - 1].role === "model") {
-            insertAIResponse();
-
+        if (responseComplete && messages.length > 0 && messages[messages.length - 1].role === "model") {
             router.push(`/playgrounds/lumina/${CurrThreadID}?node=${messages[messages.length - 1].id}`);
         }
-
     }, [responseComplete])
 
 
@@ -481,6 +447,8 @@ function Lumina({ children }) {
                                     Model={Model}
                                     selectedFiles={selectedFiles}
                                     CurrThreadID={CurrThreadID}
+                                    CurrThreadName={CurrThreadName}
+                                    ThreadPublic={ThreadPublic}
                                     handleNewPrompt={handleNewPrompt}
                                     handleStreamResponse={handleStreamResponse}
                                     setalert={setalert}

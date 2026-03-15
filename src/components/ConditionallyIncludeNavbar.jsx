@@ -4,7 +4,7 @@ import NavBar from "@/components/NavBar";
 
 function ConditionallyIncludeNavbar() {
     const pathname = usePathname();
-    const pagesToExclude = ["/auth", "/signup", "/playgrounds/", "/profile"];
+    const pagesToExclude = ["/auth", "/signup", "/playgrounds/lumina", "/profile"];
     const includeNavbar = !pagesToExclude.some(page => pathname.startsWith(page));
     return (
         includeNavbar && (<NavBar />)

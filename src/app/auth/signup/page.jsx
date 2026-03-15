@@ -55,7 +55,7 @@ function page() {
             }
             <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none">
                 <div
-                    className="w-110 h-170 rounded-3xl opacity-70 blur-3xl animate-gradient"
+                    className="w-full max-w-lg h-[80vh] rounded-3xl opacity-70 blur-3xl animate-gradient"
                     style={{
                         background: "linear-gradient(45deg, #06b6d4, #8b5cf6, #06b6d4, #8b5cf6)",
                         backgroundSize: "400% 400%",
@@ -78,12 +78,12 @@ function page() {
                 `}</style>
             </div>
 
-            <div className="z-50 bg-black/50 rounded-2xl p-4 shadow-md shadow-white w-fit max-w-120 h-fit flex flex-col items-center">
-                <div className="px-6 py-4 items-center justify-center flex flex-col">
+            <div className="z-50 bg-black/50 rounded-2xl p-4 shadow-md shadow-white w-[90%] max-w-md h-fit flex flex-col items-center">
+                <div className="px-6 py-4 items-center justify-center flex flex-col w-full">
 
-                    <h1 className="text-4xl my-2 mb-4 text-center">Enter the Universe <br></br> Neura Verse</h1>
+                    <h1 className="text-3xl md:text-4xl my-2 mb-4 text-center">Enter the Universe <br></br> Neura Verse</h1>
                     <h2 className="text-green-400">Get full experience in mere seconds. It's quick</h2>
-                    <div className="flex items-center text-center w-90  my-6 ">
+                    <div className="flex items-center text-center w-full my-6 ">
                         <div className="flex-grow h-px bg-white/50"></div>
                     </div>
 
@@ -92,33 +92,34 @@ function page() {
                             OAuth
                             <h1 className="text-sm text-green-400 text-center">Faster</h1>
                         </div>
-                        <div className="flex flex-row flex-wrap gap-4 items-center justify-center">
+                        <div className="flex flex-row flex-wrap gap-4 items-center justify-center w-full">
                             {oAuthProviders.map((item) => (
                                 <button
                                     key={item.Name}
-                                    className="w-42 h-15 rounded-2xl border-2 border-white/50 flex flex-row flex-wrap items-center justify-start cursor-pointer  hover:bg-white/20 focus:bg-white/20 transition-all duration-300 ease-in-out relative overflow-hidden group"
+                                    className="w-full sm:w-auto px-6 py-3 rounded-2xl border-2 border-white/50 flex flex-row items-center justify-center cursor-pointer hover:bg-white/20 focus:bg-white/20 transition-all duration-300 ease-in-out relative overflow-hidden group"
                                     onClick={() => oAuth(item.providerID)}
                                 >
                                     <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-indigo-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></span>
                                     <Image
                                         src={item.Icon}
-                                        width={50}
-                                        height={50}
+                                        width={30}
+                                        height={30}
                                         alt={item.Name}
-                                        className="p-2 z-10"
+                                        className="z-10 mr-2"
                                     />
-                                    <div className="text-white/75 text-2xl px-2 z-10"> {item.Name}</div>
+                                    <div className="text-white/75 text-xl z-10"> {item.Name}</div>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="flex items-center text-center w-90  my-6 ">
+                    <div className="flex items-center text-center w-full my-6 ">
                         <div className="flex-grow h-px bg-white/50"></div>
                         <span className="mx-2 font-bold text-white/50">OR</span>
                         <div className="flex-grow h-px bg-white/50"></div>
                     </div>
                     <form
+                         className="w-full"
                         onSubmit={async (e) => {
                             e.preventDefault();
                             const formData = new FormData;
@@ -133,24 +134,24 @@ function page() {
                             }
                         }}
                     >
-                        <div className="flex flex-col gap-4 w-full max-w-md items-center justify-center">
-                            <div className="text-white/50 text-2xl m-2 font-bold">
+                        <div className="flex flex-col gap-4 w-full items-center justify-center">
+                            <div className="text-white/50 text-2xl m-2 font-bold self-start">
                                 Email
                             </div>
-                            <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row hover:bg-black/50 transition-all duration-300 ease-in-out">
-                                <Mail size={25} className="opacity-50 text-white" />
-                                <input name="email" type="email" placeholder="Email" className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4" required />
+                            <div className="w-full rounded-2xl p-2 border-2 border-white/50 flex flex-row items-center hover:bg-black/50 transition-all duration-300 ease-in-out">
+                                <Mail size={25} className="opacity-50 text-white min-w-[25px]" />
+                                <input name="email" type="email" placeholder="Email" className="bg-transparent text-white w-full rounded-2xl px-4 py-2 text-xl outline-none" required />
                             </div>
 
 
                             {/*show/hide and validation */}
-                            <div className="rounded-2xl p-2 border-2 border-white/50 flex flex-row items-center hover:bg-black/50 transition-all duration-300 ease-in-out relative w-full">
-                                <Lock size={25} className="opacity-50 text-white" />
+                            <div className="w-full rounded-2xl p-2 border-2 border-white/50 flex flex-row items-center hover:bg-black/50 transition-all duration-300 ease-in-out relative">
+                                <Lock size={25} className="opacity-50 text-white min-w-[25px]" />
                                 <input
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Password"
-                                    className="rounded-2xl px-4 py-2 text-xl outline-none min-w-3/4 w-full bg-transparent text-white"
+                                    className="bg-transparent text-white w-full rounded-2xl px-4 py-2 text-xl outline-none"
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
                                     required
@@ -186,7 +187,7 @@ function page() {
                                     </li>
                                 </ul>
                             </div>
-                            <button type="submit" className="px-4 py-2 bg-white/90 text-black rounded-2xl m-4 text-2xl cursor-pointer transition-all duration-300 ease-in-out shadow-lg shadow-white/30 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-indigo-500 hover:text-white hover:scale-105 active:scale-95 focus:ring-2 focus:ring-cyan-400">
+                            <button type="submit" className="w-full sm:w-auto px-8 py-3 bg-white/90 text-black rounded-2xl m-4 text-2xl cursor-pointer transition-all duration-300 ease-in-out shadow-lg shadow-white/30 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-indigo-500 hover:text-white hover:scale-105 active:scale-95 focus:ring-2 focus:ring-cyan-400">
                                 Sign Up
                             </button>
                         </div>

@@ -19,13 +19,13 @@ const playgrounds = [
 
 export default function PlaygroundsPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-blue-100 m-10">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-blue-100 my-10 px-4">
       <h1 className="text-4xl font-bold mb-4">AI Playgrounds</h1>
-      <p className="text-lg text-blue-100/70 mb-8 max-w-[70%] text-center">
+      <p className="text-base md:text-lg text-blue-100/70 mb-8 max-w-[90%] md:max-w-[70%] text-center">
         Welcome to the Playgrounds! Here you can experiment with various AI models, tools, and interactive demos. Select a playground from the menu or check back soon for new features.
       </p>
 
-      <div className="m-10 grid grid-cols-1 sm:grid-cols-2 gap-10 w-full max-w-4xl">
+      <div className="my-10 grid grid-cols-1 sm:grid-cols-2 gap-10 w-full max-w-4xl px-4">
         {playgrounds.map((playground, index) => (
           <GlassCard
             key={index}

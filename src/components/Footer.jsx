@@ -97,7 +97,7 @@ function Footer() {
 
       <div >
         <p className="text-lg text-white/50 font-bold ml-2"> &copy; 2025 Neura-Verse. All rights reserved.</p>
-        <p className='text-8xl mb-5 text-center font-black text-[#575757] tracking-[2.5rem]'>NEURA VERSE</p>
+        <p className='text-4xl md:text-8xl mb-5 text-center font-black text-[#575757] tracking-[0.5rem] md:tracking-[2.5rem]'>NEURA VERSE</p>
       </div>
 
     </footer>

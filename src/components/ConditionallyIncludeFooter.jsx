@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 
 function ConditionallyIncludeFooter() {
     const pathname = usePathname();
-    const pagesToExclude = ["/auth", "/signup", "/playgrounds/"];
+    const pagesToExclude = ["/auth", "/signup", "/playgrounds/lumina"];
     const includeNavbar = !pagesToExclude.some(page => pathname.startsWith(page));
     return (
         includeNavbar && (<Footer />)

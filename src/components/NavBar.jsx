@@ -3,6 +3,7 @@
 import "@/app/globals.css";
 import Link from "next/link";
 import NavItem from "./NavItem";
+import HamburgerButton from "./HamburgerButton";
 import { createClient_client } from "@/utils/supabase/supabaseClient";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -29,6 +30,7 @@ function NavBar() {
 
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [profile_pic, setprofile_pic] = useState(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
 
@@ -63,37 +65,48 @@ function NavBar() {
   }, []);
 
 
-  //convert to SSR
-
-
   return (
-    <nav className="px-4 h-fit w-full flex items-center top-0 sticky border-b-1 border-b-white/10 bg-transparent backdrop-blur-md z-90">
-      <div className={`${michroma.className} w-full h-full flex flex-row justify-between items-center flex-wrap items-center`}>
-        <Link href="/">
-          <Image src={"/logo.svg"} width={200} height={55} alt="logo" className="my-2 ml-6 brightness-150 hover:scale-105 transition-all duration-500 ease-in-out pointer-events-none"></Image>
+    <nav className="px-4 w-full top-0 sticky border-b border-b-white/10 bg-transparent backdrop-blur-md z-[120]">
+      <div className={`${michroma.className} w-full flex flex-row justify-between items-center py-2 relative`}>
+        <Link href="/" className="z-[60]">
+          <Image 
+            src={"/logo.svg"} 
+            width={0} 
+            height={0} 
+            sizes="100vw"
+            alt="logo" 
+            className="w-32 md:w-48 h-auto brightness-150 hover:scale-105 transition-all duration-500 ease-in-out pointer-events-none"
+          />
         </Link>
+        
+ 
+        <HamburgerButton 
+          isOpen={isMenuOpen} 
+          onClick={() => setIsMenuOpen(!isMenuOpen)} 
+        />
 
-        <ul className="flex flex-row flex-wrap h-full items-center justify-around cursor-pointer">
+      
+        <ul className="hidden md:flex flex-row items-center justify-around gap-8 cursor-pointer h-full">
           {navItems.map((items) => (
             <li key={items.label} className="h-full">
-              <NavItem href={items.href}>
-                {/* I made this a client side to dynamically highlight the page userLoggedIn is on, in the navbar. to use client side hooks like usePathname we need to make it client side, it is better to make only navitem a client side instead of making whole navbar client side. Also you can only call a component from server and not a custom hook, so you need to make whole navitem cleint side.*/}
-                {items.label} {/* this is the children prop that is passed to navitem) */}
+              <NavItem href={items.href} className="h-full">
+                {items.label} 
               </NavItem>
             </li>
           ))}
         </ul>
-        {
-          userLoggedIn ? (
+
+        <div className="hidden md:block">
+          {userLoggedIn ? (
             <Link href={"/profile"}>
               <div key={"profile"}>
                 {(!profile_pic || profile_pic === "/pfp-placeholder-2.svg") ? (
-                  <CircleUser size={55} className="text-white opacity-80 rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                  <CircleUser size={45} className="text-white opacity-80 rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
                 ) : (
                   <Image
                     src={profile_pic}
-                    width={55}
-                    height={55}
+                    width={45}
+                    height={45}
                     alt="Profile"
                     style={{ aspectRatio: "1/1" }}
                     className=" object-cover rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
@@ -102,13 +115,69 @@ function NavBar() {
             </Link>
           ) : (
             <Link href={"/auth/login"}>
-              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black font-bold">
+              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors">
                 Sign In
               </div>
             </Link>
-          )
-        }
+          )}
+        </div>
+
+
+        <div 
+          className={`fixed inset-0 w-full min-h-screen bg-black/80 backdrop-blur-3xl transform transition-all duration-500 cubic-bezier(0.32, 0.72, 0, 1) md:hidden flex flex-col items-center justify-center gap-10 z-[55] overflow-y-auto ${
+            isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+          }`}
+        >
+          <ul className="flex flex-col items-center gap-8 text-2xl w-full">
+            {navItems.map((items, idx) => (
+              <li 
+                key={items.label} 
+                onClick={() => setIsMenuOpen(false)} 
+                className={`w-full flex justify-center transition-all duration-700 ease-out transform ${
+                  isMenuOpen ? "translate-y-0 opacity-100 blur-0" : "translate-y-8 opacity-0 blur-sm"
+                }`}
+                style={{ transitionDelay: `${150 + idx * 100}ms` }}
+              >
+                <NavItem href={items.href} className="justify-center py-4 w-auto text-3xl font-light tracking-wider hover:text-white transition-colors duration-300">
+                  {items.label}
+                </NavItem>
+              </li>
+            ))}
+          </ul>
+          
+          <div 
+            onClick={() => setIsMenuOpen(false)} 
+            className={`flex flex-col items-center gap-6 transition-all duration-700 ease-out transform ${
+              isMenuOpen ? "translate-y-0 opacity-100 blur-0" : "translate-y-8 opacity-0 blur-sm"
+            }`}
+             style={{ transitionDelay: `${150 + navItems.length * 100}ms` }}
+          >
+            {userLoggedIn ? (
+              <Link href={"/profile"} className="flex flex-col items-center gap-2 group">
+                 {(!profile_pic || profile_pic === "/pfp-placeholder-2.svg") ? (
+                  <CircleUser size={60} className="text-white/80 group-hover:text-white transition-colors duration-300" />
+                ) : (
+                  <Image
+                    src={profile_pic}
+                    width={60}
+                    height={60}
+                    alt="Profile"
+                    style={{ aspectRatio: "1/1" }}
+                    className="object-cover rounded-full shadow-2xl shadow-white/20 transition-transform duration-300 hover:scale-105" />
+                )}
+                <span className="text-white text-lg font-bold">My Profile</span>
+              </Link>
+            ) : (
+              <Link href={"/auth/login"}>
+                <div key={"SignIn"} className="px-8 py-3 rounded-xl bg-white text-black font-bold text-xl">
+                  Sign In
+                </div>
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
+      
     </nav>
   );
 }

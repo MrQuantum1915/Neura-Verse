@@ -143,17 +143,17 @@ function Profile() {
                         <MyAlert message={alertMessage} alertHandler={setalert} />
                     )
                 }
-                <div className="md:w-[60vw] w-[80vw] my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
+                <div className="md:w-[60vw] w-[90vw] my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
                     <div className="text-3xl">My Account</div>
                     <div className="h-0.5 bg-white/50"></div>
                     <div className="flex flex-col">
                         <div className="text-xl mt-4 mb-2 opacity-50">
                             Profile Picture
                         </div>
-                        <div className="flex flex-row flex-wrap justify-between items-center">
-                            <div className="relative w-[200px] h-[200px] flex-shrink-0">
+                        <div className="flex flex-col md:flex-row flex-wrap justify-between items-center gap-6">
+                            <div className="relative w-32 h-32 md:w-[200px] md:h-[200px] flex-shrink-0">
                                 {Profile_Picture === "/pfp-placeholder-2.svg" ? (
-                                    <CircleUser size={200} className="text-white opacity-80" />
+                                    <CircleUser className="w-full h-full text-white opacity-80" />
                                 ) : (
                                     <Image
                                         src={Profile_Picture}
@@ -163,7 +163,7 @@ function Profile() {
                                     />
                                 )}
                             </div>
-                            <div className='flex flex-row flex-wrap items-center gap-4'>
+                            <div className='flex flex-row flex-wrap items-center gap-4 justify-center'>
 
                                 <label className="cursor-pointer">
                                     <input

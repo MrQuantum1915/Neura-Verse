@@ -1,33 +1,33 @@
-import GlassCard from "@/components/GlassCard";
+import Card from "@/components/Card";
 
 const playgrounds = [
   {
-    title: "Lumina",
-    description: "Experience seamless conversations with Lumina, your all-in-one AI companion. Whether you need quick answers, thoughtful recommendations, or just want to chat, Lumina adapts to your needs with natural, intelligent dialogue.",
+    title: "LUMINA",
+    description: "A multimodal LLM chat with unified AI providers and persistent history. Features NEURA FLOW - a version-controlled DAG engine for non-linear reasoning with Git-like branching and canvas flow management.",
     link: "/playgrounds/lumina",
     tags: ["General Purpose", "Conversational"],
-    image: "/playgroundsImages/lumina.jpg"
+    image: "/playgroundsImages/lumina.png"
   }, 
   {
-    title: "Lumina",
-    description: "Experience seamless conversations with Lumina, your all-in-one AI companion. Whether you need quick answers, thoughtful recommendations, or just want to chat, Lumina adapts to your needs with natural, intelligent dialogue.",
-    link: "/playgrounds/lumina",
-    tags: ["General Purpose", "Conversational"],
-    image: "/playgroundsImages/lumina.jpg"
+    title: "Neura Glyph",
+    description: "An interactive playground hosting custom-trained digit recognition models. Explore the intricacies of machine learning vision systems and test their accuracy in real-time.",
+    link: "/playgrounds/neura-glyph",
+    tags: ["Neural Networks", "CNN", "Image Recognition"],
+    image: "/playgroundsImages/neura-glyph.png"
   }
 ];
 
 export default function PlaygroundsPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-blue-100 my-10 px-4">
-      <h1 className="text-4xl font-bold mb-4">AI Playgrounds</h1>
-      <p className="text-base md:text-lg text-blue-100/70 mb-8 max-w-[90%] md:max-w-[70%] text-center">
-        Welcome to the Playgrounds! Here you can experiment with various AI models, tools, and interactive demos. Select a playground from the menu or check back soon for new features.
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-blue-100 my-20 px-4">
+      <h1 className="text-5xl text- md:text-7xl font-black mb-8 uppercase tracking-widest text-center border-b-2 border-white/20 pb-6 w-full max-w-4xl">PLAYGROUNDS</h1>
+      <p className="text-base md:text-lg text-white/70 mb-12 max-w-[90%] md:max-w-[70%] text-center tracking-widest leading-relaxed font-sans">
+        Dive into our interactive playgrounds. Explore the modules related to AI/ML. Come back often to see new modules and updates! If you have any suggestions for new playgrounds or improvements, please reach out to us on GitHub!  
       </p>
 
       <div className="my-10 grid grid-cols-1 sm:grid-cols-2 gap-10 w-full max-w-4xl px-4">
         {playgrounds.map((playground, index) => (
-          <GlassCard
+          <Card
             key={index}
             Title={playground.title}
             Description={playground.description}

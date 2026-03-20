@@ -125,14 +125,15 @@ function Sidebar({ page, sidebarClose, setsidebarClose, profile_pic, CurrThreadI
               <div className="hidden md:flex flex-col items-center justify-between h-[90vh]">
                 <div className="my-8">
                   <button
+                    className="rounded-full bg-white/10 border border-white/0 hover:border-white/30 transition-all duration-200 ease-in-out cursor-pointer"
                     onClick={async () => {
                       router.push(`/playgrounds/lumina/`);
                       setCurrThreadName("New Thread");
                     }}
                   >
                     <Plus
-                      size={40}
-                      className="p-1 text-white opacity-50 hover:opacity-100 rounded-full bg-white/10 border border-white/0 hover:border-white/30 cursor-pointer transition-all duration-200 ease-in-out"
+                      size={35}
+                      className="p-1 text-white opacity-50 hover:opacity-100"
                     />
                   </button>
                 </div>

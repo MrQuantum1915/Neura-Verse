@@ -1,13 +1,16 @@
 "use client";
+import { useAlertStore } from '@/store/global/useAlertStore';
 import Image from "next/image";
-import { Paperclip, CircleStop, SendHorizontal } from "lucide-react";
+import { CircleStop, SendHorizontal } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
-import MyAlert from "../MyAlert";
+
 import { v7 } from "uuid";
 import { getSignedURLsOfWorkspaceFiles } from "@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles";
 import { JetBrains_Mono } from 'next/font/google';
 import { useThreadStore } from '@/store/lumina/useThreadStore';
-
+import { useToolsStore } from '@/store/lumina/useToolsStore';
+import { useRouter } from "next/navigation";
+import { createClient_client } from '@/utils/supabase/supabaseClient';
 const jetbrainsMono = JetBrains_Mono({
     subsets: ['latin'],
     weight: ['400', '500', '600', '700'],
@@ -29,8 +32,25 @@ function PromptBox({
     const model = Model.id;
 
     const [awaitingResponse, setawaitingResponse] = useState(false);
-    const [alert, setalert] = useState(false);
-    const [alertMessage, setalertMessage] = useState("Alert");
+    const showAlert = useAlertStore((state) => state.showAlert);
+    const activeTools = useToolsStore((state) => state.activeTools);
+    const toggleTool = useToolsStore((state) => state.toggleTool);
+    const isGemini = Model && Model.id && Model.id.includes("gemini");
+    const [showToolsMenu, setShowToolsMenu] = useState(false);
+    const toolsRef = useRef(null);
+
+    const router = useRouter();
+
+    const supabase = createClient_client();
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (toolsRef.current && !toolsRef.current.contains(event.target)) {
+                setShowToolsMenu(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
 
     // auto-resizing textarea with max height
@@ -52,24 +72,43 @@ function PromptBox({
             setawaitingResponse(true);
             try {
 
+                const { data, error } = await supabase.auth.getSession();
+                if (error) {
+                    console.error("Error fetching session:", error);
+                }
+                const session = data?.session;
+                if (!session) {
+                    showAlert('You must be logged in to send a prompt.');
+                    router.push('/auth/login');
+                    setawaitingResponse(false);
+                    return;
+                }
+
+                // IMP: fetch signed urls BEFORE calling onPrompt, because onPrompt 
+                // triggers router.push() which cancels subsequent server action calls
+                const preThreadId = useThreadStore.getState().threadId;
+                let signedURLs = [];
+                if (selectedFiles && selectedFiles.length > 0 && preThreadId) {
+                    console.log("fetching signed urls for files:", selectedFiles, "threadId:", preThreadId);
+                    try {
+                        const result = await getSignedURLsOfWorkspaceFiles(preThreadId, selectedFiles);
+                        console.log("getSignedURLsOfWorkspaceFiles result:", result);
+                        if (result.error) {
+                            showAlert('Could not fetch signed URLs for files.');
+                            return;
+                        }
+                        signedURLs = result.data.map(file => file.signedUrl);
+                        console.log("Signed URLs:", signedURLs);
+                    } catch (signedUrlError) {
+                        console.error("Error calling getSignedURLsOfWorkspaceFiles:", signedUrlError);
+                        showAlert('Failed to fetch signed URLs for files.');
+                        return;
+                    }
+                }
+
                 const newNodeId = await onPrompt(prompt);
 
                 const activeThreadId = useThreadStore.getState().threadId;
-
-                let signedURLs = [];
-                if (selectedFiles && selectedFiles.length > 0) {
-                    const { data, error } = await getSignedURLsOfWorkspaceFiles(activeThreadId, selectedFiles);
-                    if (error) {
-
-                        setalertMessage("Failed to fetch signed URLs for files.");
-                        setalert(true);
-                        return;
-                    }
-                    signedURLs = data.map(file => file.signedUrl);
-                    console.log("Signed URLs:", signedURLs);
-                }
-
-                // const newNodeId = await newNodeIdPromise;
 
                 let responseText = "";
                 const aiMessageId = v7();
@@ -84,6 +123,7 @@ function PromptBox({
                         node_id: newNodeId,
                         thread_id: activeThreadId,
                         ai_model_object: Model,
+                        active_tools: activeTools,
                         thread_name: CurrThreadName,
                         parent_id: newNodeId,
                         is_public: ThreadPublic,
@@ -114,8 +154,7 @@ function PromptBox({
 
             } catch (error) {
                 console.error("Error in fetch:", error);
-                setalertMessage("An error occurred while processing your request.");
-                setalert(true);
+                showAlert('Failed to send prompt. Please try again.');
             } finally {
                 setawaitingResponse(false);
                 setresponseComplete(true);
@@ -124,8 +163,7 @@ function PromptBox({
 
         else {
 
-            setalertMessage("Please enter a prompt.");
-            setalert(true);
+            showAlert('Please enter a prompt before sending.');
             setawaitingResponse(false);
             // { console.log("awaitingResponse", awaitingResponse) }
         }
@@ -136,22 +174,43 @@ function PromptBox({
     // }, []);
 
     return (
-        <div className={`${navigatingThread && ("pointer-events-none")} bg-[#171717] focus-within:ring-1 focus-within:ring-white/50 fixed bottom-5 w-[90vw] md:w-[60vw] lg:w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 md:px-4 border-1 border-white/20 hover:border-white/50 transition-all duration-300 ease-in-out`}>
-            {
-                alert && <MyAlert message={alertMessage} alertHandler={setalert} />
-            }
-            {/* user uploads their damn media here , just whatever*/}
-            <label className="relative m-1 opacity-50 flex-shrink-0">
-                {/* <input onChange={handleMediaUpload} type="file" className="hidden" multiple /> */}
-                <Paperclip size={20} className="text-white hover:text-white transition-opacity" />
-                {/* {
-                    (files.length != 0) &&
-                    (
-                        <div className="text-sm text-orange-400 absolute z-50 top-8 left-15 rounded-sm bg-orange-500/20 px-1  ">{selectedFiles.length}
-            </div>
-                    )
-                } */}
-            </label>
+        <div className={`z-50 ${navigatingThread && ("pointer-events-none")} bg-[#171717] focus-within:ring-1 focus-within:ring-white/50 fixed bottom-5 w-[90vw] md:w-[60vw] lg:w-[40vw] rounded-2xl flex flex-row items-center justify-between px-2 md:px-4 border-1 border-white/20 hover:border-white/50 transition-all duration-300 ease-in-out`}>
+            
+
+            {isGemini && (
+                <div className="relative flex items-center" ref={toolsRef}>
+                    <button 
+                        type="button"
+                        onClick={() => setShowToolsMenu(!showToolsMenu)}
+                        className={`mx-1 flex-shrink-0 transition-opacity ${activeTools.length > 0 ? "text-orange-400 opacity-100" : "text-white opacity-50 hover:opacity-100"}`}
+                        title="Gemini Tools"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    </button>
+                    {showToolsMenu && (
+                        <div className="absolute bottom-10 left-0 bg-[#1e1e1e] border border-white/20 rounded-lg shadow-lg p-2 flex flex-col gap-2 min-w-48 z-[1001] animate-fadeIn">
+                            <div className="text-xs text-white/50 px-1 uppercase tracking-wider font-semibold">Gemini Tools</div>
+                            <button
+                                type="button"
+                                onClick={() => toggleTool("googleSearch")}
+                                className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${activeTools.includes("googleSearch") ? "bg-orange-500/20 text-orange-400" : "text-white/80 hover:bg-white/10"}`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                Google Search
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => toggleTool("codeExecution")}
+                                className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-sm transition-colors ${activeTools.includes("codeExecution") ? "bg-orange-500/20 text-orange-400" : "text-white/80 hover:bg-white/10"}`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                Code Execution
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* <button className="btn m-20 border-1 border-white/30 rounded-3xl"> */}
 
 
@@ -176,26 +235,29 @@ function PromptBox({
             />
 
 
-            <button>
+            <button
+                type="button"
+                className="flex items-center justify-center p-2 mx-1 md:mx-2 transition-all duration-300 ease-in-out flex-shrink-0 hover:scale-105 active:scale-95"
+                onClick={(e) => {
+                    e.preventDefault();
+                    if (awaitingResponse) {
+                        handleInput();
+                    } else {
+                        sendToLLM();
+                        if (textareaRef.current) textareaRef.current.value = "";
+                        handleInput();
+                    }
+                }}
+            >
                 {awaitingResponse ? (
                     <CircleStop
                         size={24}
-                        className="cursor-pointer text-red-400 opacity-90 mx-5 transition-all duration-300 ease-in-out hover:scale-105 animate-pulse"
-                        onClick={(e) => {
-                            handleInput();
-                            e.preventDefault();
-                        }}
+                        className="text-red-400 opacity-90 animate-pulse cursor-pointer pointer-events-none"
                     />
                 ) : (
                     <SendHorizontal
                         size={24}
-                        className="cursor-pointer text-white opacity-90 ml-1 mr-3 md:mx-3 transition-all duration-300 ease-in-out flex-shrink-0 hover:scale-105"
-                        onClick={(e) => {
-                            sendToLLM();
-                            textareaRef.current.value = "";
-                            handleInput();
-                            e.preventDefault();
-                        }}
+                        className="text-white opacity-90 cursor-pointer pointer-events-none"
                     />
                 )}
             </button>

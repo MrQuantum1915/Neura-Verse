@@ -27,13 +27,13 @@ export default function Custom404() {
                 </p>
                 <Link
                     href="/"
-                    className="mt-4 inline-block px-6 py-3 bg-cyan-400 hover:bg-indigo-700 transition-colors duration-300 rounded-full text-black font-semibold shadow-lg text-2xl"
+                    className="mt-8 px-8 py-4 border-2 border-white text-base md:text-xl font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer"
                 >
                     Get back to realm of Neura Verse
                 </Link>
-                <p className="mt-4 text-sm italic bg-indigo-600 font-bold text-md rounded-2xl px-4 py-2">
-                    Pro tip: Watch out for wormholes on the spacetime!
-                </p>
+                <div className="mt-12 bg-black/60 border border-white/20 border-l-4 border-l-orange-500 font-sans tracking-wide text-md px-6 py-4">
+                    <span className="font-bold text-orange-500 uppercase mr-2">Pro tip:</span> Watch out for wormholes on the spacetime!
+                </div>
             </div>
         </div>
     );

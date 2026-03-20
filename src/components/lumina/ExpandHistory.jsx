@@ -1,9 +1,10 @@
 'use client'
+import { useAlertStore } from '@/store/global/useAlertStore';
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import OpenInNewTab from "../icons/OpenInNewTab";
 import { deleteThread } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteThread";
-import MyAlert from "../MyAlert";
+
 import Image from "next/image";
 import { X, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -21,9 +22,8 @@ const playfairDisplay = Playfair_Display({
 function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, setHistoryExpand, setnavigatingThread }) {
 
     const router = useRouter();
-    const [alert, setalert] = useState(false);
-    const [alertMessage, setalertMessage] = useState("Alert");
-    const [mounted, setMounted] = useState(false);
+    const showAlert = useAlertStore((state) => state.showAlert);
+const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -33,9 +33,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
 
     return createPortal(
         <div className="fixed inset-0 z-[100] bg-transparent backdrop-blur-sm w-full h-full flex items-center justify-center font-sans">
-            {
-                alert && <MyAlert message={alertMessage} alertHandler={setalert} />
-            }
+            
             <div data-lenis-prevent className="flex flex-col justify-start rounded-xl w-[95%] md:w-1/2 h-3/4 bg-[#171717] border  border-white/10 items-center transition-all duration-300 ease-out">
 
                 <div className="flex flex-row text-3xl m-2 w-full px-4 justify-between py-2">
@@ -91,8 +89,7 @@ function ExpandHistory({ History, CurrThreadID, setCurrThreadName, setHistory, s
                                                 onClick={async () => {
                                                     const { data, error } = await deleteThread(item.thread_id);
                                                     if (error) {
-                                                        setalertMessage(error);
-                                                        setalert(true);
+                                                        showAlert('Failed to delete thread.');
                                                         return;
                                                     }
 

@@ -20,6 +20,7 @@ export async function POST(request) {
         const thread_id = body.thread_id;
         const media = body.mediaURLs;
         const ai_model_object = body.ai_model_object;
+        const active_tools = body.active_tools;
         const thread_name = body.thread_name;
         const parent_id = body.parent_id;
         const is_public = body.is_public;
@@ -42,8 +43,32 @@ export async function POST(request) {
             return new Response("Context Retrieval Error", { status: 500, headers: corsHeaders });
         }
 
+        // fetch file content from signed URLs and convert to base64 inline data
+        let mediaData = [];
+        if (media && media.length > 0) {
+            console.log(`[ AI-Provider ] Fetching ${media.length} media file(s) from signed URLs...`);
+            const mediaPromises = media.map(async (url) => {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) {
+                        console.error(`[ AI-Provider ] Failed to fetch media: ${res.status} ${res.statusText}`);
+                        return null;
+                    }
+                    const contentType = res.headers.get('content-type') || 'application/octet-stream';
+                    const arrayBuffer = await res.arrayBuffer();
+                    const base64 = Buffer.from(arrayBuffer).toString('base64');
+                    console.log(`[ AI-Provider ] Fetched media: ${contentType}, ${Math.round(arrayBuffer.byteLength / 1024)}KB`);
+                    return { mimeType: contentType, data: base64 };
+                } catch (fetchErr) {
+                    console.error(`[ AI-Provider ] Error fetching media URL:`, fetchErr);
+                    return null;
+                }
+            });
+            mediaData = (await Promise.all(mediaPromises)).filter(Boolean);
+        }
+
         const provider = getProvider(model);
-        const responseGenerator = await provider.generateStream(model, context, media);
+        const responseGenerator = await provider.generateStream(model, context, mediaData, ai_model_object, active_tools);
 
         let fullResponseText = "";
 

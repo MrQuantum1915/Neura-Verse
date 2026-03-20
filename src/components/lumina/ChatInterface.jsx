@@ -9,7 +9,9 @@ import PromptBox from "@/components/lumina/PromptBox";
 import { deleteMessage } from "@/app/playgrounds/(playgrounds)/lumina/_actions/deleteMessage";
 import { useRouter } from "next/navigation";
 import { Playfair_Display, JetBrains_Mono } from 'next/font/google';
-import { Trash, Split, AudioWaveform, MoreVertical, Copy, Check } from "lucide-react";
+import { Trash, Split, AudioWaveform, MoreVertical, Copy, Check, ChevronDown, ChevronUp, Terminal, Code2, BrainCircuit, Globe } from "lucide-react";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const playfairDisplay = Playfair_Display({
     subsets: ['latin'],
@@ -79,6 +81,75 @@ const CustomLi = ({ children }) => (
     <li className="py-1 leading-[1.7]">{children}</li>
 );
 
+const CustomTable = ({ children }) => (
+    <div className="overflow-x-auto my-4 w-full">
+        <table className="w-full text-sm text-left border-collapse border border-white/20">
+            {children}
+        </table>
+    </div>
+);
+
+const CustomTh = ({ children }) => (
+    <th className="px-4 py-2 border border-white/20 bg-white/10 font-medium text-white/90">{children}</th>
+);
+
+const CustomTd = ({ children }) => (
+    <td className="px-4 py-2 border border-white/20 text-white/80">{children}</td>
+);
+
+const CustomImg = ({ src, alt, ...props }) => {
+    if (!src) return null;
+    return (
+        <img src={src} alt={alt} {...props} className="my-4 max-w-full h-auto rounded-xl border border-white/20 shadow-lg object-contain bg-white/5" />
+    );
+};
+
+const CopyButton = ({ text }) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    return (
+        <button
+            onClick={handleCopy}
+            className="text-white/50 hover:text-white transition-colors"
+            title="Copy Code"
+        >
+            {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+        </button>
+    );
+};
+
+const CustomCode = ({ node, inline, className, children, ...props }) => {
+    const match = /language-(\w+)/.exec(className || '');
+
+    return !inline && match ? (
+        <div className="my-4 rounded-lg overflow-hidden border border-white/10 text-sm">
+            <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10">
+                <span className="text-xs text-white/50 font-medium tracking-wider uppercase">{match[1]}</span>
+                <CopyButton text={String(children).replace(/\n$/, '')} />
+            </div>
+            <SyntaxHighlighter
+                {...props}
+                style={vscDarkPlus}
+                language={match[1]}
+                PreTag="div"
+                customStyle={{ margin: 0, padding: '1rem', background: '#0d0d0d' }}
+            >
+                {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+        </div>
+    ) : (
+        <code {...props} className="bg-white/10 text-orange-300 px-1.5 py-0.5 rounded text-[0.9em]">
+            {children}
+        </code>
+    );
+};
+
 const ThinkBlock = ({ content, isStreaming, isThinking }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -105,22 +176,120 @@ const ThinkBlock = ({ content, isStreaming, isThinking }) => {
                         </div>
                     ) : (
                         <span className="text-orange-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M9 13a4.5 4.5 0 0 0 3-4"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M12 13h4"/><path d="M12 17h6"/><path d="M16 9h2"/><path d="M16 5h6"/><path d="M21 8v1"/><path d="M21 16v1"/><path d="M22 4l-1 1"/><path d="M22 20l-1-1"/></svg>
+                            <BrainCircuit size={16} />
                         </span>
                     )}
                     <span className="font-semibold">{isThinking ? 'Thinking...' : 'Thought Process'}</span>
                 </div>
                 <div className="flex items-center justify-center">
                     {isExpanded ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        <ChevronUp size={16} />
                     ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <ChevronDown size={16} />
                     )}
                 </div>
             </button>
             {isExpanded && (
                 <div className="px-4 py-3 text-sm text-white/60 border-t border-white/10 whitespace-pre-wrap font-mono leading-relaxed bg-black/40">
                     {content}
+                </div>
+            )}
+        </div>
+    );
+};
+
+const CitationsBlock = ({ citations }) => {
+    if (!citations || citations.length === 0) return null;
+
+    return (
+        <div className="mt-4 pt-3 border-t border-white/10 w-full">
+            <div className="text-xs text-white/50 mb-2 font-medium uppercase tracking-wider flex items-center gap-1.5">
+                <Globe size={12} />
+                Sources
+            </div>
+            <div className="flex flex-wrap gap-2">
+                {citations.map((c, idx) => (
+                    <a
+                        key={idx}
+                        href={c.uri}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-xs text-white/80 transition-colors max-w-[200px] group"
+                        title={c.title}
+                    >
+                        <span className="truncate group-hover:text-orange-400 transition-colors">{c.title}</span>
+                    </a>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const CodeExecutionBlock = ({ executions }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    if (!executions || executions.length === 0) return null;
+
+    return (
+        <div className="mb-4 rounded-xl overflow-hidden border border-white/10 bg-black/20">
+            <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="flex w-full items-center justify-between px-4 py-3 text-sm text-white/70 hover:text-white transition-colors bg-white/5"
+            >
+                <div className="flex items-center gap-2">
+                    <span className="text-orange-400">
+                        <Code2 size={16} />
+                    </span>
+                    <span className="font-semibold">Executed Tool: Python Code</span>
+                </div>
+                <div className="flex items-center justify-center">
+                    {isExpanded ? (
+                        <ChevronUp size={16} />
+                    ) : (
+                        <ChevronDown size={16} />
+                    )}
+                </div>
+            </button>
+            {isExpanded && (
+                <div className="p-4 border-t border-white/10 bg-black/40 flex flex-col gap-4">
+                    {executions.map((exec, idx) => (
+                        <div key={idx} className="bg-[#0d0d0d] border border-white/10 rounded-lg overflow-hidden">
+                            {exec.type === 'code' ? (
+                                <>
+                                    <div className="flex items-center justify-between px-3 py-1.5 bg-white/5 border-b border-white/10">
+                                        <div className="flex items-center gap-2">
+                                            <Code2 size={14} className="text-white/50" />
+                                            <span className="text-xs text-white/50 font-medium tracking-wider uppercase">{exec.language || 'Python'}</span>
+                                        </div>
+                                        <CopyButton text={exec.code.trim()} />
+                                    </div>
+                                    <SyntaxHighlighter
+                                        style={vscDarkPlus}
+                                        language={(exec.language || 'python').toLowerCase()}
+                                        PreTag="div"
+                                        customStyle={{ margin: 0, padding: '1rem', background: '#0d0d0d', fontSize: '0.85rem' }}
+                                    >
+                                        {exec.code.trim()}
+                                    </SyntaxHighlighter>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="flex items-center justify-between px-3 py-1.5 bg-white/5 border-b border-white/10">
+                                        <div className="flex items-center gap-2">
+                                            <Terminal size={14} className="text-white/50" />
+                                            <span className={`text-xs font-medium tracking-wider uppercase ${exec.outcome === 'OUTCOME_OK' ? 'text-green-400' : 'text-red-400'}`}>
+                                                Output ({exec.outcome})
+                                            </span>
+                                        </div>
+                                        <CopyButton text={exec.output.trim()} />
+                                    </div>
+                                    <div className="p-3 overflow-x-auto text-xs font-mono text-white/60">
+                                        <pre><code>{exec.output.trim()}</code></pre>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
@@ -155,6 +324,8 @@ const TypewriterMarkdown = ({ content, isStreaming }) => {
     let mainContent = displayedContent;
     let thinkContent = null;
     let isThinking = false;
+    let citationsContent = null;
+    let codeExecutionsContent = null;
 
     const thinkMatch = displayedContent.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
     if (thinkMatch) {
@@ -163,6 +334,24 @@ const TypewriterMarkdown = ({ content, isStreaming }) => {
         if (isStreaming && !displayedContent.includes('</think>')) {
             isThinking = true;
         }
+    }
+
+    const citationsMatch = displayedContent.match(/<citations>([\s\S]*?)(?:<\/citations>|$)/);
+    if (citationsMatch) {
+        try {
+            citationsContent = JSON.parse(citationsMatch[1].trim());
+        } catch (e) {
+            // silently ignore if json is incomplete because of streaming
+        }
+        mainContent = mainContent.replace(/<citations>[\s\S]*?(?:<\/citations>|$)/, '').trim();
+    }
+
+    const execMatch = displayedContent.match(/<codeexecution>([\s\S]*?)(?:<\/codeexecution>|$)/);
+    if (execMatch) {
+        try {
+            codeExecutionsContent = JSON.parse(execMatch[1].trim());
+        } catch (e) {}
+        mainContent = mainContent.replace(/<codeexecution>[\s\S]*?(?:<\/codeexecution>|$)/, '').trim();
     }
 
     return (
@@ -185,12 +374,22 @@ const TypewriterMarkdown = ({ content, isStreaming }) => {
                             ol: CustomOl,
                             li: CustomLi,
                             a: CustomLink,
+                            table: CustomTable,
+                            th: CustomTh,
+                            td: CustomTd,
+                            code: CustomCode,
+                            img: CustomImg,
                         }
-                    } remarkPlugins={[remarkGfm]}>
+                    } 
+                    remarkPlugins={[remarkGfm]}
+                    urlTransform={(value) => value.startsWith('data:') ? value : value}
+                    >
                         {mainContent}
                     </ReactMarkdown>
                 </div>
             )}
+            <CodeExecutionBlock executions={codeExecutionsContent} />
+            <CitationsBlock citations={citationsContent} />
         </div>
     );
 };

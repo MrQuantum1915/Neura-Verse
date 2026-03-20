@@ -36,9 +36,9 @@ const socialItem = [
 ];
 
 const footerNavItem = [
-  { href: "/home", label: "Home" },
-  { href: "/playgrounds", label: "Playgrounds" },
-  { href: "/contact", label: "Contact" },
+  { href: "/home", label: "HOME" },
+  { href: "/playgrounds", label: "PLAYGROUNDS" },
+  { href: "/profile", label: "PROFILE" },
 ];
 
 function SocialItem({ href, icon }) {
@@ -51,7 +51,7 @@ function SocialItem({ href, icon }) {
   )
 }
 
-const footerNavItemClass = "text-white/50 hover:text-white border-b-1 border-transparent hover:border-white/100 cursor-pointer my-3 transition-all duration-300 ease-in-out";
+const footerNavItemClass = "text-white/50 hover:text-orange-500 border-b-1 border-transparent hover:border-white/100 cursor-pointer my-3 transition-all duration-300 ease-in-out";
 
 function FooterNavItem({ href, children }) {
   return (
@@ -63,9 +63,16 @@ function FooterNavItem({ href, children }) {
 
 function Footer() {
   return (
-    <footer className={`flex flex-col items-center gap-4 bg-gradient-to-b from-black/20 via-black/60 to-black text-white items-center justify-center border-t-1 border-t-white/40 w-full z-[100]`}>
+    <footer className={`relative overflow-hidden flex flex-col items-center gap-4 bg-black text-white items-center justify-center border-t-2 border-white/20 w-full z-[100] pb-8`}>
+      
+      <div
+        className="absolute bottom-0 left-0 w-full h-[350px] pointer-events-none z-0"
+        style={{
+          background: 'radial-gradient(ellipse 100% 180% at 50% 120%, rgba(255,90,0,0.5) 0%, rgba(255,60,0,0.25) 30%, rgba(200,50,0,0.08) 55%, transparent 75%)',
+        }}
+      ></div>
 
-      <div className="flex flex-row flex-wrap justify-around w-full mt-10">
+      <div className="relative z-10 flex flex-row flex-wrap justify-around w-full mt-12 mb-8 gap-y-10">
 
         <div className="flex flex-col items-center gap-2 mt-4">
           <p className='text-xl text-white/70 font-black '>Mr. Quantum_1915</p>
@@ -79,12 +86,12 @@ function Footer() {
         </div>
 
 
-        <div className="flex flex-col px-4 mx-10 justify-between items-center">
-          <h2 className="text-2xl mb-3 underline">
-            Links
+        <div className="flex flex-col px-4 mx-10 justify-between items-start">
+          <h2 className="text-2xl mb-3 font-black uppercase tracking-[0.2em]">
+            ATLAS
           </h2>
 
-          <ul className="flex flex-col items-center h-full text-xl">
+          <ul className="flex flex-col items-start h-full text-xl">
             {footerNavItem.map((item) => (
               <FooterNavItem key={item.label} href={item.href}>
                 {item.label}
@@ -95,9 +102,9 @@ function Footer() {
 
       </div>
 
-      <div >
-        <p className="text-lg text-white/50 font-bold ml-2"> &copy; 2025 Neura-Verse. All rights reserved.</p>
-        <p className='text-4xl md:text-8xl mb-5 text-center font-black text-[#575757] tracking-[0.5rem] md:tracking-[2.5rem]'>NEURA VERSE</p>
+      <div className="relative z-10">
+        <p className="text-lg text-white/50 font-bold ml-2">&copy; {new Date().getFullYear()} Neura-Verse. All rights reserved.</p>
+        <p className='text-4xl md:text-8xl mb-5 text-center font-black text-white/40 tracking-[0.5rem] md:tracking-[2.5rem]'>NEURA VERSE</p>
       </div>
 
     </footer>

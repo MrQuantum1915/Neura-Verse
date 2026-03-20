@@ -1,11 +1,12 @@
 "use client"
+import { useAlertStore } from '@/store/global/useAlertStore';
 import Image from "next/image"
 import Link from "next/link";
 import { Playfair_Display } from 'next/font/google';
 import DropDown from "@/components/DropDown";
 import { useState, useEffect, useRef } from "react";
 import { updateThreadName } from "@/app/playgrounds/(playgrounds)/lumina/_actions/updateThreadName";
-import MyAlert from "../MyAlert";
+
 import { editThreadVisibility } from "@/app/playgrounds/(playgrounds)/lumina/_actions/editThreadVisibility";
 import { Globe, Lock, Hash, Check, Pencil, ChevronDown, Link as LinkIcon, Menu, MessageSquare, Workflow } from 'lucide-react';
 
@@ -37,11 +38,8 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
 
 
     const threadNameRef = useRef(null)
-    const [alert, setalert] = useState(false);
-    const [alertMessage, setalertMessage] = useState("Alert");
-
-
-    const [copied, setCopied] = useState(false);
+    const showAlert = useAlertStore((state) => state.showAlert);
+const [copied, setCopied] = useState(false);
 
 
     useEffect(() => {
@@ -118,8 +116,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
         }
         const { data, error } = await editThreadVisibility(CurrThreadID, value);
         if (error) {
-            setalertMessage(error);
-            setalert(true);
+            showAlert('Failed to update thread visibility.');
             return;
         }
     }
@@ -141,7 +138,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
 
             {alert && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[60]">
-                    <MyAlert message={alertMessage} alertHandler={setalert} />
+                    
                 </div>
             )}
 
@@ -183,8 +180,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
                                                     const newThreadName = threadNameRef.current.value;
                                                     const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
                                                     if (error) {
-                                                        setalertMessage(`Error renaming thread: ${error}`);
-                                                        setalert(true);
+                                                        showAlert('Failed to update thread name.');
                                                         return;
                                                     }
                                                     setCurrThreadName(newThreadName);
@@ -212,8 +208,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
                                         const newThreadName = threadNameRef.current.value;
                                         const { data, error } = await updateThreadName(newThreadName, CurrThreadID);
                                         if (error) {
-                                            setalertMessage(`Error renaming thread: ${error}`);
-                                            setalert(true);
+                                            showAlert('Failed to update thread name.');
                                             return;
                                         }
                                         setCurrThreadName(newThreadName);
@@ -224,7 +219,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
                                     seteditThreadName(true);
                                 }
                             }}
-                            className="flex-shrink-0 text-white/50 hover:text-white transition-colors p-0.5 md:p-1 rounded hover:bg-white/10"
+                            className="flex-shrink-0 text-white/50 hover:text-white transition-colors p-1"
                         >
                             {CurrThreadID !== null && (
                                 editThreadName ? <Check size={12} className="md:w-3.5 md:h-3.5" /> : <Pencil size={12} className="md:w-3.5 md:h-3.5" />
@@ -312,7 +307,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
                     <button
                         onClick={() => setmodelDropdownOpen(!modelDropdownOpen)}
                         ref={mobileModelButtonRef}
-                        className="relative flex flex-row items-center gap-1 px-2 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white text-xs font-medium transition-colors"
+                        className="relative flex flex-row items-center gap-1 px-2 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white text-xs font-medium transition-colors"
                     >
                         {Model.icon && (
                             <div className="flex items-center justify-center w-4 h-4 flex-shrink-0">
@@ -353,7 +348,7 @@ function TopBar({ sidebarClose, setsidebarClose, models, Model, setModel, page, 
                         <span>Models</span>
                         <ChevronDown size={14} className={`opacity-70 transition-transform duration-200 ${modelDropdownOpen ? "rotate-180" : ""}`} />
                         {modelDropdownOpen && (
-                            <DropDown width="min-w-[200px] lg:min-w-[240px] w-max" top={35} right={0} color="orange-400" itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.id} />
+                            <DropDown width="min-w-[200px] lg:min-w-[240px] w-max" top={35} right={0} color="orange-400" itemsArray={models} selectItem={handleSelectItem} ref={modelDropdownMenuRef} currentSelectedItemID={Model.uid || Model.id} />
                         )}
                     </button>
                 </div>

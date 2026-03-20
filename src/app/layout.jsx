@@ -1,16 +1,16 @@
-// import { SpeedInsights } from "@vercel/speed-insights/next"
-// import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 import SmoothScrolling from "@/components/SmoothScrolling";
 import ConditionallyIncludeNavbar from "@/components/ConditionallyIncludeNavbar";
 import ConditionallyIncludeFooter from "@/components/ConditionallyIncludeFooter";
+import MyAlert from "@/components/MyAlert";
 import {
   Playfair_Display,
   Roboto,
   Michroma,
   Instrument_Serif
 } from 'next/font/google';
-import Galaxy from "@/components/Galaxy";
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -53,28 +53,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${roboto.variable} ${playfairDisplay.variable} ${instrumentSerif.variable}`}>
-      {/* <SpeedInsights /> */}
+      <SpeedInsights />
       <body className={`min-h-screen flex flex-col ${michroma.className}`}>
         <SmoothScrolling>
           <ConditionallyIncludeNavbar />
         <main className="flex-1 flex flex-col bg-black relative">
-          <div className="fixed inset-0 z-0">
-            <Galaxy
-              mouseRepulsion={true}
-              mouseInteraction={true}
-              density={0.3}
-              glowIntensity={0.7}
-              saturation={2}
-              hueShift={500}
-            />
-          </div>
-          <div className="relative z-10">
+          <div className="relative z-10 w-full h-full flex flex-col flex-1">
             {children}
-            {/* <Analytics /> */}
+            <Analytics />
           </div>
         </main>
           <ConditionallyIncludeFooter />
         </SmoothScrolling>
+        <MyAlert />
       </body>
     </html>
   );

@@ -1,15 +1,15 @@
 "use client"
+import { useAlertStore } from '@/store/global/useAlertStore';
 import React from 'react'
 import { ImageIcon, FileText, AudioLines, Video, Layers, X as XIcon, Upload, CheckCircle, CheckSquare, Square, MoreVertical, Trash, Menu } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Roboto_Slab } from 'next/font/google';
 import DropDown from '../DropDown';
 import Cross from '../icons/Cross';
 import Link from 'next/link';
 import OpenInNewTab from '../icons/OpenInNewTab';
 import { uploadWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumina/_actions/uploadWorkspaceFiles';
-import MyAlert from '../MyAlert';
+
 import { fetchListOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumina/_actions/fetchListOfWorkspaceFiles';
 import { getSignedURLsOfWorkspaceFiles } from '@/app/playgrounds/(playgrounds)/lumina/_actions/getSignedURLsOfWorkspaceFiles';
 import CircularLoader from '../CircularLoader';
@@ -20,12 +20,7 @@ import { useThreadStore } from '@/store/lumina/useThreadStore';
 import { v7 } from 'uuid';
 import { insertNewMessage } from '@/app/playgrounds/(playgrounds)/lumina/_actions/insertNewMessage';
 
-const robotoSlab = Roboto_Slab({
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-    display: 'swap',
-    variable: '--font-roboto-slab',
-});
+
 
 const fileTypes = [
     { itemName: "Images", mimeType: "image/*", id: "image/*", icon: <ImageIcon size={25} /> },
@@ -47,11 +42,8 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
     const fileTypesMenuRef = React.useRef(null);
     const dropdownRef = React.useRef(null);
 
-    const [alert, setalert] = useState(false);
-    const [alertMessage, setalertMessage] = useState("Alert");
-
-
-    useEffect(() => {
+    const showAlert = useAlertStore((state) => state.showAlert);
+useEffect(() => {
         if (!fileTypesMenu) {
             return;
         }
@@ -124,8 +116,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                     }
                 );
                 if (newThreaderr) {
-                    setalertMessage(newThreaderr);
-                    setalert(true);
+                    showAlert('Could not start a new thread.');
                 }
                 else {
                     useThreadStore.getState().setThreadId(newThreadID);
@@ -142,8 +133,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
             // FormData.append() expects a string or Blob/File, not an array. Hence we need to Loop and append each file individually. otherwise it converts whole to string
             for (let i = 0; i < tempfiles.length; i++) {
                 if (files.some(item => item.name === tempfiles[i].name)) {
-                    setalertMessage(`Discarded ${tempfiles[i].name}, as it is already uploaded`);
-                    setalert(true);
+                    showAlert('File already exists in workspace.');
                     continue;
                 }
                 formData.append('files', tempfiles[i]);
@@ -151,11 +141,10 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
             formData.append('thread_id', activeThreadId);
             const { data, error } = await uploadWorkspaceFiles(formData);
-            console.log("log")
+            // console.log("log")
 
             if (error) {
-                setalertMessage(error);
-                setalert(true);
+                showAlert('Failed to upload files.');
             }
             else {
                 // console.log(data);
@@ -174,11 +163,10 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
 
             const { data, error } = await fetchListOfWorkspaceFiles(CurrThreadID);
             if (error) {
-                setalertMessage(error);
-                setalert(true);
+                showAlert('Failed to load workspace files.');
                 return;
             }
-            console.log(data);
+            // console.log(data);
             setFiles(data);
         }
 
@@ -186,7 +174,6 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
     }, [CurrThreadID]);
 
     const [UploadingFile, setUploadingFile] = useState(false);
-    const [sendingToGemini, setSend] = useState(false);
     const [CreatingFileURL, setCreatingFileURL] = useState(false);
     const [DeletingFile, setDeletingFile] = useState(false);
 
@@ -197,30 +184,29 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                 className={`md:hidden fixed inset-0 bg-black/50 z-[90] transition-opacity duration-300 ${WorkspaceOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={() => setWorkspaceOpen(false)}
             />
-            <div className="flex flex-row z-100 md:z-10 absolute right-0 h-full md:relative">
+            <div className={`flex flex-row z-100 absolute right-0 ${WorkspaceOpen ? 'h-full md:relative md:z-10' : 'pointer-events-none'}`}>
                 {
                     !WorkspaceOpen &&
                     <button
                         onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
-                        className={`mt-4 bg-[#212121] hover:bg-white/10 border border-white/0 hover:border-white/30 rounded-lg p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out ${WorkspaceOpen ? ("") : ("mr-4")}`}>
+                        className={`mt-6 pointer-events-auto bg-white/10 border border-white/10 hover:border-white/30 transition-all duration-200 ease-in-out cursor-pointer p-2 rounded-xl active:scale-95 flex flex-row items-center h-fit flex-shrink-0 ${WorkspaceOpen ? ("") : ("mr-4")}`}>
 
-                        <Layers size={30} className="text-white" />
+                        <Layers size={30}  className="text-white" />
                     </button>
                 }
 
-                {
-                    alert && <MyAlert message={alertMessage} alertHandler={setalert} />
-                }
-                <div className={`bg-[#101010] rounded-bl-2xl h-full shadow-[-4px_0_24px_rgba(0,0,0,0.5)] md:shadow-none ${WorkspaceOpen ? ("w-[85vw] sm:w-[350px] md:w-80 md:max-w-80") : ("w-0  translate-x-[100%] pointer-events-none  whitespace-nowrap overflow-hidden opacity-0")} flex flex-col items-center  transition-all duration-500 ease-in-out`}>
+                
+                <div className={`bg-black text-white border-l-2 border-white/20 h-full shadow-[-4px_0_24px_rgba(0,0,0,0.5)] md:shadow-none ${WorkspaceOpen ? ("w-[85vw] sm:w-[350px] md:w-80 md:max-w-80") : ("w-0 translate-x-[100%] pointer-events-none whitespace-nowrap overflow-hidden opacity-0")} flex flex-col items-center transition-all duration-500 ease-in-out`}>
 
-                    <div className='bg-[#212121]  rounded-b-xl w-[95%] top-0 sticky flex flex-col items-center'>
+                    <div className='bg-black/40 backdrop-blur-md border-b border-white/20 pb-2 z-10 w-[100%] top-0 sticky flex flex-col items-center'>
 
                         <div className='flex flex-row items-center'>
                             <button
                                 onClick={() => setWorkspaceOpen(!WorkspaceOpen)}
-                                className="absolute left-0 opacity-50 hover:opacity-100 bg-[#212121] hover:bg-white/5 border border-white/0 hover:border-white/30 hover:rotate-90 rounded-full p-1 flex flex-row items-center cursor-pointer h-fit flex-shrink-0 transition-all duration-300 ease-in-out">
+                                className="absolute left-2 opacity-50 hover:opacity-100 hover:bg-white/10 
+                                bg-white/10 border border-white/0 hover:border-white/30 transition-all duration-200 ease-in-out cursor-pointer active:scale-95 rounded-full p-2 flex flex-row items-center cursor-pointer h-fit flex-shrink-0">
 
-                                <XIcon size={30} className="text-white" />
+                                <XIcon size={24} strokeWidth={2} className="text-white" />
                             </button>
                             <Layers size={30} className="text-white" />
                             <h1 className='p-2 text-2xl font-bold text-center text-white'>Workspace</h1>
@@ -239,8 +225,8 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                         </label>
                     </div>
 
-                    <div className='flex flex-row items-center justify-between my-2 rounded-lg bg-[#212121] w-[95%]'>
-                        <div className='bg-[#404040] rounded-l-lg rounded-r-xl text-xl px-4 py-1 text-gray-300'>Status</div>
+                    <div className='flex flex-row items-center justify-between my-3 rounded-lg bg-white/5 border border-white/10 w-[95%]'>
+                        <div className='bg-white/10 rounded-l-lg rounded-r-xl text-xl px-4 py-1 text-white/80'>Status</div>
                         <div className='flex items-center justify-center'>
                             {
                                 UploadingFile ? (
@@ -284,24 +270,6 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                 <span className="flex-shrink-0 flex items-center justify-center w-[25px] h-[25px] text-white">{currFileType.icon}</span>
                                 {currFileType.itemName}
                             </div>
-                            <button
-                                onClick={async () => {
-                                    setSend(true);
-
-                                    try {
-                                        const { data, error } = await sendFilesToGemini();
-                                        if (error) {
-                                            setalertMessage(error);
-                                            setalert(true);
-                                        }
-                                    }
-                                    finally {
-                                        setSend(false);
-                                    }
-                                }}
-                                className={`${UploadingFile ? ("pointer-events-none opacity-50") : ("opacity-85 hover:opacity-100")} cursor-pointer my-2 bg-white hover:bg-neutral-200 flex flex-row p-0.5 rounded-lg text-black items-center gap-1 w-fit self-center transition-all duration-300 ease-in-out`}>
-                                <div>{`${sendingToGemini ? ("Sending...") : ("Sent")}`}</div>
-                            </button>
 
 
                             <button
@@ -393,8 +361,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                     try {
                                         const { data, error } = await deleteWorkspaceFile(CurrThreadID, selectedFileMenu);
                                         if (error) {
-                                            setalertMessage(error);
-                                            setalert(true);
+                                            showAlert('Failed to delete file.');
                                             return;
                                         }
                                         setFiles((prev) => {
@@ -416,8 +383,7 @@ function WorkSpace({ files, setFiles, setselectedFiles, selectedFiles, CurrThrea
                                     setCreatingFileURL(true);
                                     const { data, error } = await getSignedURLsOfWorkspaceFiles(CurrThreadID, [selectedFileMenu]);
                                     if (error) {
-                                        setalertMessage("Failed to fetch the file");
-                                        setalert(true);
+                                        showAlert('Failed to fetch file link.');
                                         return;
                                     }
                                     setCreatingFileURL(false);

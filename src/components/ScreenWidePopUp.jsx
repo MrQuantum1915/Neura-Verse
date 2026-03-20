@@ -35,33 +35,31 @@ function ScreenWidePopUp({ headline, description, color, bgcolor, buttonName, bu
         >
             <div
                 className={`
-                    flex flex-col justify-center items-center rounded-2xl border-3 ${borderColorClass} shadow-2xl shadow-red-800/75 w-1/3 bg-black
-                    transition-all duration-500 ease-out
+                    flex flex-col justify-center items-center border-2 border-white w-1/3 bg-black
+                    transition-all duration-500 ease-out p-8
                     ${visible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}
                 `}
                 style={{ transformOrigin: 'center' }}
             >
-                <p className={`text-4xl my-4 mx-2 font-bold text-blue-100`}>{headline}</p>
-                <p className='text-2xl my-4 mx-8 text-blue-100'>{description}</p>
-                <div className='flex flex-row gap-4 my-4 flex-wrap'>
+                <p className={`text-3xl my-4 mx-2 font-bold uppercase tracking-widest text-white`}>{headline}</p>
+                <p className='text-lg my-4 mx-8 text-white/70 text-center'>{description}</p>
+                <div className='flex flex-row gap-4 my-8 flex-wrap'>
                     <button
                         className={
-                            `px-4 py-2 cursor-pointer border-2
-                        ${bgColorClass}
-                        ${borderColorClass} rounded-lg
+                            `px-6 py-3 cursor-pointer border-2
+                        border-white bg-black text-white font-bold uppercase tracking-widest
                         transition-all duration-300 ease-in-out
-                        hover:opacity-75`
+                        hover:bg-red-600 hover:border-red-600`
                         }
                         onClick={() => {
                             buttonAction(() => true);
                         }}>{buttonName}</button>
                     <button
                         className={
-                            `px-4 py-2 cursor-pointer border-2
-                            border-cyan-400 bg-white/10
-                            rounded-lg
+                            `px-6 py-3 cursor-pointer border-2
+                            border-white bg-black text-white font-bold uppercase tracking-widest
                             transition-all duration-300 ease-in-out
-                            hover:bg-white/20`
+                            hover:bg-white hover:text-black`
                         }
                         onClick={handleClose}
                     >

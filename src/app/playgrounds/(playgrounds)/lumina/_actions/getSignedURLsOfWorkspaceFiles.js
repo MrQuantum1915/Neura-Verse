@@ -2,6 +2,8 @@
 import { createClient_server } from "@/utils/supabase/supabaseServer"
 
 export async function getSignedURLsOfWorkspaceFiles(thread_id,filenames) {
+    // console.log("thread_id", thread_id);
+    // console.log("filenames", filenames);
     const supabase = await createClient_server();
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -12,7 +14,7 @@ export async function getSignedURLsOfWorkspaceFiles(thread_id,filenames) {
     if (!user) return { error: 'User not authenticated' };
 
     const filepaths = filenames.map(filename => `${user.id}/${thread_id}/${filename}`);
-    
+    // console.log(filepaths);
     const { data, error } = await supabase.storage
         .from('lumina-workspace-files')
         .createSignedUrls(filepaths, 120);

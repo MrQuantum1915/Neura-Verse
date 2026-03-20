@@ -21,9 +21,9 @@ const michroma = Michroma({
 
 
 const navItems = [
-  { href: "/home", label: "Home" },
-  { href: "/playgrounds", label: "Playgrounds" },
-  { href: "/contact", label: "Contact" },
+  { href: "/home", label: "HOME" },
+  { href: "/playgrounds", label: "PLAYGROUNDS" },
+  { href: "/contact", label: "CONTACT" },
 ];
 
 function NavBar() {
@@ -66,16 +66,16 @@ function NavBar() {
 
 
   return (
-    <nav className="px-4 w-full top-0 sticky border-b border-b-white/10 bg-transparent backdrop-blur-md z-[120]">
+    <nav className="px-4 w-full top-0 left-0 fixed border-b border-white/20 bg-black z-[120]">
       <div className={`${michroma.className} w-full flex flex-row justify-between items-center py-2 relative`}>
         <Link href="/" className="z-[60]">
           <Image 
-            src={"/logo.svg"} 
+            src={"/nv.svg"} 
             width={0} 
             height={0} 
-            sizes="100vw"
+            // sizes="100vw"
             alt="logo" 
-            className="w-32 md:w-48 h-auto brightness-150 hover:scale-105 transition-all duration-500 ease-in-out pointer-events-none"
+            className="w-32 md:w-40 h-auto brightness-150 hover:scale-105 transition-all duration-500 ease-in-out pointer-events-none"
           />
         </Link>
         
@@ -99,9 +99,9 @@ function NavBar() {
         <div className="hidden md:block">
           {userLoggedIn ? (
             <Link href={"/profile"}>
-              <div key={"profile"}>
+              <div key={"profile"} className="cursor-pointer">
                 {(!profile_pic || profile_pic === "/pfp-placeholder-2.svg") ? (
-                  <CircleUser size={45} className="text-white opacity-80 rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                  <CircleUser size={45} className="text-white opacity-80 rounded-none border-2 transition-all duration-300 ease-in-out hover:bg-white hover:text-black border-white" />
                 ) : (
                   <Image
                     src={profile_pic}
@@ -109,13 +109,13 @@ function NavBar() {
                     height={45}
                     alt="Profile"
                     style={{ aspectRatio: "1/1" }}
-                    className=" object-cover rounded-full border-2 transition-all duration-300 ease-in-out hover:bg-white/50 border-white" />
+                    className=" object-cover rounded-none border-2 transition-all duration-300 ease-in-out hover:opacity-80 border-white" />
                 )}
               </div>
             </Link>
           ) : (
             <Link href={"/auth/login"}>
-              <div key={"SignIn"} className="px-4 py-2 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors">
+              <div key={"SignIn"} className="px-6 py-2 border-2 border-white rounded-none bg-white text-black font-bold hover:bg-transparent hover:text-white transition-all duration-300">
                 Sign In
               </div>
             </Link>
@@ -124,7 +124,7 @@ function NavBar() {
 
 
         <div 
-          className={`fixed inset-0 w-full min-h-screen bg-black/80 backdrop-blur-3xl transform transition-all duration-500 cubic-bezier(0.32, 0.72, 0, 1) md:hidden flex flex-col items-center justify-center gap-10 z-[55] overflow-y-auto ${
+          className={`fixed inset-0 w-full min-h-screen bg-black transform transition-all duration-500 cubic-bezier(0.32, 0.72, 0, 1) md:hidden flex flex-col items-center justify-center gap-10 z-[55] overflow-y-auto ${
             isMenuOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
           }`}
         >
@@ -155,7 +155,7 @@ function NavBar() {
             {userLoggedIn ? (
               <Link href={"/profile"} className="flex flex-col items-center gap-2 group">
                  {(!profile_pic || profile_pic === "/pfp-placeholder-2.svg") ? (
-                  <CircleUser size={60} className="text-white/80 group-hover:text-white transition-colors duration-300" />
+                  <CircleUser size={60} className="text-white/80 group-hover:text-white transition-colors duration-300 rounded-none border-2 border-transparent group-hover:border-white p-1" />
                 ) : (
                   <Image
                     src={profile_pic}
@@ -163,13 +163,13 @@ function NavBar() {
                     height={60}
                     alt="Profile"
                     style={{ aspectRatio: "1/1" }}
-                    className="object-cover rounded-full shadow-2xl shadow-white/20 transition-transform duration-300 hover:scale-105" />
+                    className="object-cover rounded-none border-2 border-white transition-transform duration-300 hover:scale-105" />
                 )}
                 <span className="text-white text-lg font-bold">My Profile</span>
               </Link>
             ) : (
               <Link href={"/auth/login"}>
-                <div key={"SignIn"} className="px-8 py-3 rounded-xl bg-white text-black font-bold text-xl">
+                <div key={"SignIn"} className="px-8 py-3 border-2 border-white rounded-none bg-white text-black font-bold text-xl hover:bg-transparent hover:text-white transition-all duration-300">
                   Sign In
                 </div>
               </Link>

@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import Image from "next/image";
 
-const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem, currentSelectedItemID, color = "cyan-400", width }, ref) => {
+const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem, currentSelectedItemID, color = "orange-500", width }, ref) => {
 
   const style = {
     ...(top !== undefined ? { top } : {}),
@@ -18,7 +18,7 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
     <div
       ref={ref}
       style={style}
-      className={`flex flex-col z-[1000] text-white border border-white/20 bg-neutral-900 rounded-lg shadow-md animate-fadeIn ${width} h-fit py-1.5 pointer-events-auto transition-all duration-300 ease-in-out`}
+      className={`flex flex-col z-[1000] text-white border border-white/20 bg-black animate-fadeIn px-2 py-2 pointer-events-auto transition-all duration-300 ease-in-out ${width ? width : "w-fit"} min-w-max`}
       role="menu"
     >
       {itemsArray.map((item) => (
@@ -27,8 +27,8 @@ const DropDown = forwardRef(({ top, right, left, bottom, itemsArray, selectItem,
             selectItem(item);
             e.stopPropagation();
           }}
-          key={item.id}
-          className={`flex flex-row p-2 items-center gap-2 ${(item.id === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}
+          key={item.uid || item.id}
+          className={`flex flex-row p-2 items-center gap-2 ${((item.uid || item.id) === currentSelectedItemID) ? (currentSelectedItemClass) : ("")} ${dynamicClass}`}
         >
           {typeof item.icon === 'string' ? (
             <Image src={item.icon} width={20} height={20} className="object-contain" alt="icon" />

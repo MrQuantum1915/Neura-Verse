@@ -7,7 +7,12 @@ function ConditionallyIncludeNavbar() {
     const pagesToExclude = ["/auth", "/signup", "/playgrounds/lumina", "/profile"];
     const includeNavbar = !pagesToExclude.some(page => pathname.startsWith(page));
     return (
-        includeNavbar && (<NavBar />)
+        includeNavbar && (
+            <>
+                <NavBar />
+                <div className="h-[65px] md:h-[73px]"></div>
+            </>
+        )
     );
 }
 

@@ -39,18 +39,19 @@ const roboto = Roboto({
 });
 
 const models = [
-    { itemName: "Sarvam", id: "sarvam-m", icon: "/sarvam.svg" },
-    { itemName: "Sarvam 30B", id: "sarvam-30b", icon: "/sarvam.svg" },
-    { itemName: "Sarvam 30B 16K", id: "sarvam-30b-16k", icon: "/sarvam.svg" },
-    { itemName: "Sarvam 105B", id: "sarvam-105b", icon: "/sarvam.svg" },
-    { itemName: "Sarvam 105B 32K", id: "sarvam-105b-32k", icon: "/sarvam.svg" },
-    { itemName: "Gemini 3 Flash", id: "gemini-3-flash-preview", icon: "/gemini.svg" },
-    // { itemName: "Gemini 2.5 Pro", id: "gemini-2.5-pro", icon: "/gemini.svg" },
-    { itemName: "Gemma 3 27B", id: "gemma-3-27b-it", icon: "/gemini.svg" },
-    { itemName: "Gemma 3n E4B", id: "gemma-3n-e4b-it", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", icon: "/gemini.svg" },
-    { itemName: "Gemini 2.5 Flash-Lite", id: "gemini-2.5-flash-lite", icon: "/gemini.svg" },
-    // { itemName: "Gemini 2.5 Flash Preview", id: "gemini-2.5-flash-preview-tts" }, //for audio
+    { itemName: "Sarvam", id: "sarvam-m", uid: "sarvam-m", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 30B", id: "sarvam-30b", uid: "sarvam-30b", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 30B 16K", id: "sarvam-30b-16k", uid: "sarvam-30b-16k", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 105B", id: "sarvam-105b", uid: "sarvam-105b", icon: "/sarvam.svg" },
+    { itemName: "Sarvam 105B 32K", id: "sarvam-105b-32k", uid: "sarvam-105b-32k", icon: "/sarvam.svg" },
+    { itemName: "Gemini 3 Flash", id: "gemini-3-flash-preview", uid: "gemini-3-flash-preview", icon: "/gemini.svg" },
+    { itemName: "Gemini 3 Flash Thinking", id: "gemini-3-flash-preview", uid: "gemini-3-flash-preview-thinking", icon: "/gemini.svg", thinking: true },
+    { itemName: "Gemma 3 27B", id: "gemma-3-27b-it", uid: "gemma-3-27b-it", icon: "/gemini.svg" },
+    { itemName: "Gemma 3n E4B", id: "gemma-3n-e4b-it", uid: "gemma-3n-e4b-it", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash", id: "gemini-2.5-flash", uid: "gemini-2.5-flash", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash Thinking", id: "gemini-2.5-flash", uid: "gemini-2.5-flash-thinking", icon: "/gemini.svg", thinking: true },
+    { itemName: "Gemini 2.5 Flash-Lite", id: "gemini-2.5-flash-lite", uid: "gemini-2.5-flash-lite", icon: "/gemini.svg" },
+    { itemName: "Gemini 2.5 Flash-Lite Thinking", id: "gemini-2.5-flash-lite", uid: "gemini-2.5-flash-lite-thinking", icon: "/gemini.svg", thinking: true },
 ];
 
 const toolbar = [

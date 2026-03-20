@@ -18,8 +18,8 @@ import { removeImage } from './_actions/removeImage';
 import { deleteAccountServerAction } from './_actions/deleteAccountServerAction';
 
 import ScreenWidePopUp from '@/components/ScreenWidePopUp';
-import MyAlert from '@/components/MyAlert';
 import NavBar from '@/components/NavBar';
+import { useAlertStore } from '@/store/global/useAlertStore';
 
 function Profile() {
 
@@ -37,9 +37,7 @@ function Profile() {
     const [deleteAccountConfirmation, setdeleteAccountConfirmation] = useState(false);
     const [deleteAccount, setdeleteAccount] = useState(false);
 
-    const [alert, setalert] = useState(false);
-    const [alertMessage, setalertMessage] = useState("Alert");
-
+    const showAlert = useAlertStore((state) => state.showAlert);
 
     const router = useRouter();
 
@@ -73,8 +71,7 @@ function Profile() {
                 const { error } = await deleteAccountServerAction();
                 if (error) {
                     console.error('Error deleting account:', error);
-                    setalertMessage("Error deleting account");
-                    setalert(true);
+                    showAlert("Error deleting account");
                     setdeleteAccount(false);
                 } else {
                     // also delete all cookies
@@ -105,7 +102,7 @@ function Profile() {
                         <div className="inner two"></div>
                         <div className="inner three"></div>
                     </div>
-                    <h1 className='text-3xl text-cyan-400 mx-4 mt-4'>
+                    <h1 className='text-xl text-white/70 tracking-[0.2em] uppercase font-light mx-4 mt-4'>
                         Compiling your awesomeness...
                     </h1>
                 </div>
@@ -118,7 +115,7 @@ function Profile() {
     return (
         <>
             <NavBar />
-            <div className="flex flex-col items-center justify-center break-words my-5">
+            <div className="flex flex-col items-center justify-center break-words my-20">
                 {
                     isUpdating && (
                         <div className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center z-50 h-full w-full">
@@ -127,7 +124,7 @@ function Profile() {
                                 <div className="inner two"></div>
                                 <div className="inner three"></div>
                             </div>
-                            <h1 className='text-3xl text-cyan-400 mx-4 mt-4'>
+                            <h1 className='text-xl text-white/70 tracking-[0.2em] uppercase font-light mx-4 mt-4'>
                                 Updating Profile...
                             </h1>
                         </div>
@@ -138,34 +135,29 @@ function Profile() {
                         <ScreenWidePopUp headline={"Are You Sure?"} description={"All your Account Data and History with our Playgrounds will be deleted from our servers. You will not be able to access once you click this Confirmation Button."} color={"red-800"} bgcolor={"red-800/50"} buttonName={"Delete"} buttonAction={setdeleteAccount} triggerCause={setdeleteAccountConfirmation}></ScreenWidePopUp>
                     )
                 }
-                {
-                    alert && (
-                        <MyAlert message={alertMessage} alertHandler={setalert} />
-                    )
-                }
-                <div className="md:w-[60vw] w-[90vw] my-10 border-2 border-cyan-400 rounded-2xl p-6 bg-cyan-400/10 shadow-xl shadow-cyan-400/50">
-                    <div className="text-3xl">My Account</div>
-                    <div className="h-0.5 bg-white/50"></div>
+                <div className="md:w-[60vw] w-[90vw] my-10 border-2 border-white p-8 md:p-12 bg-black">
+                    <div className="text-3xl font-black uppercase tracking-widest mb-4">My Account</div>
+                    <div className="h-0.5 bg-white/20 mb-8"></div>
                     <div className="flex flex-col">
                         <div className="text-xl mt-4 mb-2 opacity-50">
                             Profile Picture
                         </div>
-                        <div className="flex flex-col md:flex-row flex-wrap justify-between items-center gap-6">
-                            <div className="relative w-32 h-32 md:w-[200px] md:h-[200px] flex-shrink-0">
+                        <div className="flex flex-col md:flex-row flex-wrap justify-start items-center md:items-start gap-6">
+                            <div className="relative w-32 h-32 md:w-[200px] md:h-[200px] flex-shrink-0 border-2 border-white bg-white/5">
                                 {Profile_Picture === "/pfp-placeholder-2.svg" ? (
-                                    <CircleUser className="w-full h-full text-white opacity-80" />
+                                    <CircleUser className="w-full h-full text-white opacity-80 p-4" />
                                 ) : (
                                     <Image
                                         src={Profile_Picture}
                                         fill
                                         alt="Profile Picture"
-                                        className="rounded-full border-2 border-white object-cover aspect-square"
+                                        className="rounded-none object-cover aspect-square"
                                     />
                                 )}
                             </div>
-                            <div className='flex flex-row flex-wrap items-center gap-4 justify-center'>
+                            <div className='flex flex-row flex-wrap items-center gap-4 justify-center w-full md:w-auto'>
 
-                                <label className="cursor-pointer">
+                                <label className="cursor-pointer w-full md:w-auto">
                                     <input
                                         id='imageInput'
                                         type="file"
@@ -181,21 +173,18 @@ function Profile() {
                                                     if (formData.get('profile_pic').size > 1 * 1024 * 1024) {
                                                         console.error('File size exceeds 1MB limit');
 
-                                                        setalertMessage("File size exceeds 1MB limit. Please upload a smaller image.");
-                                                        setalert(true);
+                                                        showAlert('Something went wrong. Please try again.');
                                                         return;
                                                     }
                                                     const { publicUrl, error } = await updateImage(formData);
                                                     if (error) {
                                                         if (error == "File size exceeds 1MB limit") {
                                                             console.error('File size exceeds 1MB limit:', error);
-                                                            setalertMessage("File size exceeds 1MB limit. Please upload a smaller image.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                         else {
                                                             console.error('Error updating profile image:', error);
-                                                            setalertMessage("Error updating profile image. Please try again.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                     } else {
                                                         setProfile((prev) => ({
@@ -211,13 +200,7 @@ function Profile() {
                                         }}
                                     />
                                     <button
-                                        className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-cyan-400/10
-                                    border-cyan-400 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-cyan-400/20
-                                    `}
+                                        className={`px-6 py-3 cursor-pointer border-2 bg-black border-white text-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-white hover:text-black w-full md:w-auto flex-1`}
                                         onClick={() => {
                                             imageInputRef.current.click();
                                         }}
@@ -227,26 +210,18 @@ function Profile() {
                                 </label>
 
                                 <button
-                                    className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-red-800/50
-                                    border-red-800 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-red-800/30
-                                `}
+                                    className={`px-6 py-3 cursor-pointer border-2 bg-black text-white border-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-red-600 hover:border-red-600 hover:text-white w-full md:w-auto flex-1`}
                                     onClick={async () => {
                                         try {
                                             if (!profile.profile_pic) {
-                                                setalertMessage("No profile picture to remove.");
-                                                setalert(true);
+                                                showAlert('Something went wrong. Please try again.');
                                                 return;
                                             }
                                             setIsUpdating(true);
                                             const { error } = await removeImage();
                                             if (error) {
                                                 console.error('Error removing profile picture:', error);
-                                                setalertMessage("Error removing profile picture. Please try again.");
-                                                setalert(true);
+                                                showAlert('Something went wrong. Please try again.');
                                             } else {
                                                 setProfile((prev) => ({
                                                     ...prev,
@@ -266,36 +241,28 @@ function Profile() {
                             </div>
                         </div>
 
-                        <div className="text-xl mt-4 mb-2 opacity-50">
+                        <div className="text-lg mt-8 mb-2 text-white/50 tracking-widest uppercase font-bold">
                             Username
                         </div>
-                        <div className="flex flex-row flex-wrap justify-between items-center w-full">
+                        <div className="flex flex-col md:flex-row flex-wrap justify-between items-start md:items-center w-full gap-4">
                             {
                                 changeUsername ? (
                                     <input
                                         id='usernameInput'
                                         ref={usernameRef}
-                                        className="border-b-2 border-white/50 outline-none text-[1.5em]"
+                                        className="border-b-2 border-white/50 outline-none text-2xl bg-transparent py-2 flex-grow min-w-[200px] w-full md:w-auto"
                                         placeholder='Enter your username'
                                         type='text'
                                         defaultValue={profile.username ? (profile.username) : ("")}
                                     />
                                 ) : (
-                                    <div className={`text-[1.5em] overflow-scroll ${profile.username ? "" : "text-red-500 animate-pulse border-2 border-red rounded-2xl px-4"}`}>
+                                    <div className={`text-xl md:text-2xl break-all flex-grow min-w-[200px] w-full md:w-auto ${profile.username ? "" : "text-red-500 animate-pulse border-2 border-red-500 rounded-none p-4"}`}>
                                         {profile.username ? profile.username : "Please Set a Username to continue"}
                                     </div>
                                 )
                             }
                             <button
-                                className={`
-                                    px-4 py-2 mx-2 cursor-pointer border-2
-                                    bg-cyan-400/10
-                                    border-cyan-400 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-cyan-400/20
-                                    flex-shrink-0
-                                    whitespace-nowrap
-                                `}
+                                className={`px-6 py-3 cursor-pointer border-2 bg-black border-white text-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-white hover:text-black flex-shrink-0 w-full md:w-auto`}
                                 onClick={
                                     async () => {
                                         if (changeUsername) { // if previous state was changeUsername = true then this click is for saving operation 
@@ -307,13 +274,11 @@ function Profile() {
                                                     if (error) {
                                                         if (error == "Username already exists") {
                                                             console.error('Username already exists:', error);
-                                                            setalertMessage("Username already exists. Please choose a different username.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                         else {
                                                             console.error('Error updating username:', error);
-                                                            setalertMessage("Error updating username. Please try again.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                     }
                                                     else {
@@ -338,35 +303,28 @@ function Profile() {
                         </div>
 
 
-                        <div className="text-xl mt-4 mb-2 opacity-50">
+                        <div className="text-lg mt-8 mb-2 text-white/50 tracking-widest uppercase font-bold">
                             Full Name
                         </div>
-                        <div className="flex  flex-row flex-wrap justify-between items-center">
+                        <div className="flex flex-col md:flex-row flex-wrap justify-between items-start md:items-center w-full gap-4">
                             {
                                 changeFullName ? (
                                     <input
                                         id='fullNameInput'
                                         ref={fullNameRef}
-                                        className="border-b-2 border-white/50 outline-none text-[1.5em]"
+                                        className="border-b-2 border-white/50 outline-none text-2xl bg-transparent py-2 flex-grow min-w-[200px] w-full md:w-auto"
                                         placeholder='Enter your full name'
                                         type='text'
                                         defaultValue={profile.full_name ? (profile.full_name) : ("")}
                                     />
                                 ) : (
-                                    <div className={`text-[1.5em] overflow-scroll`}>
+                                    <div className={`text-xl md:text-2xl break-words flex-grow min-w-[200px] w-full md:w-auto`}>
                                         {profile.full_name ? profile.full_name : "Not Set"}
                                     </div>
                                 )
                             }
                             <button
-                                className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-cyan-400/10
-                                    border-cyan-400 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-cyan-400/20
-                                    flex-shrink-0
-                                `}
+                                className={`px-6 py-3 cursor-pointer border-2 bg-black border-white text-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-white hover:text-black flex-shrink-0 w-full md:w-auto`}
                                 onClick={
                                     async () => {
                                         if (changeFullName) {
@@ -377,8 +335,7 @@ function Profile() {
                                                     const { error } = await updateFullName(newFullName);
                                                     if (error) {
                                                         console.error('Error updating full name:', error);
-                                                        setalertMessage("Error updating full name. Please try again.");
-                                                        setalert(true);
+                                                        showAlert('Something went wrong. Please try again.');
                                                     }
                                                     else {
                                                         setProfile((prev) => ({
@@ -402,35 +359,28 @@ function Profile() {
                         </div>
 
 
-                        <div className="text-xl mt-4 mb-2 opacity-50">
+                        <div className="text-lg mt-8 mb-2 text-white/50 tracking-widest uppercase font-bold">
                             Email
                         </div>
-                        <div className="flex  flex-row flex-wrap justify-between items-center">
+                        <div className="flex flex-col md:flex-row flex-wrap justify-between items-start md:items-center w-full gap-4">
                             {
                                 changeEmail ? (
                                     <input
                                         id='emailInput'
                                         ref={emailRef}
-                                        className="border-b-2 border-white/50 outline-none text-[1.5  em] w-3/4"
+                                        className="border-b-2 border-white/50 outline-none text-2xl bg-transparent py-2 flex-grow min-w-[200px] w-full md:w-auto"
                                         placeholder='Enter your email'
                                         type='email'
                                         defaultValue={profile.email_id}
                                     />
                                 ) : (
-                                    <div className="text-[1.5em] break-words overflow-scroll">
+                                    <div className="text-xl md:text-2xl break-all flex-grow min-w-[200px] w-full md:w-auto">
                                         {profile.email_id}
                                     </div>
                                 )
                             }
                             <button
-                                className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-cyan-400/10
-                                    border-cyan-400 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-cyan-400/20
-                                    flex-shrink-0
-                                `}
+                                className={`px-6 py-3 cursor-pointer border-2 bg-black border-white text-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-white hover:text-black flex-shrink-0 w-full md:w-auto`}
                                 onClick={
                                     async () => {
                                         if (changeEmail) {
@@ -442,13 +392,11 @@ function Profile() {
                                                     if (error) {
                                                         if (error == "Email already exists") {
                                                             console.error('Email already exists:', error);
-                                                            setalertMessage("Email already exists. Please choose a different email.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                         else {
                                                             console.error('Error updating email:', error);
-                                                            setalertMessage("Error updating email. Please try again.");
-                                                            setalert(true);
+                                                            showAlert('Something went wrong. Please try again.');
                                                         }
                                                     }
                                                     else {
@@ -477,24 +425,18 @@ function Profile() {
                     </div>
                 </div>
 
-                <div className="md:w-[60vw] w-[80vw] my-10 border-2 border-red-800 rounded-2xl p-6 bg-red-800/10 shadow-xl shadow-red-800/50">
-                    <div className="text-3xl">Area-51</div>
-                    <div className="h-0.5 bg-white/50"></div>
+                <div className="md:w-[60vw] w-[90vw] my-10 border-2 border-red-800 p-8 md:p-12 bg-[#050000]">
+                    <div className="text-3xl font-black uppercase tracking-widest mb-4 text-red-500">Danger Zone</div>
+                    <div className="h-0.5 bg-red-500/20 mb-8"></div>
                     <div className="flex flex-col">
 
-                        <div className='flex flex-row flex-wrap items-center justify-between'>
-                            <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
-                                <LogOut size={30} className="text-white" />
-                                <div className="opacity-75 text-xl">Sign out of this session</div>
+                        <div className='flex flex-col md:flex-row flex-wrap items-start md:items-center justify-between gap-4'>
+                            <div className="flex flex-row flex-wrap justify-start gap-4 md:gap-5 items-center my-4">
+                                <LogOut size={30} className="text-red-500 flex-shrink-0" />
+                                <div className="text-white/70 text-lg md:text-xl tracking-wider uppercase font-bold">Sign out of this session</div>
                             </div>
                             <button
-                                className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-red-800/50
-                                    border-red-800 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-red-800/30
-                                `}
+                                className={`px-6 py-3 cursor-pointer border-2 bg-black text-white border-white font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-white hover:text-black w-full md:w-auto`}
                                 onClick={
                                     async () => {
                                         const supabase = createClient_client();
@@ -502,8 +444,7 @@ function Profile() {
 
                                         if (error) {
                                             console.error('Error signing out:', error);
-                                            setalertMessage("Error signing out. Please try again.");
-                                            setalert(true);
+                                            showAlert('Something went wrong. Please try again.');
                                         } else {
                                             // Also delete all cookies
                                             const cookies = document.cookie.split(';');
@@ -523,19 +464,13 @@ function Profile() {
                             </button>
                         </div>
 
-                        <div className='flex flex-row flex-wrap items-center justify-between'>
-                            <div className="flex  flex-row flex-wrap justify-between gap-5 items-center my-4">
-                                <AlertTriangle size={30} className="text-white" />
-                                <div className="opacity-75 text-xl">Delete Your Account</div>
+                        <div className='flex flex-col md:flex-row flex-wrap items-start md:items-center justify-between gap-4 mt-6 pt-6 border-t-2 border-red-500/10'>
+                            <div className="flex flex-row flex-wrap justify-start gap-4 md:gap-5 items-center my-4">
+                                <AlertTriangle size={30} className="text-red-500 flex-shrink-0" />
+                                <div className="text-white/70 text-lg md:text-xl tracking-wider uppercase font-bold">Delete Your Account</div>
                             </div>
                             <button
-                                className={`
-                                    px-4 py-2 cursor-pointer border-2
-                                    bg-red-800/50
-                                    border-red-800 rounded-lg
-                                    transition-all duration-300 ease-in-out
-                                    hover:bg-red-800/30
-                                `}
+                                className={`px-6 py-3 cursor-pointer border-2 bg-black text-red-500 border-red-500 font-bold uppercase tracking-widest transition-colors duration-300 hover:bg-red-600 hover:text-white hover:border-red-600 w-full md:w-auto`}
                                 onClick={() => {
                                     setdeleteAccountConfirmation(true);
                                 }

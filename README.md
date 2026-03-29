@@ -1,4 +1,4 @@
-## BTW this is not mobile friendly for now, so open on desktop
+# Readme needs update
 ## [Under Development]
 
 # Visit this website > [Neura Verse](https://neuraverse37.vercel.app)
